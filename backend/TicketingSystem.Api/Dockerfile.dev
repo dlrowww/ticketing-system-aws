@@ -1,0 +1,18 @@
+FROM mcr.microsoft.com/dotnet/sdk:8.0
+
+WORKDIR /workspace
+
+ENV DOTNET_USE_POLLING_FILE_WATCHER=true \
+    DOTNET_WATCH_RESTART_ON_RUDE_EDIT=true \
+    DOTNET_CLI_TELEMETRY_OPTOUT=true \
+    DOTNET_NOLOGO=true
+
+COPY backend/TicketingSystem.Api/*.csproj ./backend/TicketingSystem.Api/
+RUN dotnet restore ./backend/TicketingSystem.Api/TicketingSystem.Api.csproj
+
+COPY backend/TicketingSystem.Api/ ./backend/TicketingSystem.Api/
+WORKDIR /workspace/backend/TicketingSystem.Api
+
+EXPOSE 8080
+
+CMD ["dotnet", "watch", "run", "--no-launch-profile"]
