@@ -52,7 +52,7 @@ Namespace: ticketing-system
 
 - `frontend/deployment.yaml` 中的前端 ECR 镜像；
 - `api/deployment.yaml` 中的后端 ECR 镜像；
-- `external-secrets.yaml` 中四个 `REPLACE_WITH_*` 远端 Secret 引用；
+- 如果不使用自动化脚本，修改 `external-secrets.yaml` 中四个 `REPLACE_WITH_*` 引用；
 - `ingress.yaml` 中的域名和 ACM ARN；
 - `configmap.yaml` 中的域名、邮件地址。
 
@@ -63,9 +63,17 @@ Namespace: ticketing-system
 先确保 Terraform 已安装 External Secrets Operator，并且 AWS Secrets Manager 的三个
 应用 Secret 已填入值。然后依次部署：
 
+推荐使用仓库脚本自动读取 Terraform outputs、初始化 Secret 值并渲染/应用清单：
+
 ```bash
 kubectl apply -f k8s_deploy/namespace.yaml
-kubectl apply -f k8s_deploy/external-secrets.yaml
+./devops_scripts/bootstrap-secrets.sh
+./devops_scripts/render-external-secrets.sh --apply
+```
+
+如果不用脚本，才需要手动替换 `external-secrets.yaml` 中的占位符。
+
+```bash
 kubectl apply -f k8s_deploy/configmap.yaml
 kubectl apply -f k8s_deploy/api/serviceaccount.yaml
 kubectl apply -f k8s_deploy/api/deployment.yaml
@@ -74,6 +82,9 @@ kubectl apply -f k8s_deploy/frontend/deployment.yaml
 kubectl apply -f k8s_deploy/frontend/service.yaml
 kubectl apply -f k8s_deploy/ingress.yaml
 ```
+
+手动模式才执行 `kubectl apply -f k8s_deploy/external-secrets.yaml`；使用脚本时不要重复
+应用这个占位符版本。
 
 如果只做本地教学且不使用 AWS，可以继续复制 `secret.example.yaml` 到临时文件并手动
 创建 Secret，但不要同时应用手动 Secret 与 ExternalSecret。

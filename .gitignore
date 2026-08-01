@@ -93,3 +93,6 @@ backend/**/.env
 
 # Optional personal files
 # backend/**/Properties/launchSettings.json
+
+# === DEVOPS GENERATED MANIFESTS ===
+devops_scripts/generated/
