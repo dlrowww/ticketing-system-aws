@@ -86,6 +86,8 @@ backend/.nuget/
 
 # Exclude .maildrop email files (keep folder and README.txt)
 backend/**/.maildrop/*.eml
+backend/**/EMAIL-SUMMARY.txt
+backend/**/TEST-DATA-REFERENCE.txt
 
 # App settings (keep base file, ignore env-specific secrets)
 backend/**/appsettings.*.local.json
