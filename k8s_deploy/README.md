@@ -9,6 +9,7 @@
 |---|---|
 | `templates/namespace.yaml` | `namespace.yaml` |
 | `templates/configmap.yaml` | `configmap.yaml` |
+| `templates/external-secrets.yaml` | `external-secrets.yaml` |
 | `templates/frontend/deployment.yaml` | `frontend/deployment.yaml` |
 | `templates/frontend/service.yaml` | `frontend/service.yaml` |
 | `templates/frontend/hpa.yaml` | `frontend/hpa.yaml` |
@@ -22,8 +23,9 @@
 | `templates/tests/*` | `tests/*` |
 | `values.yaml` | 具体值已经写进各 YAML |
 
-`secret.example.yaml` 没有对应的 Helm 模板，因为 Helm Chart 当前要求 Secret 通过
-AWS Secrets Manager 同步或由部署流程提前创建。
+`secret.example.yaml` 是不使用 External Secrets Operator 时的本地/教学备用方案。
+AWS/EKS 部署推荐使用 `external-secrets.yaml`，由 Terraform 安装的 Operator 自动生成
+`ticketing-system-runtime`。
 
 ## 资源关系
 
@@ -40,7 +42,8 @@ Namespace: ticketing-system
 │              Frontend Deployment → Frontend Pod:3000
 │
 ├── ConfigMaps → 非敏感环境变量
-└── Secret → 数据库、JWT、SMTP、管理员凭证
+└── ExternalSecret
+    └── AWS Secrets Manager → ticketing-system-runtime
 ```
 
 ## 先替换示例值
@@ -49,7 +52,7 @@ Namespace: ticketing-system
 
 - `frontend/deployment.yaml` 中的前端 ECR 镜像；
 - `api/deployment.yaml` 中的后端 ECR 镜像；
-- `secret.example.yaml` 中的所有占位值；
+- `external-secrets.yaml` 中四个 `REPLACE_WITH_*` 远端 Secret 引用；
 - `ingress.yaml` 中的域名和 ACM ARN；
 - `configmap.yaml` 中的域名、邮件地址。
 
@@ -57,17 +60,12 @@ Namespace: ticketing-system
 
 ## 基础部署顺序
 
-先复制 Secret 示例到一个不提交 Git 的临时文件并填写真实值：
-
-```bash
-cp k8s_deploy/secret.example.yaml /tmp/ticketing-system-secret.yaml
-```
-
-然后依次部署：
+先确保 Terraform 已安装 External Secrets Operator，并且 AWS Secrets Manager 的三个
+应用 Secret 已填入值。然后依次部署：
 
 ```bash
 kubectl apply -f k8s_deploy/namespace.yaml
-kubectl apply -f /tmp/ticketing-system-secret.yaml
+kubectl apply -f k8s_deploy/external-secrets.yaml
 kubectl apply -f k8s_deploy/configmap.yaml
 kubectl apply -f k8s_deploy/api/serviceaccount.yaml
 kubectl apply -f k8s_deploy/api/deployment.yaml
@@ -76,6 +74,9 @@ kubectl apply -f k8s_deploy/frontend/deployment.yaml
 kubectl apply -f k8s_deploy/frontend/service.yaml
 kubectl apply -f k8s_deploy/ingress.yaml
 ```
+
+如果只做本地教学且不使用 AWS，可以继续复制 `secret.example.yaml` 到临时文件并手动
+创建 Secret，但不要同时应用手动 Secret 与 ExternalSecret。
 
 检查：
 

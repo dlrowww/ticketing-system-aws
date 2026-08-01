@@ -17,6 +17,7 @@ templates/
 ├── _helpers.tpl
 ├── namespace.yaml              # optional; disabled by default
 ├── configmap.yaml              # frontend and API non-secret configuration
+├── external-secrets.yaml       # AWS SecretStore and runtime ExternalSecret
 ├── ingress.yaml
 ├── frontend/
 │   ├── deployment.yaml
@@ -44,8 +45,10 @@ release does not make Helm delete a shared Namespace. Set
 Build and push the two project images to the ECR repositories created by
 Terraform. Override both image repositories and immutable tags.
 
-Create or synchronize a Kubernetes Secret named `ticketing-system-runtime`
-with these keys:
+Terraform installs External Secrets Operator and gives its controller a
+least-privilege IRSA role. This chart creates a namespaced `SecretStore` and an
+`ExternalSecret`, which synchronize a Kubernetes Secret named
+`ticketing-system-runtime` with these keys:
 
 ```text
 connection-string   Required Npgsql connection string
@@ -56,9 +59,14 @@ admin-email         Optional
 admin-password      Optional
 ```
 
-The AWS Secrets Manager resources alone do not automatically become Kubernetes
-environment variables. Use External Secrets/Secrets Store CSI Driver, or create
-the Kubernetes Secret through an approved deployment process.
+Set `externalSecrets.enabled=true` and pass the four remote references from
+Terraform outputs. The RDS-managed JSON fields are rendered into the complete
+Npgsql `connection-string`; the other three JSON secrets use the shapes
+documented in `aws/APPLICATION_INFRASTRUCTURE.md`.
+
+The base values keep External Secrets disabled so the chart can still be used
+for local/manual-secret deployments. `values-prod.yaml` enables it and requires
+all four remote references.
 
 Do not commit real secret values to this repository.
 
@@ -87,7 +95,12 @@ helm template ticketing-system example/ticketing-system \
   --set frontend.image.repository=<frontend-ecr-url> \
   --set frontend.image.tag=<immutable-tag> \
   --set api.image.repository=<backend-ecr-url> \
-  --set api.image.tag=<immutable-tag>
+  --set api.image.tag=<immutable-tag> \
+  --set externalSecrets.enabled=true \
+  --set externalSecrets.remoteRefs.rdsMaster=<terraform-rds-secret-arn> \
+  --set externalSecrets.remoteRefs.jwt=<terraform-jwt-secret-name> \
+  --set externalSecrets.remoteRefs.smtp=<terraform-smtp-secret-name> \
+  --set externalSecrets.remoteRefs.initialAdmin=<terraform-initial-admin-secret-name>
 ```
 
 ## Install
@@ -105,8 +118,26 @@ helm upgrade --install ticketing-system example/ticketing-system \
   --set frontend.image.tag=<immutable-tag> \
   --set api.image.repository=<backend-ecr-url> \
   --set api.image.tag=<immutable-tag> \
+  --set externalSecrets.secretStore.region=<aws-region> \
+  --set externalSecrets.remoteRefs.rdsMaster=<terraform-rds-secret-arn> \
+  --set externalSecrets.remoteRefs.jwt=<terraform-jwt-secret-name> \
+  --set externalSecrets.remoteRefs.smtp=<terraform-smtp-secret-name> \
+  --set externalSecrets.remoteRefs.initialAdmin=<terraform-initial-admin-secret-name> \
   --set ingress.certificateArn=<terraform-acm-certificate-arn>
 ```
+
+After installation, wait for secret synchronization before judging the
+application Pods as failed:
+
+```bash
+kubectl wait --for=condition=Ready externalsecret/ticketing-system-runtime \
+  --namespace ticketing-system \
+  --timeout=120s
+```
+
+When an AWS secret is rotated, ESO updates the Kubernetes Secret on the next
+refresh. Because the Deployments consume it through environment variables,
+perform a rollout restart to load the new values into running Pods.
 
 ## Current scaling constraint
 

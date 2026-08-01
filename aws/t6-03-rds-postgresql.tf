@@ -84,23 +84,3 @@ resource "aws_db_instance" "ticketing" {
   )
 }
 
-output "rds_endpoint" {
-  description = "Private PostgreSQL endpoint in host:port form."
-  value       = aws_db_instance.ticketing.endpoint
-}
-
-output "rds_address" {
-  description = "Private PostgreSQL hostname, without the port."
-  value       = aws_db_instance.ticketing.address
-}
-
-output "rds_database_name" {
-  description = "Initial PostgreSQL database name."
-  value       = aws_db_instance.ticketing.db_name
-}
-
-output "rds_master_user_secret_arn" {
-  description = "ARN of the RDS-managed Secrets Manager secret containing the master database credentials."
-  value       = aws_db_instance.ticketing.master_user_secret[0].secret_arn
-}
-
