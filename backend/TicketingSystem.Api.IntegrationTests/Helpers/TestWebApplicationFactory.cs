@@ -95,6 +95,12 @@ public sealed class TestWebApplicationFactory : WebApplicationFactory<Program>
         }
 
         _databaseCreated = true;
+
+        // Production runs migrations in a dedicated Kubernetes Job. Integration
+        // tests explicitly initialize their isolated database for the same reason.
+        await using var scope = Services.CreateAsyncScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        await db.Database.MigrateAsync();
     }
 
     public override async ValueTask DisposeAsync()
