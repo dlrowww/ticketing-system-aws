@@ -1,0 +1,35 @@
+version: '3.9'
+
+services:
+  api:
+    image: ${DOCKER_USERNAME}/ticketing-backend:latest
+    ports:
+      - "${API_PORT}:8080"
+    env_file:
+      - .env
+    networks:
+      - admin-postgres_default
+      - ticketing
+    volumes:
+      - ${STORAGE_PATH}/maildrop:/app/.maildrop
+
+  frontend:
+    image: ${DOCKER_USERNAME}/ticketing-frontend:latest
+    ports:
+      - "${FRONTEND_PORT}:3000"
+    environment:
+      PUBLIC_API_BASE: ${API_BASE_URL}
+      LOOKUPS_API: http://api:8080
+      PUBLIC_DEFAULT_LOCALE: en-US
+    env_file:
+      - .env
+    networks:
+      - ticketing
+    depends_on:
+      - api
+
+networks:
+  ticketing:
+    driver: overlay
+  admin-postgres_default:
+    external: true

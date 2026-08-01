@@ -1,0 +1,90 @@
+/**
+ * IronPack Brand Colors
+ * Source: https://ironpack.pl/
+ * Extracted: November 30, 2025
+ * 
+ * Usage: Import this file to maintain consistent branding across frontend and email templates
+ */
+
+:root {
+    /* Primary Brand Colors */
+    --ironpack-red: #d92129;
+    --ironpack-red-rgb: 217, 33, 41;
+    --ironpack-red-dark: #c31e25;
+    --ironpack-red-cta: #822a2a;
+
+    --ironpack-gray-dark: #212529;
+    
+    /* Background Colors */
+    --ironpack-bg-dark: #110e0b;
+    --ironpack-bg-dark-transparent: rgba(17, 14, 11, 0);
+    --ironpack-bg-dark-semi: rgba(17, 14, 11, 0.9);
+    --ironpack-bg-light: #221c17;
+    
+    /* Text Colors */
+    --ironpack-font-primary: #9f9580;
+    --ironpack-font-dark: #696150;
+    --ironpack-font-black: #000;
+    --ironpack-white: #fff;
+    
+    /* Accent Colors */
+    --ironpack-hover: #d92129;
+    --ironpack-border: #3e3e3e;
+    --ironpack-border-rgb: 62, 62, 62;
+    
+    /* Gradient Colors */
+    --ironpack-gradient-from: #e1e1e1;
+    --ironpack-gradient-to: #d92129;
+    --ironpack-gradient-hover-from: #d4d4d4;
+    --ironpack-gradient-hover-to: #c31e25;
+    
+    /* Button Colors */
+    --ironpack-button-primary: #e1e1e1;
+    --ironpack-button-hover: #c7c7c7;
+    --ironpack-button-content: #0f172a;
+    
+    /* Focus Colors */
+    --ironpack-focus-primary: #7b7b7b;
+    --ironpack-focus-secondary: #280608;
+    
+    /* Email Template Specific Colors */
+    --email-primary: #d92129; /* IronPack Red */
+    --email-success: #c8e6c9; /* Light Nude Green for Resolved */
+    --email-warning: #ff9800; /* Orange for Priority Escalated */
+    --email-neutral-light: #e1e1e1; /* Light Gray */
+    --email-neutral-dark: #3e3e3e; /* Dark Gray */
+    --email-text-dark: #110e0b; /* Dark text */
+    --email-text-light: #9f9580; /* Light text */
+
+    --ironpack-ticket-trend-color: #495057;  /* gray-700 */
+}
+
+/* Gradient Utilities */
+.ironpack-gradient-primary {
+    background: linear-gradient(135deg, #e1e1e1 0%, #d92129 100%);
+}
+
+.ironpack-gradient-hover {
+    background: linear-gradient(135deg, #d4d4d4 0%, #c31e25 100%);
+}
+
+.ironpack-gradient-dark {
+    background: linear-gradient(135deg, #3e3e3e 0%, #110e0b 100%);
+}
+
+/* Email Template Classes */
+.email-header-primary {
+    background: linear-gradient(135deg, #e1e1e1 0%, #d92129 100%);
+}
+
+.email-header-success {
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+}
+
+.email-header-warning {
+    background: linear-gradient(135deg, #ffe0b2 0%, #ff9800 100%);
+}
+
+.email-header-neutral {
+    background: linear-gradient(135deg, #e1e1e1 0%, #bdbdbd 100%);
+}

@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  # 当前前端镜像在构建时使用了 http://api:8080。
+  name: api
+  namespace: ticketing-system
+  labels:
+    app.kubernetes.io/part-of: ticketing-system
+    app.kubernetes.io/component: api
+  annotations:
+    alb.ingress.kubernetes.io/healthcheck-path: /health
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: ticketing-system-api
+    app.kubernetes.io/component: api
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+      protocol: TCP
+

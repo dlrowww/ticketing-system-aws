@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ticketing-system-api
+  namespace: ticketing-system
+  labels:
+    app.kubernetes.io/name: ticketing-system-api
+    app.kubernetes.io/part-of: ticketing-system
+    app.kubernetes.io/component: api
+spec:
+  # 当前应用启动时会执行 EF Migration，因此暂时保持一个副本。
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ticketing-system-api
+      app.kubernetes.io/component: api
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: ticketing-system-api
+        app.kubernetes.io/part-of: ticketing-system
+        app.kubernetes.io/component: api
+    spec:
+      serviceAccountName: ticketing-api
+      containers:
+        - name: api
+          # 替换为 Terraform 输出的 backend ECR URL 和不可变 tag。
+          image: ticketing-backend:1.0.0
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          envFrom:
+            - configMapRef:
+                name: ticketing-system-api
+          env:
+            - name: ConnectionStrings__DefaultConnection
+              valueFrom:
+                secretKeyRef:
+                  name: ticketing-system-runtime
+                  key: connection-string
+            - name: Jwt__Key
+              valueFrom:
+                secretKeyRef:
+                  name: ticketing-system-runtime
+                  key: jwt-key
+            - name: Email__Username
+              valueFrom:
+                secretKeyRef:
+                  name: ticketing-system-runtime
+                  key: smtp-username
+                  optional: true
+            - name: Email__Password
+              valueFrom:
+                secretKeyRef:
+                  name: ticketing-system-runtime
+                  key: smtp-password
+                  optional: true
+            - name: ADMIN_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: ticketing-system-runtime
+                  key: admin-email
+                  optional: true
+            - name: ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ticketing-system-runtime
+                  key: admin-password
+                  optional: true
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          startupProbe:
+            httpGet:
+              path: /health
+              port: http
+            failureThreshold: 60
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 30
+            failureThreshold: 5
+          resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+

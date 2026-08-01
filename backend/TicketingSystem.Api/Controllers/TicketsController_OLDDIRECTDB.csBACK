@@ -1,0 +1,375 @@
+using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.EntityFrameworkCore;
+using System.Text;
+using System.Net;
+using TicketingSystem.Api.Data;
+using TicketingSystem.Api.Models;
+using TicketingSystem.Api.DTOs.Tickets;
+using TicketingSystem.Api.Services;
+using TicketingSystem.Api.Common;
+
+namespace TicketingSystem.Api.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class TicketsController : ControllerBase
+{
+    private readonly ITicketService _tickets;
+    private readonly IValidator<CreateTicketRequest> _createValidator;
+    private readonly AppDbContext _db;
+    private readonly ITicketAttachmentService _attachments;
+
+    public TicketsController(ITicketService tickets, IValidator<CreateTicketRequest> createValidator, AppDbContext db, ITicketAttachmentService attachments)
+    {
+        _tickets = tickets;
+        _createValidator = createValidator;
+        _db = db;
+        _attachments = attachments;  
+    }
+
+    /// <summary>Create a ticket. Send as multipart/form-data if Files are included.</summary>
+    [HttpPost]
+    [Consumes("multipart/form-data")]
+    [RequestSizeLimit(60L * 1024 * 1024)] // 60 MB request cap (tweak if needed)
+    public async Task<IActionResult> Create([FromForm] CreateTicketRequest req, CancellationToken ct)
+    {
+        var validation = await _createValidator.ValidateAsync(req, ct);
+        if (!validation.IsValid)
+        {
+            // Build ModelState from FluentValidation errors
+            var ms = new ModelStateDictionary();
+            foreach (var err in validation.Errors)
+            {
+                var key = string.IsNullOrWhiteSpace(err.PropertyName) ? string.Empty : err.PropertyName;
+                ms.AddModelError(key, err.ErrorMessage);
+            }
+
+            // Create ValidationProblemDetails with our error code for FE i18n
+            var vpd = ProblemDetailsExtensions.CreateValidationProblem(HttpContext, ms, title: "Validation Failed", code: ErrorCodes.ValidationFailed);
+
+            // Return RFC7807-compliant payload
+            return StatusCode(vpd.Status ?? StatusCodes.Status400BadRequest, vpd);
+        }
+
+        var created = await _tickets.CreateAsync(req, ct);
+        return CreatedAtAction(nameof(GetById), new { id = created.TicketId }, created);
+    }
+
+    /// <summary>Fetch a single ticket.</summary>
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> GetById([FromRoute] int id, CancellationToken ct)
+    {
+        var dto = await _tickets.GetByIdAsync(id, ct);
+        if (dto is null)
+        {
+            throw new AppException(ErrorCodes.TicketNotFound,
+                "Ticket {id} is not found",
+                HttpStatusCode.NotFound);
+        }
+        return Ok(dto);
+    }
+
+    [HttpGet]
+    public async Task<ActionResult<Paged<TicketListItemDto>>> Get(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10,
+        [FromQuery] string? search = null,
+        [FromQuery] byte? status = null,
+        [FromQuery] byte? category = null,
+        [FromQuery] byte? priority = null,
+        [FromQuery] DateOnly? dateFrom = null,
+        [FromQuery] DateOnly? dateTo = null,
+        [FromQuery] string? sortBy = "createdAt",
+        [FromQuery] string? sortDir = "desc",
+        [FromQuery] string? mode = "ef",          // optional: switch implementation
+        CancellationToken ct = default)
+    {
+        var svc = _resolver.Resolve(mode);         // inject ITicketServiceResolver in ctor
+
+        var result = await svc.GetListAsync(new TicketListQuery
+        {
+            Page = new PageRequest { Page = page, Size = pageSize, Sort = $"{(string.Equals(sortDir,"asc",true)?"":"-")}{(sortBy??"createdAt")}" },
+            Search   = search,
+            Status   = status,
+            Category = category,
+            Priority = priority,
+            DateFrom = dateFrom,
+            DateTo   = dateTo,
+            SortBy   = sortBy ?? "createdAt",
+            SortDir  = sortDir ?? "desc"
+        }, ct);
+
+        return Ok(result);
+    }
+
+    [HttpGet]
+    public async Task<ActionResult<Paged<TicketListItemDto>>> Get(
+        // paging
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10,
+        // search & filters
+        [FromQuery] string? search = null,
+        [FromQuery] byte? status = null,
+        [FromQuery] byte? category = null,
+        [FromQuery] byte? priority = null,
+        [FromQuery] DateOnly? dateFrom = null,
+        [FromQuery] DateOnly? dateTo = null,
+        // sorting (camelCase to match FE)
+        [FromQuery] string? sortBy = "createdAt",
+        [FromQuery] string? sortDir = "desc",
+        CancellationToken ct = default
+    )
+    {
+        IQueryable<Ticket> q = _db.Tickets.AsNoTracking();
+
+        // search: id or title keywords
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var term = search.Trim();
+            q = q.Where(t => t.TicketId.ToString().Contains(term) || EF.Functions.ILike(t.Title, $"%{term}%"));
+        }
+
+        // numeric filters (enums are stored as ints)
+        if (status is > 0) q = q.Where(t => (int)t.Status == status);
+        if (category is > 0) q = q.Where(t => (int)t.Category == category);
+        if (priority is > 0) q = q.Where(t => (int)t.Priority == priority);
+
+        // date range on CreatedAt (convert DateOnly to DateTime bounds)
+        if (dateFrom is not null)
+        {
+            var from = dateFrom.Value.ToDateTime(TimeOnly.MinValue).ToUniversalTime();
+            q = q.Where(t => t.CreatedAt >= from);
+        }
+        if (dateTo is not null)
+        {
+            var to = dateTo.Value.ToDateTime(TimeOnly.MinValue).ToUniversalTime();
+            q = q.Where(t => t.CreatedAt <= to);
+        }
+
+        // FE sort field (camelCase) to DTO property (case-insensitive)
+        var sortMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["ticketid"] = "TicketId",
+            ["title"] = "Title",
+            ["category"] = "Category",
+            ["priority"] = "Priority",
+            ["status"] = "Status",
+            ["updatedat"] = "UpdatedAt",
+            ["createdat"] = "CreatedAt"
+        };
+
+        var sortKey = (sortBy ?? "createdAt").Replace("_", "");
+        var dtoSortField = sortMap.TryGetValue(sortKey, out var mapped) ? mapped : "CreatedAt";
+        var sortSpec = SortSpec.Parse(
+            string.Equals(sortDir, "asc", StringComparison.OrdinalIgnoreCase)
+                ? dtoSortField
+                : "-" + dtoSortField
+        );
+        q = q.ApplySort(sortSpec);
+
+        var req = new PageRequest
+        {
+            Page = page,
+            Size = pageSize,
+            Sort = $"{(sortSpec.Direction == SortDirection.Desc ? "-" : "")}{dtoSortField}"
+        };
+        var (skip, take) = req.ToSkipTake();
+        var total = await q.CountAsync(ct);
+
+        var items = await q
+            .Skip(skip).Take(take)
+            .Select(t => new TicketListItemDto(
+                t.TicketId,
+                t.Title,
+                (byte)t.Category,
+                (byte)t.Priority,
+                (byte)t.Status,
+                t.CreatedAt,
+                t.UpdatedAt,
+                _db.Users
+                    .Where(u => u.UserId == t.CreatedById)
+                    .Select(u => u.Name)
+                    .FirstOrDefault(),
+                t.AssignedToId == null
+                    ? null
+                    : _db.Users.Where(u => u.UserId == t.AssignedToId)
+                            .Select(u => u.Name)
+                            .FirstOrDefault()
+            ))
+            .ToListAsync(ct);
+        
+        return Ok(new Paged<TicketListItemDto>(items, total, req));
+
+        // OLD return
+        // return Ok(new PagedResult<TicketListItemDto>(
+        //     paged.Items,
+        //     paged.Total,
+        //     paged.Page,
+        //     paged.Size
+        // ));
+
+        // sorting
+        // var key = (sortBy ?? "createdAt").Replace("_", "").ToLowerInvariant();
+        // var asc = string.Equals(sortDir, "asc", StringComparison.OrdinalIgnoreCase);
+
+        // q = key switch
+        // {
+        //     "ticketid"       => asc ? q.OrderBy(t => t.TicketId)       : q.OrderByDescending(t => t.TicketId),
+        //     "title"          => asc ? q.OrderBy(t => t.Title)          : q.OrderByDescending(t => t.Title),
+        //     "category"       => asc ? q.OrderBy(t => t.Category)       : q.OrderByDescending(t => t.Category),
+        //     "priority"       => asc ? q.OrderBy(t => t.Priority)       : q.OrderByDescending(t => t.Priority),
+        //     "status"         => asc ? q.OrderBy(t => t.Status)         : q.OrderByDescending(t => t.Status),
+        //     "updatedat"      => asc ? q.OrderBy(t => t.UpdatedAt)      : q.OrderByDescending(t => t.UpdatedAt),
+        //     _                => asc ? q.OrderBy(t => t.CreatedAt)      : q.OrderByDescending(t => t.CreatedAt)
+        // };
+
+        // var total = await q.CountAsync();
+
+        // var items = await q
+        //     .Skip((page - 1) * pageSize)
+        //     .Take(pageSize)
+        //     .Select(t => new TicketListItemDto(
+        //         t.TicketId,
+        //         t.Title,
+        //         (byte)t.Category,
+        //         (byte)t.Priority,
+        //         (byte)t.Status,
+        //         t.CreatedAt,
+        //         t.UpdatedAt,
+        //         _db.Users
+        //             .Where(u => u.UserId == t.CreatedById)
+        //             .Select(u => u.Name)
+        //             .FirstOrDefault(),
+        //         t.AssignedToId == null
+        //             ? null
+        //             : _db.Users.Where(u => u.UserId == t.AssignedToId)
+        //                     .Select(u => u.Name)
+        //                     .FirstOrDefault()
+        //     ))
+        //     .ToListAsync();
+
+        // return Ok(new PagedResult<TicketListItemDto>(items, total, page, pageSize));
+    }
+
+    [HttpGet("export")]
+    public async Task<IActionResult> Export(
+        [FromQuery] string? search = null,
+        [FromQuery] byte? status = null,
+        [FromQuery] byte? category = null,
+        [FromQuery] byte? priority = null,
+        [FromQuery] DateOnly? dateFrom = null,
+        [FromQuery] DateOnly? dateTo = null,
+        [FromQuery] string? sortBy = "createdAt",
+        [FromQuery] string? sortDir = "desc"
+    )
+    {
+        // Build the same filtered/sorted query, no paging
+        var q = _db.Tickets.AsNoTracking().AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var term = search.Trim();
+            q = q.Where(t => t.TicketId.ToString().Contains(term) || EF.Functions.ILike(t.Title, $"%{term}%"));
+        }
+        if (status   is > 0) q = q.Where(t => (int)t.Status   == status);
+        if (category is > 0) q = q.Where(t => (int)t.Category == category);
+        if (priority is > 0) q = q.Where(t => (int)t.Priority == priority);
+
+        if (dateFrom is not null)
+        {
+            var from = dateFrom.Value.ToDateTime(TimeOnly.MinValue).ToUniversalTime();
+            // var from = dateFrom.Value.ToDateTime(TimeOnly.MinValue);
+            q = q.Where(t => t.CreatedAt >= from);
+        }
+        if (dateTo is not null)
+        {
+            var to = dateTo.Value.ToDateTime(TimeOnly.MinValue).ToUniversalTime();
+            // var to = dateTo.Value.ToDateTime(TimeOnly.MaxValue);
+            q = q.Where(t => t.CreatedAt <= to);
+        }
+
+        var key = (sortBy ?? "createdAt").Replace("_", "").ToLowerInvariant();
+        var asc = string.Equals(sortDir, "asc", StringComparison.OrdinalIgnoreCase);
+
+        q = key switch
+        {
+            "ticketid"       => asc ? q.OrderBy(t => t.TicketId)       : q.OrderByDescending(t => t.TicketId),
+            "title"          => asc ? q.OrderBy(t => t.Title)          : q.OrderByDescending(t => t.Title),
+            "category"       => asc ? q.OrderBy(t => t.Category)       : q.OrderByDescending(t => t.Category),
+            "priority"       => asc ? q.OrderBy(t => t.Priority)       : q.OrderByDescending(t => t.Priority),
+            "status"         => asc ? q.OrderBy(t => t.Status)         : q.OrderByDescending(t => t.Status),
+            "updatedat"      => asc ? q.OrderBy(t => t.UpdatedAt)      : q.OrderByDescending(t => t.UpdatedAt),
+            _                => asc ? q.OrderBy(t => t.CreatedAt)      : q.OrderByDescending(t => t.CreatedAt)
+        };
+
+        var rows = await q
+            .Select(t => new TicketListItemDto(
+                t.TicketId,
+                t.Title,
+                (byte)t.Category,
+                (byte)t.Priority,
+                (byte)t.Status,
+                t.CreatedAt,
+                t.UpdatedAt,
+                _db.Users
+                    .Where(u => u.UserId == t.CreatedById)
+                    .Select(u => u.Name)
+                    .FirstOrDefault(),
+                t.AssignedToId == null
+                    ? null
+                    : _db.Users.Where(u => u.UserId == t.AssignedToId)
+                            .Select(u => u.Name)
+                            .FirstOrDefault()
+            ))
+            .ToListAsync();
+        var csv = ToCsv(rows);
+        return File(Encoding.UTF8.GetBytes(csv), "text/csv; charset=utf-8", "tickets.csv");
+    }
+
+    [HttpGet("{id:int}/files")]
+    public async Task<ActionResult<IEnumerable<TicketFileDto>>> ListFiles([FromRoute] int id, CancellationToken ct)
+    {
+        var files = await _attachments.ListAsync(id, ct);
+        return Ok(files);
+    }
+
+    [HttpGet("{id:int}/files/{fileId:int}")]
+    public async Task<IActionResult> DownloadFile([FromRoute] int id, [FromRoute] int fileId, CancellationToken ct)
+    {
+        var df = await _attachments.OpenForDownloadAsync(id, fileId, ct);
+        return File(df.Content, df.ContentType, df.OriginalName, enableRangeProcessing: true);
+    }
+
+    // --- mapping & helpers ---
+    private static string ToCsv(IEnumerable<TicketListItemDto> items)
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine("ticketId,title,category,priority,status,createdAt,updatedAt,createdByName,assignedToName");
+        foreach (var t in items)
+        {
+            sb.AppendLine(string.Join(',', new[]
+            {
+                t.TicketId.ToString(),
+                CsvEscape(t.Title),
+                t.Category.ToString(),
+                t.Priority.ToString(),
+                t.Status.ToString(),
+                t.CreatedAt.ToString("O"),
+                t.UpdatedAt?.ToString("O") ?? "",
+                CsvEscape(t.CreatedByName),
+                CsvEscape(t.AssignedToName)
+            }));
+        }
+        return sb.ToString();
+    }
+
+    private static string CsvEscape(string? s)
+    {
+        if (string.IsNullOrEmpty(s)) return "";
+        var needQuotes = s.Contains(',') || s.Contains('"') || s.Contains('\n') || s.Contains('\r');
+        var escaped = s.Replace("\"", "\"\"");
+        return needQuotes ? $"\"{escaped}\"" : escaped;
+    }
+}

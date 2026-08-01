@@ -1,0 +1,12 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: ticketing-system-frontend
+  namespace: ticketing-system
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ticketing-system-frontend
+      app.kubernetes.io/component: frontend
+

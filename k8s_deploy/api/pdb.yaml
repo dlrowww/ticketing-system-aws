@@ -1,0 +1,13 @@
+# 教学对照文件：API 只有一个副本时不建议启用这个 PDB。
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: ticketing-system-api
+  namespace: ticketing-system
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ticketing-system-api
+      app.kubernetes.io/component: api
+

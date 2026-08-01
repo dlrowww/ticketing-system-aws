@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "ticketing-system.frontendName" . }}
+  labels:
+    {{- include "ticketing-system.labels" . | nindent 4 }}
+    app.kubernetes.io/component: frontend
+data:
+  NODE_ENV: production
+  HOST: "0.0.0.0"
+  PORT: {{ .Values.frontend.service.targetPort | quote }}
+  PUBLIC_API_BASE: {{ .Values.frontend.config.publicApiBase | quote }}
+  PUBLIC_DEFAULT_LOCALE: {{ .Values.frontend.config.publicDefaultLocale | quote }}
+  ORIGIN: {{ .Values.frontend.config.origin | quote }}
+  BACKEND_URL: {{ printf "http://%s:%v" (include "ticketing-system.apiServiceName" .) .Values.api.service.port | quote }}
+  LOOKUPS_API: {{ printf "http://%s:%v" (include "ticketing-system.apiServiceName" .) .Values.api.service.port | quote }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "ticketing-system.apiName" . }}
+  labels:
+    {{- include "ticketing-system.labels" . | nindent 4 }}
+    app.kubernetes.io/component: api
+data:
+  ASPNETCORE_ENVIRONMENT: {{ .Values.api.config.aspnetcoreEnvironment | quote }}
+  ASPNETCORE_HTTP_PORTS: {{ .Values.api.service.targetPort | quote }}
+  Jwt__Issuer: {{ .Values.api.config.jwtIssuer | quote }}
+  Jwt__Audience: {{ .Values.api.config.jwtAudience | quote }}
+  Cors__AllowedOrigins__0: {{ .Values.api.config.corsAllowedOrigin | quote }}
+  Email__SmtpHost: {{ .Values.api.config.smtpHost | quote }}
+  Email__SmtpPort: {{ .Values.api.config.smtpPort | quote }}
+  Email__UseSsl: {{ .Values.api.config.smtpUseSsl | quote }}
+  Email__FromAddress: {{ .Values.api.config.emailFromAddress | quote }}
+  Email__FromName: {{ .Values.api.config.emailFromName | quote }}
+  Email__BaseUrl: {{ .Values.api.config.emailBaseUrl | quote }}
+  Email__TemplatesPath: EmailTemplates
+  Email__UsePickupDirectory: "false"
+  SEED_DEMO_DATA: {{ .Values.api.config.seedDemoData | quote }}
+  Backup__Enabled: {{ .Values.api.config.backupEnabled | quote }}

@@ -1,0 +1,36 @@
+# Ignore common development files
+.git
+.gitignore
+.vscode
+.idea
+*.log
+*.md
+*.txt
+
+# Backend specific
+backend/**/bin
+backend/**/obj
+backend/**/.vs
+backend/**/logs
+backend/**/.maildrop
+
+# Frontend specific  
+frontend/node_modules
+frontend/.svelte-kit
+frontend/build
+frontend/dist
+frontend/.env
+frontend/**.log
+
+# Docs and scripts
+docs
+scripts
+backups
+
+# Keep only what's needed for build
+!backend/TicketingSystem.Api
+!frontend
+
+# But exclude build artifacts from those too
+frontend/node_modules
+frontend/.svelte-kit

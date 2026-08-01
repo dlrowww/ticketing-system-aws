@@ -1,0 +1,128 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ticketing-system.apiName" . }}
+  labels:
+    {{- include "ticketing-system.labels" . | nindent 4 }}
+    app.kubernetes.io/component: api
+spec:
+  {{- if not .Values.api.autoscaling.enabled }}
+  replicas: {{ .Values.api.replicaCount }}
+  {{- end }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      {{- include "ticketing-system.apiSelectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- with .Values.api.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "ticketing-system.apiSelectorLabels" . | nindent 8 }}
+        {{- with .Values.api.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      serviceAccountName: {{ include "ticketing-system.apiServiceAccountName" . }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.api.podSecurityContext | nindent 8 }}
+      containers:
+        - name: api
+          image: {{ include "ticketing-system.image" (list . .Values.api.image) | quote }}
+          imagePullPolicy: {{ .Values.api.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.api.securityContext | nindent 12 }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "ticketing-system.apiName" . }}
+          env:
+            - name: ConnectionStrings__DefaultConnection
+              valueFrom:
+                secretKeyRef:
+                  name: {{ required "api.existingSecret is required" .Values.api.existingSecret }}
+                  key: {{ .Values.api.secretKeys.connectionString }}
+            - name: Jwt__Key
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.api.existingSecret }}
+                  key: {{ .Values.api.secretKeys.jwtKey }}
+            - name: Email__Username
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.api.existingSecret }}
+                  key: {{ .Values.api.secretKeys.smtpUsername }}
+                  optional: true
+            - name: Email__Password
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.api.existingSecret }}
+                  key: {{ .Values.api.secretKeys.smtpPassword }}
+                  optional: true
+            - name: ADMIN_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.api.existingSecret }}
+                  key: {{ .Values.api.secretKeys.adminEmail }}
+                  optional: true
+            - name: ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.api.existingSecret }}
+                  key: {{ .Values.api.secretKeys.adminPassword }}
+                  optional: true
+          ports:
+            - name: http
+              containerPort: {{ .Values.api.service.targetPort }}
+              protocol: TCP
+          {{- if .Values.api.probes.startup.enabled }}
+          startupProbe:
+            httpGet:
+              path: {{ .Values.api.probes.startup.path }}
+              port: http
+            failureThreshold: {{ .Values.api.probes.startup.failureThreshold }}
+            periodSeconds: {{ .Values.api.probes.startup.periodSeconds }}
+          {{- end }}
+          {{- if .Values.api.probes.readiness.enabled }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.api.probes.readiness.path }}
+              port: http
+            periodSeconds: {{ .Values.api.probes.readiness.periodSeconds }}
+          {{- end }}
+          {{- if .Values.api.probes.liveness.enabled }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.api.probes.liveness.path }}
+              port: http
+            periodSeconds: {{ .Values.api.probes.liveness.periodSeconds }}
+            failureThreshold: {{ .Values.api.probes.liveness.failureThreshold }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.api.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

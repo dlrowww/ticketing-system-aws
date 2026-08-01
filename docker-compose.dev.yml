@@ -1,0 +1,55 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:16
+    container_name: ticketing-db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: ticketing_system
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d ticketing_system"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ./backend/TicketingSystem.Api
+    container_name: ticketing-api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://0.0.0.0:8080
+      ConnectionStrings__DefaultConnection: Host=db;Port=5432;Database=ticketing_system;Username=admin;Password=admin
+      Email__Password: admin
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "5000:8080"
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: ticketing-frontend
+    working_dir: /app
+    command: >
+      sh -c "pnpm install && pnpm run dev -- --host 0.0.0.0 --port 3000"
+    environment:
+      # Backend address inside Docker network
+      LOOKUPS_API: http://api:8080
+      # What the browser uses as the base path for API calls
+      PUBLIC_API_BASE: /api
+      PUBLIC_DEFAULT_LOCALE: en-US
+    depends_on:
+      - api
+    ports:
+      - "3000:3000"
+
+volumes:
+  postgres-data:

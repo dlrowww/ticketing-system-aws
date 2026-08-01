@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="64" height="64" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style><![CDATA[
+      .dark { stroke:#2B2B2B; fill:none; stroke-width:3.2; stroke-linejoin:round; stroke-linecap:round; }
+      .red  { stroke:#D71920; fill:none; stroke-width:3.2; stroke-linejoin:round; stroke-linecap:round; }
+    ]]></style>
+  </defs>
+
+  <!-- Centered icon with extra padding to avoid clipping -->
+  <g transform="translate(8,14) scale(0.32)">
+    <!-- Cube corner -->
+    <polyline class="red" points="20,30 85,0 150,30" />
+    <polyline class="dark" points="20,30 20,120 85,155 85,65 20,30" />
+    <polyline class="dark" points="150,30 150,120 85,155 85,65 150,30" />
+    <polyline class="dark" opacity="0.35" points="30,44 85,14 140,44" />
+    <line class="dark" opacity="0.35" x1="85" y1="65" x2="85" y2="150" />
+
+    <!-- Ticket -->
+    <g transform="translate(35,42) rotate(-18 75 55)">
+      <path d="
+        M 15 35
+        Q 8 35 8 28
+        L 8 18
+        Q 8 12 15 12
+        L 135 12
+        Q 142 12 142 18
+        L 142 28
+        Q 142 35 135 35
+        Q 125 40 135 50
+        Q 142 50 142 57
+        L 142 67
+        Q 142 73 135 73
+        L 15 73
+        Q 8 73 8 67
+        L 8 57
+        Q 8 50 15 50
+        Q 25 45 15 35
+        Z" fill="white" stroke="#2B2B2B" stroke-width="8" stroke-linejoin="round"/>
+      <path d="M 24 22 L 124 22" stroke="#D71920" stroke-width="8" stroke-linecap="round"/>
+      <rect x="28" y="30" width="38" height="28" rx="3" fill="#2B2B2B"/>
+      <line x1="92" y1="24" x2="92" y2="66" stroke="#2B2B2B" stroke-width="6" stroke-dasharray="8,8"/>
+    </g>
+  </g>
+</svg>

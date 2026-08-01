@@ -1,0 +1,66 @@
+{
+  "TicketStatus": {
+    "New": "Nowe",
+    "Open": "Otwarte",
+    "InProgress": "W trakcie",
+    "Resolved": "Rozwiązane",
+    "Canceled": "Anulowane",
+    "Postponed": "Odroczone",
+    "Returned": "Zwrócone"
+  },
+  "TicketPriority": {
+    "Low": "Niski",
+    "Medium": "Średni",
+    "High": "Wysoki",
+    "Critical": "Krytyczny"
+  },
+  "TicketCategory": {
+    "IT": "IT",
+    "Logistics": "Logistyka",
+    "Administrative": "Administracyjne"
+  },
+  "UserRole": {
+    "Employee": "Pracownik",
+    "Support": "Wsparcie",
+    "TeamLeader": "Lider zespołu",
+    "Admin": "Administrator"
+  },
+  "EmailLabels": {
+    "TicketId": "ID Zgłoszenia",
+    "Title": "Tytuł",
+    "Category": "Kategoria",
+    "Priority": "Priorytet",
+    "Status": "Status",
+    "AssignedTo": "Przypisane do",
+    "CreatedBy": "Utworzone przez",
+    "CreatedAt": "Data utworzenia",
+    "UpdatedAt": "Data aktualizacji",
+    "Description": "Opis",
+    "Comment": "Komentarz",
+    "ViewTicket": "Zobacz zgłoszenie",
+    "DoNotReply": "To jest automatyczna wiadomość. Prosimy nie odpowiadać na ten email.",
+    "CompanyName": "IronPack Sp. z o.o.",
+    "TicketNotificationSystem": "System Zgłoszeń",
+    "Hello": "Witaj",
+    "TicketAssignedSubject": "Nowe zgłoszenie zostało Ci przypisane",
+    "TicketAssignedMessage": "Zostało Ci przypisane nowe zgłoszenie. Szczegóły poniżej:",
+    "TicketReassignedSubject": "Zgłoszenie zostało ponownie przypisane",
+    "TicketReassignedToYouMessage": "Zostało Ci przypisane zgłoszenie. Szczegóły poniżej:",
+    "TicketReassignedFromYouMessage": "Zgłoszenie, które było do Ciebie przypisane, zostało przekazane innemu użytkownikowi.",
+    "TicketStatusChangedSubject": "Status zgłoszenia został zmieniony",
+    "TicketStatusChangedMessage": "Status Twojego zgłoszenia został zmieniony",
+    "OldStatus": "Poprzedni status",
+    "NewStatus": "Nowy status",
+    "CommentAddedSubject": "Dodano nowy komentarz do zgłoszenia",
+    "CommentAddedMessage": "Nowy komentarz został dodany do Twojego zgłoszenia",
+    "CommentBy": "Komentarz od",
+    "PriorityEscalatedSubject": "⚠️ Priorytet zgłoszenia został podwyższony",
+    "PriorityEscalatedMessage": "Priorytet Twojego zgłoszenia został podwyższony. Wymaga to pilnej uwagi.",
+    "OldPriority": "Poprzedni priorytet",
+    "NewPriority": "Nowy priorytet",
+    "TicketResolvedSubject": "✅ Twoje zgłoszenie zostało rozwiązane",
+    "TicketResolvedMessage": "Twoje zgłoszenie zostało rozwiązane",
+    "ResolvedBy": "Rozwiązane przez",
+    "ResolutionTime": "Czas rozwiązania"
+  }
+}

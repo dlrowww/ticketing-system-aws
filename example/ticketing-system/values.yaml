@@ -1,0 +1,169 @@
+global:
+  environment: Production
+  domain: tickets.example.com
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+namespace:
+  # Helm normally receives the namespace through --namespace/--create-namespace.
+  # Enable this only when this release should explicitly manage the Namespace.
+  create: false
+  labels: {}
+  annotations: {}
+
+frontend:
+  replicaCount: 1
+  image:
+    repository: ticketing-frontend
+    tag: ""
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 3000
+  config:
+    publicApiBase: /api
+    publicDefaultLocale: en-US
+    origin: https://tickets.example.com
+  podAnnotations: {}
+  podLabels: {}
+  podSecurityContext: {}
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  probes:
+    startup:
+      enabled: true
+      path: /
+      failureThreshold: 30
+      periodSeconds: 5
+    readiness:
+      enabled: true
+      path: /
+      periodSeconds: 10
+    liveness:
+      enabled: true
+      path: /
+      periodSeconds: 20
+  autoscaling:
+    enabled: false
+    minReplicas: 2
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 70
+  pdb:
+    enabled: false
+    minAvailable: 1
+
+api:
+  # Keep this at 1 while Program.cs performs EF migrations in every API process.
+  # Move migrations to a dedicated one-shot command/Job before scaling the API.
+  replicaCount: 1
+  image:
+    repository: ticketing-backend
+    tag: ""
+    pullPolicy: IfNotPresent
+  service:
+    # Kept as "api" for the current frontend image, which compiles
+    # BACKEND_URL=http://api:8080 through $env/static/private.
+    name: api
+    type: ClusterIP
+    port: 8080
+    targetPort: 8080
+  serviceAccount:
+    create: true
+    name: ticketing-api
+    automount: true
+    annotations: {}
+      # Set to the Terraform api_secrets_irsa_role_arn output when the
+      # application reads AWS Secrets Manager directly.
+      # eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/...
+  config:
+    aspnetcoreEnvironment: Production
+    jwtIssuer: TicketingSystem
+    jwtAudience: TicketingSystemFrontend
+    corsAllowedOrigin: https://tickets.example.com
+    smtpHost: smtp.gmail.com
+    smtpPort: "587"
+    smtpUseSsl: "true"
+    emailFromAddress: noreply@example.com
+    emailFromName: Ticketing System
+    emailBaseUrl: https://tickets.example.com
+    seedDemoData: "false"
+    backupEnabled: "false"
+  existingSecret: ticketing-system-runtime
+  secretKeys:
+    connectionString: connection-string
+    jwtKey: jwt-key
+    smtpUsername: smtp-username
+    smtpPassword: smtp-password
+    adminEmail: admin-email
+    adminPassword: admin-password
+  podAnnotations: {}
+  podLabels: {}
+  podSecurityContext: {}
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+  resources:
+    requests:
+      cpu: 200m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+  probes:
+    # /health currently includes the PostgreSQL readiness check.
+    startup:
+      enabled: true
+      path: /health
+      failureThreshold: 60
+      periodSeconds: 5
+    readiness:
+      enabled: true
+      path: /health
+      periodSeconds: 10
+    liveness:
+      enabled: true
+      path: /health
+      periodSeconds: 30
+      failureThreshold: 5
+  autoscaling:
+    enabled: false
+    minReplicas: 2
+    maxReplicas: 6
+    targetCPUUtilizationPercentage: 70
+  pdb:
+    enabled: false
+    minAvailable: 1
+
+ingress:
+  enabled: true
+  className: alb
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}]'
+  # After ACM is available, set certificateArn and enable HTTPS redirect.
+  certificateArn: ""
+  sslRedirect: true
+  paths:
+    api: /api
+    frontend: /
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+topologySpreadConstraints: []

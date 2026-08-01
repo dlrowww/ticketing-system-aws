@@ -1,0 +1,177 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import './ironpack-colors.css';
+
+.ironpack-login-bg {
+    min-height: 100vh;
+    background: var(--ironpack-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.ironpack-login-card {
+    display: flex;
+    flex-direction: column;
+    min-height: 440px; /* or your chosen size */
+    height: 100%;      /* if you want full container height */
+    justify-content: flex-start;
+
+    max-width: 30em;
+    width: 98vw;
+    margin: 32px auto;
+    background: var(--ironpack-white);
+    border-radius: 1.3rem;
+    box-shadow: 0 8px 36px 0 rgba(var(--ironpack-red-rgb), 0.10);
+    border-top: 5px solid var(--ironpack-red);
+    padding: 2.3rem 2rem 2rem 2rem;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-height: 38rem;
+    transition: min-height 0.18s;
+}
+.login-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+}
+.login-actions {
+  margin-top: auto;
+}
+.login-logo-bar {
+
+/* App-wide IronPack styling (Phase M.9) */
+
+.app-container {
+    color: var(--ironpack-font-black);
+}
+
+.app-container a {
+    color: var(--ironpack-font-black);
+}
+
+.app-container a:hover {
+    color: var(--ironpack-red);
+}
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.2rem;
+}
+.logo {
+    height: 7em;
+    margin-bottom: 0.1rem;
+}
+.login-title {
+    color: var(--ironpack-red);
+    font-weight: 700;
+    font-size: 1.44rem;
+    letter-spacing: 0.5px;
+    margin-bottom: 1.2rem;
+}
+.form-label {
+    color: var(--ironpack-red);
+    font-weight: 500;
+    margin-bottom: 0.3rem;
+}
+.btn-primary {
+    background: var(--ironpack-red) !important;
+    border: none !important;
+    border-color: var(--ironpack-red) !important;
+    font-weight: 600;
+    border-radius: 0.45rem;
+    font-size: 1.08em;
+    transition: background 0.16s;
+}
+.btn-primary:hover, .btn-primary:focus {
+    background: var(--ironpack-red-dark) !important;
+    border-color: var(--ironpack-red-dark) !important;
+}
+.btn-primary:active, .btn-primary:focus-visible {
+    background: var(--ironpack-red-dark) !important;
+    border-color: var(--ironpack-red-dark) !important;
+    box-shadow: 0 0 0 0.15rem rgba(var(--ironpack-red-rgb), 0.4) !important;
+}
+.btn-check:checked+.btn, .btn.active, .btn.show, .btn:first-child:active, :not(.btn-check)+.btn:active {
+    background-color: var(--ironpack-red-dark) !important;
+    border-color: var(--ironpack-red) !important;
+    box-shadow: 0 0 0 0.15rem rgba(var(--ironpack-red-rgb), 0.4) !important;
+}
+.form-control:focus {
+    border-color: var(--ironpack-red);
+    box-shadow: 0 0 0 0.15rem rgba(var(--ironpack-red-rgb), 0.11);
+}
+.login-link a {
+    //color: var(--ironpack-red) !important;
+    color: #6c757d;
+    text-decoration: none;
+}
+.login-link a:hover {
+    //color: var(--ironpack-red-dark) !important;
+    color: #6c757d;
+    text-decoration: underline;
+}
+.lang-select {
+    width: 5.875em;
+    margin-left: auto;
+    // margin-bottom: 0.5rem;
+    // margin-top: -0.5rem;
+}
+.ironpack-select {
+        color: var(--ironpack-font-black);
+        font-weight: 600;
+        border: 1px solid var(--bs-border-color);
+    border-radius: 0.4em;
+    background: #fff;
+    box-shadow: none;
+    padding-left: 0.7em;
+        background-image: var(--bs-form-select-bg-img, none);
+    background-repeat: no-repeat;
+    background-position: right 0.8em center;
+    background-size: 1.1em;
+    padding-right: 2.1em;
+}
+.ironpack-select:focus {
+    border-color: var(--bs-secondary);
+    outline: none;
+    box-shadow: 0 0 0 0.25rem rgba(var(--bs-secondary-rgb), 0.25);
+}
+.text-primary {
+    color: var(--ironpack-red) !important;
+}
+a {
+    &:focus, &:hover {
+        font-weight: bold;
+    }
+}
+
+@media (max-width: 470px) {
+    .ironpack-login-card {
+        margin: 16px 3vw;
+        padding: 1.3rem 0.7rem 1.3rem 0.7rem;
+    }
+}
+
+.form-check-input {
+    &:checked,
+    &:indeterminate {
+        background-color: var(--bs-secondary);
+        border-color: var(--bs-secondary);
+        // Force a visible white mark even if --bs-form-check-bg-image isn't set as expected.
+        --bs-form-check-bg-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e");
+        background-image: var(--bs-form-check-bg-image);
+    }
+
+    &:focus,
+    &:focus-visible {
+        border-color: var(--bs-secondary);
+        box-shadow: 0 0 0 0.25rem rgba(var(--bs-secondary-rgb), 0.25);
+    }
+
+    &:checked:focus,
+    &:indeterminate:focus,
+    &:checked:focus-visible,
+    &:indeterminate:focus-visible {
+        border-color: var(--bs-secondary);
+        box-shadow: 0 0 0 0.25rem rgba(var(--bs-secondary-rgb), 0.25);
+    }
+}

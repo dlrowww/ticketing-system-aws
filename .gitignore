@@ -1,0 +1,95 @@
+# === ROOT ===
+.git/
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.swp
+*.bak
+*.old
+*.orig
+
+# === TERRAFORM ===
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfplan.*
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Keep dependency lock files.
+!**/.terraform.lock.hcl
+
+# === DOCKER ===
+.env
+**/.env
+docker-data/
+**/tmp/
+**/logs/
+**/cache/
+*.pid
+*.sock
+*.db
+
+# Keep Docker build files
+!Dockerfile
+!docker-compose.yml
+!docker-compose.dev.yml
+!.dockerignore
+
+# === FRONTEND (SvelteKit) ===
+frontend/node_modules/
+frontend/.svelte-kit/
+frontend/.vercel/
+frontend/.netlify/
+frontend/.wrangler/
+frontend/build/
+frontend/dist/
+frontend/coverage/
+frontend/.idea/
+frontend/.vscode/
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/vite.config.js.timestamp-*
+frontend/vite.config.ts.timestamp-*
+
+# Env files (keep examples)
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+!frontend/.env.test
+
+# === BACKEND (.NET) ===
+backend/**/bin/
+backend/**/obj/
+backend/**/.vs/
+backend/**/*.user
+backend/**/*.suo
+backend/**/*.cache
+backend/**/*.dbmdl
+backend/**/*.db
+backend/**/*.log
+backend/**/.idea/
+backend/**/.vscode/
+backend/TestResults/
+backend/coverage/
+backend/**/PublishProfiles/
+backend/.nuget/
+
+# Exclude .maildrop email files (keep folder and README.txt)
+backend/**/.maildrop/*.eml
+
+# App settings (keep base file, ignore env-specific secrets)
+backend/**/appsettings.*.local.json
+backend/**/.env
+
+# Optional personal files
+# backend/**/Properties/launchSettings.json

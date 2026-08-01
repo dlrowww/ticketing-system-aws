@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- IronPack Favicon - Minimalist Ticket Icon -->
+  <rect width="64" height="64" fill="#E20714" rx="8"/>
+  <g fill="#FFFFFF">
+    <!-- Ticket stub (left) -->
+    <rect x="14" y="20" width="36" height="24" rx="2"/>
+    <!-- Perforation holes -->
+    <circle cx="32" cy="24" r="1.5" fill="#E20714"/>
+    <circle cx="32" cy="32" r="1.5" fill="#E20714"/>
+    <circle cx="32" cy="40" r="1.5" fill="#E20714"/>
+    <!-- Ticket lines (right side) -->
+    <rect x="38" y="26" width="8" height="2" rx="1" fill="#E20714"/>
+    <rect x="38" y="32" width="8" height="2" rx="1" fill="#E20714"/>
+    <rect x="38" y="38" width="6" height="2" rx="1" fill="#E20714"/>
+  </g>
+</svg>

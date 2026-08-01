@@ -1,0 +1,36 @@
+global:
+  environment: Development
+  domain: tickets-dev.example.com
+
+frontend:
+  replicaCount: 1
+  config:
+    origin: https://tickets-dev.example.com
+  resources:
+    requests:
+      cpu: 50m
+      memory: 96Mi
+    limits:
+      cpu: 250m
+      memory: 256Mi
+
+api:
+  replicaCount: 1
+  config:
+    aspnetcoreEnvironment: Development
+    corsAllowedOrigin: https://tickets-dev.example.com
+    emailBaseUrl: https://tickets-dev.example.com
+  resources:
+    requests:
+      cpu: 100m
+      memory: 192Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+ingress:
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}]'
+

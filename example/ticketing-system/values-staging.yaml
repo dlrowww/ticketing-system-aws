@@ -1,0 +1,28 @@
+global:
+  environment: Staging
+  domain: tickets-staging.example.com
+
+frontend:
+  replicaCount: 1
+  config:
+    origin: https://tickets-staging.example.com
+  pdb:
+    enabled: false
+
+api:
+  # Keep one replica until EF migrations are moved out of API startup.
+  replicaCount: 1
+  config:
+    aspnetcoreEnvironment: Staging
+    corsAllowedOrigin: https://tickets-staging.example.com
+    emailBaseUrl: https://tickets-staging.example.com
+    seedDemoData: "false"
+  pdb:
+    enabled: false
+
+ingress:
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80},{"HTTPS":443}]'
+

@@ -1,0 +1,16 @@
+bin
+obj
+.vscode
+.idea
+.git
+.gitignore
+*.user
+*.suo
+*.swp
+*.tmp
+*.log
+.env
+node_modules
+npm-debug.log
+Dockerfile
+docker-compose.yml

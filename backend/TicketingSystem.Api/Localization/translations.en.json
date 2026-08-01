@@ -1,0 +1,66 @@
+{
+  "TicketStatus": {
+    "New": "New",
+    "Open": "Open",
+    "InProgress": "In Progress",
+    "Resolved": "Resolved",
+    "Canceled": "Canceled",
+    "Postponed": "Postponed",
+    "Returned": "Returned"
+  },
+  "TicketPriority": {
+    "Low": "Low",
+    "Medium": "Medium",
+    "High": "High",
+    "Critical": "Critical"
+  },
+  "TicketCategory": {
+    "IT": "IT",
+    "Logistics": "Logistics",
+    "Administrative": "Administrative"
+  },
+  "UserRole": {
+    "Employee": "Employee",
+    "Support": "Support",
+    "TeamLeader": "Team Leader",
+    "Admin": "Administrator"
+  },
+  "EmailLabels": {
+    "TicketId": "Ticket ID",
+    "Title": "Title",
+    "Category": "Category",
+    "Priority": "Priority",
+    "Status": "Status",
+    "AssignedTo": "Assigned To",
+    "CreatedBy": "Created By",
+    "CreatedAt": "Created At",
+    "UpdatedAt": "Updated At",
+    "Description": "Description",
+    "Comment": "Comment",
+    "ViewTicket": "View Ticket",
+    "DoNotReply": "This is an automated message. Please do not reply to this email.",
+    "CompanyName": "IronPack Sp. z o.o.",
+    "TicketNotificationSystem": "Ticketing System",
+    "Hello": "Hello",
+    "TicketAssignedSubject": "New ticket has been assigned to you",
+    "TicketAssignedMessage": "A new ticket has been assigned to you. Details below:",
+    "TicketReassignedSubject": "Ticket has been reassigned",
+    "TicketReassignedToYouMessage": "A ticket has been assigned to you. Details below:",
+    "TicketReassignedFromYouMessage": "A ticket that was assigned to you has been transferred to another user.",
+    "TicketStatusChangedSubject": "Ticket status has been changed",
+    "TicketStatusChangedMessage": "The status of your ticket has been changed",
+    "OldStatus": "Old Status",
+    "NewStatus": "New Status",
+    "CommentAddedSubject": "New comment added to ticket",
+    "CommentAddedMessage": "A new comment has been added to your ticket",
+    "CommentBy": "Comment by",
+    "PriorityEscalatedSubject": "⚠️ Ticket priority has been escalated",
+    "PriorityEscalatedMessage": "The priority of your ticket has been escalated. This requires urgent attention.",
+    "OldPriority": "Old Priority",
+    "NewPriority": "New Priority",
+    "TicketResolvedSubject": "✅ Your ticket has been resolved",
+    "TicketResolvedMessage": "Your ticket has been resolved",
+    "ResolvedBy": "Resolved By",
+    "ResolutionTime": "Resolution Time"
+  }
+}

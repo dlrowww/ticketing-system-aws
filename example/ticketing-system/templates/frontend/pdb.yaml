@@ -1,0 +1,15 @@
+{{- if .Values.frontend.pdb.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "ticketing-system.frontendName" . }}
+  labels:
+    {{- include "ticketing-system.labels" . | nindent 4 }}
+    app.kubernetes.io/component: frontend
+spec:
+  minAvailable: {{ .Values.frontend.pdb.minAvailable }}
+  selector:
+    matchLabels:
+      {{- include "ticketing-system.frontendSelectorLabels" . | nindent 6 }}
+{{- end }}
+

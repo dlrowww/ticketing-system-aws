@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Status zmieniony / Status Changed</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #110e0b; background-color: #f4f4f4; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 20px auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); overflow: hidden; }
+        .header { background: linear-gradient(135deg, #e1e1e1 0%, #d92129 100%); color: #fff; padding: 20px; text-align: center; }
+        .header img { max-width: 200px; height: auto; margin-bottom: 10px; }
+        .header h1 { margin: 0; font-size: 22px; font-weight: normal; }
+        .icon { width: 20px; height: 20px; vertical-align: middle; margin-right: 8px; }
+        .content { padding: 30px; }
+        .section { margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid #e0e0e0; }
+        .section:last-child { border-bottom: none; }
+        .section h2 { font-size: 16px; color: #d92129; margin: 0 0 10px 0; font-weight: bold; }
+        .section p { margin: 5px 0; }
+        .status-change { background: #fff3cd; padding: 15px; border-left: 4px solid #ffc107; border-radius: 5px; margin: 15px 0; }
+        .status-change .row { margin: 5px 0; }
+        .status-change .label { font-weight: bold; color: #856404; }
+        .ticket-details { background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0; border-left: 4px solid #d92129; }
+        .ticket-details .row { display: table; width: 100%; margin: 8px 0; }
+        .ticket-details .label { display: table-cell; font-weight: bold; width: 40%; padding-right: 10px; color: #696150; }
+        .ticket-details .value { display: table-cell; color: #212529; }
+        .button { display: inline-block; padding: 12px 30px; background: linear-gradient(135deg, #e1e1e1 0%, #d92129 100%); color: #fff !important; text-decoration: none; border-radius: 5px; margin: 20px 0; font-weight: bold; }
+        .button:hover { background: linear-gradient(135deg, #d4d4d4 0%, #c31e25 100%); }
+        .footer { background: linear-gradient(135deg, #3e3e3e 0%, #110e0b 100%); padding: 20px; text-align: center; color: #9f9580; font-size: 12px; color: #d92129; border-top: 1px solid #e0e0e0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="cid:ironpack-logo" alt="IronPack Logo" />
+            <h1>System Zgłoszeń / Ticketing System</h1>
+        </div>
+        
+        <div class="content">
+            <!-- Polish Section -->
+            <div class="section">
+                <h2><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='%23d92129' viewBox='0 0 16 16'%3E%3Cpath d='M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m7.5-6.923c-.67.204-1.335.82-1.887 1.855A8 8 0 0 0 5.145 4H7.5zM4.09 4a9.3 9.3 0 0 1 .64-1.539 7 7 0 0 1 .597-.933A7.03 7.03 0 0 0 2.255 4zm-.582 3.5c.03-.877.138-1.718.312-2.5H1.674a7 7 0 0 0-.656 2.5zM4.847 5a12.5 12.5 0 0 0-.338 2.5H7.5V5zM8.5 5v2.5h2.99a12.5 12.5 0 0 0-.337-2.5zM4.51 8.5a12.5 12.5 0 0 0 .337 2.5H7.5V8.5zm3.99 0V11h2.653c.187-.765.306-1.608.338-2.5zM5.145 12q.208.58.468 1.068c.552 1.035 1.218 1.65 1.887 1.855V12zm.182 2.472a7 7 0 0 1-.597-.933A9.3 9.3 0 0 1 4.09 12H2.255a7 7 0 0 0 3.072 2.472M3.82 11a13.7 13.7 0 0 1-.312-2.5h-2.49c.062.89.291 1.733.656 2.5zm6.853 3.472A7 7 0 0 0 13.745 12H11.91a9.3 9.3 0 0 1-.64 1.539 7 7 0 0 1-.597.933M8.5 12v2.923c.67-.204 1.335-.82 1.887-1.855q.26-.487.468-1.068zm3.68-1h2.146c.365-.767.594-1.61.656-2.5h-2.49a13.7 13.7 0 0 1-.312 2.5m2.802-3.5a7 7 0 0 0-.656-2.5H12.18c.174.782.282 1.623.312 2.5zM11.27 2.461c.247.464.462.98.64 1.539h1.835a7 7 0 0 0-3.072-2.472c.218.284.418.598.597.933M10.855 4a8 8 0 0 0-.468-1.068C9.835 1.897 9.17 1.282 8.5 1.077V4z'/%3E%3C/svg%3E" alt="[PL]" class="icon" />POLSKI</h2>
+                <p>Status Twojego zgłoszenia został zmieniony.</p>
+            </div>
+
+            <!-- English Section -->
+            <div class="section">
+                <h2><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='%23d92129' viewBox='0 0 16 16'%3E%3Cpath d='M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m7.5-6.923c-.67.204-1.335.82-1.887 1.855A8 8 0 0 0 5.145 4H7.5zM4.09 4a9.3 9.3 0 0 1 .64-1.539 7 7 0 0 1 .597-.933A7.03 7.03 0 0 0 2.255 4zm-.582 3.5c.03-.877.138-1.718.312-2.5H1.674a7 7 0 0 0-.656 2.5zM4.847 5a12.5 12.5 0 0 0-.338 2.5H7.5V5zM8.5 5v2.5h2.99a12.5 12.5 0 0 0-.337-2.5zM4.51 8.5a12.5 12.5 0 0 0 .337 2.5H7.5V8.5zm3.99 0V11h2.653c.187-.765.306-1.608.338-2.5zM5.145 12q.208.58.468 1.068c.552 1.035 1.218 1.65 1.887 1.855V12zm.182 2.472a7 7 0 0 1-.597-.933A9.3 9.3 0 0 1 4.09 12H2.255a7 7 0 0 0 3.072 2.472M3.82 11a13.7 13.7 0 0 1-.312-2.5h-2.49c.062.89.291 1.733.656 2.5zm6.853 3.472A7 7 0 0 0 13.745 12H11.91a9.3 9.3 0 0 1-.64 1.539 7 7 0 0 1-.597.933M8.5 12v2.923c.67-.204 1.335-.82 1.887-1.855q.26-.487.468-1.068zm3.68-1h2.146c.365-.767.594-1.61.656-2.5h-2.49a13.7 13.7 0 0 1-.312 2.5m2.802-3.5a7 7 0 0 0-.656-2.5H12.18c.174.782.282 1.623.312 2.5zM11.27 2.461c.247.464.462.98.64 1.539h1.835a7 7 0 0 0-3.072-2.472c.218.284.418.598.597.933M10.855 4a8 8 0 0 0-.468-1.068C9.835 1.897 9.17 1.282 8.5 1.077V4z'/%3E%3C/svg%3E" alt="[EN]" class="icon" />ENGLISH</h2>
+                <p>The status of your ticket has been changed.</p>
+            </div>
+
+            <!-- Status Change -->
+            <div class="status-change">
+                <div class="row">
+                    <span class="label">Poprzedni status / Old Status:</span> {{OldStatus}}
+                </div>
+                <div class="row">
+                    <span class="label">Nowy status / New Status:</span> {{NewStatus}}
+                </div>
+            </div>
+
+            <!-- Ticket Details (Bilingual) -->
+            <div class="ticket-details">
+                <div class="row">
+                    <div class="label">ID Zgłoszenia / Ticket ID:</div>
+                    <div class="value">#{{TicketId}}</div>
+                </div>
+                <div class="row">
+                    <div class="label">Tytuł / Title:</div>
+                    <div class="value">{{Title}}</div>
+                </div>
+                <div class="row">
+                    <div class="label">Kategoria / Category:</div>
+                    <div class="value">{{Category}}</div>
+                </div>
+                <div class="row">
+                    <div class="label">Priorytet / Priority:</div>
+                    <div class="value">{{Priority}}</div>
+                </div>
+            </div>
+
+            <!-- Call to Action -->
+            <center>
+                <a href="{{TicketUrl}}" class="button">Zobacz zgłoszenie / View Ticket</a>
+            </center>
+        </div>
+
+        <div class="footer">
+            <p><strong>IronPack Sp. z o.o.</strong></p>
+            <p>To jest automatyczna wiadomość. Prosimy nie odpowiadać na ten email.<br>
+            This is an automated message. Please do not reply to this email.</p>
+        </div>
+    </div>
+</body>
+</html>

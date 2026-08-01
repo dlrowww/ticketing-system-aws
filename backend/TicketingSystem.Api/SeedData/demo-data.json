@@ -1,0 +1,432 @@
+{
+  "metadata": {
+    "description": "Demo seed dataset with 25 tickets for testing",
+    "ticketCount": 25,
+    "userCount": 8,
+    "categoryCount": 3,
+    "expectedCounts": {
+      "byStatus": {
+        "New": 5,
+        "Open": 4,
+        "InProcess": 6,
+        "Resolved": 7,
+        "Cancelled": 1,
+        "Postponed": 1,
+        "Returned": 1
+      },
+      "byPriority": {
+        "Low": 6,
+        "Medium": 10,
+        "High": 6,
+        "Critical": 3
+      },
+      "byCategory": {
+        "IT": 10,
+        "Logistics": 8,
+        "Administration": 7
+      },
+      "last7Days": 18,
+      "last30Days": 24,
+      "last90Days": 25,
+      "withComments": 17,
+      "withAttachments": 7
+    }
+  },
+  "categories": [
+    { "categoryId": 1, "namePl": "IT", "nameEn": "IT", "isActive": true },
+    { "categoryId": 2, "namePl": "Logistyka", "nameEn": "Logistics", "isActive": true },
+    { "categoryId": 3, "namePl": "Administracja", "nameEn": "Administration", "isActive": true }
+  ],
+  "users": [
+    { "name": "Michael Johnson", "email": "michael.johnson@ironpack.pl", "role": "TeamLeader", "category": "IT" },
+    { "name": "David Smith", "email": "david.smith@ironpack.pl", "role": "Support", "category": "IT" },
+    { "name": "Sarah Mitchell", "email": "sarah.mitchell@ironpack.pl", "role": "Support", "category": "Logistics" },
+    { "name": "James Wilson", "email": "james.wilson@ironpack.pl", "role": "TeamLeader", "category": "Logistics" },
+    { "name": "Emily Davis", "email": "emily.davis@ironpack.pl", "role": "TeamLeader", "category": "Administration" },
+    { "name": "Robert Brown", "email": "robert.brown@ironpack.pl", "role": "Support", "category": "Administration" },
+    { "name": "Lisa Anderson", "email": "lisa.anderson@ironpack.pl", "role": "Employee", "category": null },
+    { "name": "Tom Harris", "email": "tom.harris@ironpack.pl", "role": "Employee", "category": null }
+  ],
+  "tickets": [
+    {
+      "title": "Production server experiencing high CPU usage",
+      "description": "Main production server (SRV-PROD-01) showing 90%+ CPU usage constantly. Database queries are slow, API response times degraded. Customer orders timing out. Need urgent investigation.",
+      "category": "IT",
+      "priority": "Critical",
+      "status": "Resolved",
+      "createdDaysAgo": 45,
+      "resolvedDaysAgo": 43,
+      "creatorEmail": "lisa.anderson@ironpack.pl",
+      "assigneeEmail": "david.smith@ironpack.pl",
+      "attachments": ["1-PNG.png", "2-PDF.pdf"],
+      "comments": [
+        { "content": "Checking server logs and performance metrics now.", "isInternal": false, "authorEmail": "david.smith@ironpack.pl", "daysAgoFromCreation": 0 },
+        { "content": "Found memory leak in caching module. Deploying hotfix.", "isInternal": true, "authorEmail": "david.smith@ironpack.pl", "daysAgoFromCreation": 1 },
+        { "content": "Hotfix deployed. Monitoring for 24h.", "isInternal": false, "authorEmail": "david.smith@ironpack.pl", "daysAgoFromCreation": 1 },
+        { "content": "Confirmed stable. Closing ticket.", "isInternal": false, "authorEmail": "david.smith@ironpack.pl", "daysAgoFromCreation": 2 }
+      ]
+    },
+    {
+      "title": "Laptop keyboard not responding",
+      "description": "Dell Latitude laptop keyboard stopped working after Windows update. External USB keyboard works fine. User needs laptop for client presentation tomorrow.",
+      "category": "IT",
+      "priority": "High",
+      "status": "Resolved",
+      "createdDaysAgo": 30,
+      "resolvedDaysAgo": 30,
+      "creatorEmail": "lisa.anderson@ironpack.pl",
+      "assigneeEmail": "michael.johnson@ironpack.pl",
+      "attachments": [],
+      "comments": [
+        { "content": "Rolled back Windows update. Testing now.", "isInternal": false, "authorEmail": "michael.johnson@ironpack.pl", "daysAgoFromCreation": 0 }
+      ]
+    },
+    {
+      "title": "Wi-Fi connection drops frequently in Building A",
+      "description": "Multiple employees in Building A reporting intermittent Wi-Fi disconnects. Affecting productivity and video calls. Issue started yesterday morning.",
+      "category": "IT",
+      "priority": "Medium",
+      "status": "InProcess",
+      "createdDaysAgo": 5,
+      "resolvedDaysAgo": null,
+      "creatorEmail": "lisa.anderson@ironpack.pl",
+      "assigneeEmail": "david.smith@ironpack.pl",
+      "attachments": ["3-JPG.jpg"],
+      "comments": [
+        { "content": "Checking access point firmware and signal strength.", "isInternal": false, "authorEmail": "david.smith@ironpack.pl", "daysAgoFromCreation": 1 },
+        { "content": "Found interference from neighboring building. Changing channel.", "isInternal": true, "authorEmail": "david.smith@ironpack.pl", "daysAgoFromCreation": 3 }
+      ]
+    },
+    {
+      "title": "Email client crashes on startup",
+      "description": "Outlook crashes immediately after launching. Error message: \"Cannot start Microsoft Outlook.\" User tried restarting computer - no change.",
+      "category": "IT",
+      "priority": "Medium",
+      "status": "Open",
+      "createdDaysAgo": 3,
+      "resolvedDaysAgo": null,
+      "creatorEmail": "lisa.anderson@ironpack.pl",
+      "assigneeEmail": "david.smith@ironpack.pl",
+      "attachments": ["4.zip"],
+      "comments": []
+    },
+    {
+      "title": "VPN connection timeout errors",
+      "description": "Remote worker unable to connect to company VPN. Timeout error after authentication. Blocking access to file shares and internal systems.",
+      "category": "IT",
+      "priority": "High",
+      "status": "InProcess",
+      "createdDaysAgo": 7,
+      "resolvedDaysAgo": null,
+      "creatorEmail": "lisa.anderson@ironpack.pl",
+      "assigneeEmail": "michael.johnson@ironpack.pl",
+      "attachments": ["5-PNG.png"],
+      "comments": [
+        { "content": "Resetting VPN credentials. Please try again in 10 minutes.", "isInternal": false, "authorEmail": "michael.johnson@ironpack.pl", "daysAgoFromCreation": 2 },
+        { "content": "User still having issues. Escalating to network team.", "isInternal": true, "authorEmail": "michael.johnson@ironpack.pl", "daysAgoFromCreation": 4 }
+      ]
+    },
+    {
+      "title": "Printer not responding (Floor 2)",
+      "description": "HP LaserJet on floor 2 showing offline status. Power cycled - still not working. Multiple users need to print documents urgently.",
+      "category": "IT",
+      "priority": "Low",
+      "status": "New",
+      "createdDaysAgo": 2,
+      "resolvedDaysAgo": null,
+      "creatorEmail": "tom.harris@ironpack.pl",
+      "assigneeEmail": null,
+      "attachments": [],
+      "comments": []
+    },
+    {
+      "title": "Database queries running slow on production",
+      "description": "Customer reports timing out when loading order history. Database response times >10 seconds. Needs immediate attention to prevent customer complaints.",
+      "category": "IT",
+      "priority": "Critical",
+      "status": "InProcess",
+      "createdDaysAgo": 10,
+      "resolvedDaysAgo": null,
+      "creatorEmail": "lisa.anderson@ironpack.pl",
+      "assigneeEmail": "david.smith@ironpack.pl",
+      "attachments": ["1-PNG.png", "2-PDF.pdf"],
+      "comments": [
+        { "content": "Running database diagnostics and query optimization.", "isInternal": false, "authorEmail": "david.smith@ironpack.pl", "daysAgoFromCreation": 1 },
+        { "content": "Found missing index on Orders table. Adding index now.", "isInternal": true, "authorEmail": "david.smith@ironpack.pl", "daysAgoFromCreation": 3 },
+        { "content": "Index added. Performance improved but still monitoring.", "isInternal": false, "authorEmail": "david.smith@ironpack.pl", "daysAgoFromCreation": 5 }
+      ]
+    },
+    {
+      "title": "Antivirus update failed on multiple computers",
+      "description": "Security scan shows 15 computers failed to receive latest antivirus definitions. Update server may be down. Need to ensure all systems protected.",
+      "category": "IT",
+      "priority": "Medium",
+      "status": "Open",
+      "createdDaysAgo": 4,
+      "resolvedDaysAgo": null,
+      "creatorEmail": "tom.harris@ironpack.pl",
+      "assigneeEmail": "david.smith@ironpack.pl",
+      "attachments": [],
+      "comments": [
+        { "content": "Checking update server status and network connectivity.", "isInternal": false, "authorEmail": "david.smith@ironpack.pl", "daysAgoFromCreation": 1 }
+      ]
+    },
+    {
+      "title": "File server access denied error",
+      "description": "User getting 'Access Denied' when trying to open shared drive. Permissions seem correct in Active Directory. Other users can access same folder.",
+      "category": "IT",
+      "priority": "Low",
+      "status": "Cancelled",
+      "createdDaysAgo": 20,
+      "resolvedDaysAgo": null,
+      "creatorEmail": "lisa.anderson@ironpack.pl",
+      "assigneeEmail": "michael.johnson@ironpack.pl",
+      "attachments": [],
+      "comments": [
+        { "content": "User found alternate solution. No longer needed.", "isInternal": false, "authorEmail": "lisa.anderson@ironpack.pl", "daysAgoFromCreation": 1 }
+      ]
+    },
+    {
+      "title": "Backup job failing - Critical data at risk",
+      "description": "Nightly backup job failed for 2 consecutive nights. Database backups not completing. Production data at risk if hardware failure occurs.",
+      "category": "IT",
+      "priority": "High",
+      "status": "New",
+      "createdDaysAgo": 1,
+      "resolvedDaysAgo": null,
+      "creatorEmail": "lisa.anderson@ironpack.pl",
+      "assigneeEmail": null,
+      "attachments": [],
+      "comments": []
+    },
+    {
+      "title": "Warehouse shipment delayed - customer impact",
+      "description": "Customer order #12345 stuck in warehouse for 3 days. Shipment not processed. Customer calling daily for updates. Urgent resolution needed.",
+      "category": "Logistics",
+      "priority": "High",
+      "status": "Resolved",
+      "createdDaysAgo": 25,
+      "resolvedDaysAgo": 23,
+      "creatorEmail": "lisa.anderson@ironpack.pl",
+      "assigneeEmail": "james.wilson@ironpack.pl",
+      "attachments": [],
+      "comments": [
+        { "content": "Found missing paperwork. Processing shipment now.", "isInternal": false, "authorEmail": "james.wilson@ironpack.pl", "daysAgoFromCreation": 1 },
+        { "content": "Shipment completed. Customer notified.", "isInternal": false, "authorEmail": "james.wilson@ironpack.pl", "daysAgoFromCreation": 2 }
+      ]
+    },
+    {
+      "title": "Forklift maintenance required",
+      "description": "Forklift #3 making unusual noise and hydraulics responding slowly. Safety concern. Need maintenance check before continued use.",
+      "category": "Logistics",
+      "priority": "Medium",
+      "status": "InProcess",
+      "createdDaysAgo": 6,
+      "resolvedDaysAgo": null,
+      "creatorEmail": "tom.harris@ironpack.pl",
+      "assigneeEmail": "sarah.mitchell@ironpack.pl",
+      "attachments": ["3-JPG.jpg"],
+      "comments": [
+        { "content": "Scheduled maintenance technician for tomorrow morning.", "isInternal": false, "authorEmail": "sarah.mitchell@ironpack.pl", "daysAgoFromCreation": 2 }
+      ]
+    },
+    {
+      "title": "Inventory discrepancy in Zone C",
+      "description": "Physical count in Zone C shows 50 units missing from system records. Need to investigate and reconcile inventory. May affect customer orders.",
+      "category": "Logistics",
+      "priority": "High",
+      "status": "Open",
+      "createdDaysAgo": 4,
+      "resolvedDaysAgo": null,
+      "creatorEmail": "lisa.anderson@ironpack.pl",
+      "assigneeEmail": "james.wilson@ironpack.pl",
+      "attachments": [],
+      "comments": [
+        { "content": "Starting full recount of Zone C inventory.", "isInternal": false, "authorEmail": "james.wilson@ironpack.pl", "daysAgoFromCreation": 1 },
+        { "content": "Found data entry error from last week. Correcting now.", "isInternal": true, "authorEmail": "james.wilson@ironpack.pl", "daysAgoFromCreation": 2 }
+      ]
+    },
+    {
+      "title": "Loading dock light broken",
+      "description": "Main loading dock light not working. Safety hazard during early morning/evening shifts. Workers using flashlights temporarily.",
+      "category": "Logistics",
+      "priority": "Low",
+      "status": "New",
+      "createdDaysAgo": 3,
+      "resolvedDaysAgo": null,
+      "creatorEmail": "tom.harris@ironpack.pl",
+      "assigneeEmail": null,
+      "attachments": [],
+      "comments": []
+    },
+    {
+      "title": "Missing delivery paperwork",
+      "description": "Delivery completed but driver didn't return signed POD (Proof of Delivery). Customer disputing delivery. Need to locate paperwork urgently.",
+      "category": "Logistics",
+      "priority": "Medium",
+      "status": "Resolved",
+      "createdDaysAgo": 15,
+      "resolvedDaysAgo": 12,
+      "creatorEmail": "lisa.anderson@ironpack.pl",
+      "assigneeEmail": "sarah.mitchell@ironpack.pl",
+      "attachments": ["2-PDF.pdf"],
+      "comments": [
+        { "content": "Contacted driver. POD was misplaced in truck.", "isInternal": false, "authorEmail": "sarah.mitchell@ironpack.pl", "daysAgoFromCreation": 1 },
+        { "content": "Retrieved signed POD. Sending to customer now.", "isInternal": false, "authorEmail": "sarah.mitchell@ironpack.pl", "daysAgoFromCreation": 2 },
+        { "content": "Customer confirmed receipt. Case closed.", "isInternal": false, "authorEmail": "sarah.mitchell@ironpack.pl", "daysAgoFromCreation": 3 }
+      ]
+    },
+    {
+      "title": "Packaging materials shortage",
+      "description": "Running low on bubble wrap and cardboard boxes. Current stock will last only 2 more days. Need urgent reorder to avoid shipping delays.",
+      "category": "Logistics",
+      "priority": "High",
+      "status": "InProcess",
+      "createdDaysAgo": 8,
+      "resolvedDaysAgo": null,
+      "creatorEmail": "lisa.anderson@ironpack.pl",
+      "assigneeEmail": "james.wilson@ironpack.pl",
+      "attachments": [],
+      "comments": [
+        { "content": "Placed rush order with supplier. Expected delivery in 3 days.", "isInternal": false, "authorEmail": "james.wilson@ironpack.pl", "daysAgoFromCreation": 1 },
+        { "content": "Using alternative packaging temporarily to keep operations running.", "isInternal": true, "authorEmail": "james.wilson@ironpack.pl", "daysAgoFromCreation": 3 }
+      ]
+    },
+    {
+      "title": "Delivery truck GPS malfunction",
+      "description": "Truck #7 GPS tracker offline for 2 days. Cannot track real-time location. Driver manually calling in updates. System needs repair.",
+      "category": "Logistics",
+      "priority": "Medium",
+      "status": "Postponed",
+      "createdDaysAgo": 12,
+      "resolvedDaysAgo": null,
+      "creatorEmail": "tom.harris@ironpack.pl",
+      "assigneeEmail": "sarah.mitchell@ironpack.pl",
+      "attachments": [],
+      "comments": [
+        { "content": "GPS vendor scheduled service appointment for next week.", "isInternal": false, "authorEmail": "sarah.mitchell@ironpack.pl", "daysAgoFromCreation": 5 }
+      ]
+    },
+    {
+      "title": "Pallet jack damaged - replacement needed",
+      "description": "Electric pallet jack wheels damaged. Cannot lift pallets properly. Warehouse productivity affected. Need replacement or repair urgently.",
+      "category": "Logistics",
+      "priority": "Medium",
+      "status": "New",
+      "createdDaysAgo": 2,
+      "resolvedDaysAgo": null,
+      "creatorEmail": "lisa.anderson@ironpack.pl",
+      "assigneeEmail": null,
+      "attachments": [],
+      "comments": []
+    },
+    {
+      "title": "Office supplies order needed",
+      "description": "Running low on printer paper, pens, and sticky notes. Multiple departments requesting supplies. Need bulk order placed this week.",
+      "category": "Administration",
+      "priority": "Low",
+      "status": "Resolved",
+      "createdDaysAgo": 20,
+      "resolvedDaysAgo": 18,
+      "creatorEmail": "lisa.anderson@ironpack.pl",
+      "assigneeEmail": "robert.brown@ironpack.pl",
+      "attachments": [],
+      "comments": [
+        { "content": "Order placed with supplier. Expected delivery in 3 days.", "isInternal": false, "authorEmail": "robert.brown@ironpack.pl", "daysAgoFromCreation": 2 }
+      ]
+    },
+    {
+      "title": "Access card not working at main entrance",
+      "description": "Employee access card not opening main entrance door. Badge reader beeps but door doesn't unlock. Other doors work fine with same card.",
+      "category": "Administration",
+      "priority": "Medium",
+      "status": "Open",
+      "createdDaysAgo": 5,
+      "resolvedDaysAgo": null,
+      "creatorEmail": "tom.harris@ironpack.pl",
+      "assigneeEmail": "robert.brown@ironpack.pl",
+      "attachments": [],
+      "comments": [
+        { "content": "Testing card reader and checking access permissions in system.", "isInternal": false, "authorEmail": "robert.brown@ironpack.pl", "daysAgoFromCreation": 2 }
+      ]
+    },
+    {
+      "title": "Conference room booking system error",
+      "description": "Meeting room booking system showing double-bookings for Room 301. Two teams scheduled for same time slot. Need to fix calendar integration.",
+      "category": "Administration",
+      "priority": "Low",
+      "status": "Resolved",
+      "createdDaysAgo": 18,
+      "resolvedDaysAgo": 16,
+      "creatorEmail": "lisa.anderson@ironpack.pl",
+      "assigneeEmail": "emily.davis@ironpack.pl",
+      "attachments": [],
+      "comments": [
+        { "content": "Found sync issue with calendar. Reset booking system.", "isInternal": false, "authorEmail": "emily.davis@ironpack.pl", "daysAgoFromCreation": 1 },
+        { "content": "System working correctly now. Monitoring for 48 hours.", "isInternal": false, "authorEmail": "emily.davis@ironpack.pl", "daysAgoFromCreation": 2 }
+      ]
+    },
+    {
+      "title": "HVAC temperature too cold in office area",
+      "description": "Office temperature 16°C - too cold for comfortable work. Multiple employees complaining. Thermostat set to 21°C but not working correctly.",
+      "category": "Administration",
+      "priority": "Medium",
+      "status": "InProcess",
+      "createdDaysAgo": 7,
+      "resolvedDaysAgo": null,
+      "creatorEmail": "tom.harris@ironpack.pl",
+      "assigneeEmail": "robert.brown@ironpack.pl",
+      "attachments": [],
+      "comments": [
+        { "content": "Contacted HVAC maintenance company. Technician scheduled for tomorrow.", "isInternal": false, "authorEmail": "robert.brown@ironpack.pl", "daysAgoFromCreation": 2 },
+        { "content": "Technician found faulty sensor. Ordering replacement part.", "isInternal": true, "authorEmail": "robert.brown@ironpack.pl", "daysAgoFromCreation": 4 }
+      ]
+    },
+    {
+      "title": "Parking permit request for new employee",
+      "description": "New employee starting Monday needs parking permit. HR requested admin to process permit and assign parking space in company lot.",
+      "category": "Administration",
+      "priority": "Low",
+      "status": "New",
+      "createdDaysAgo": 4,
+      "resolvedDaysAgo": null,
+      "creatorEmail": "lisa.anderson@ironpack.pl",
+      "assigneeEmail": null,
+      "attachments": [],
+      "comments": []
+    },
+    {
+      "title": "Employee onboarding checklist incomplete",
+      "description": "New hire from 2 weeks ago still missing equipment: laptop, phone, and office supplies. IT and admin need to coordinate to complete onboarding.",
+      "category": "Administration",
+      "priority": "Medium",
+      "status": "Resolved",
+      "createdDaysAgo": 30,
+      "resolvedDaysAgo": 28,
+      "creatorEmail": "lisa.anderson@ironpack.pl",
+      "assigneeEmail": "emily.davis@ironpack.pl",
+      "attachments": [],
+      "comments": [
+        { "content": "Coordinating with IT to prepare laptop and phone.", "isInternal": false, "authorEmail": "emily.davis@ironpack.pl", "daysAgoFromCreation": 1 },
+        { "content": "Equipment delivered to employee. Onboarding complete.", "isInternal": false, "authorEmail": "emily.davis@ironpack.pl", "daysAgoFromCreation": 1 },
+        { "content": "Employee confirmed all equipment received and working.", "isInternal": false, "authorEmail": "emily.davis@ironpack.pl", "daysAgoFromCreation": 2 }
+      ]
+    },
+    {
+      "title": "Fire alarm test scheduled - notify all staff",
+      "description": "Building-wide fire alarm test scheduled for Thursday 10 AM. Need to notify all employees via email. Test will last 15 minutes with loud alarms.",
+      "category": "Administration",
+      "priority": "Critical",
+      "status": "Returned",
+      "createdDaysAgo": 10,
+      "resolvedDaysAgo": null,
+      "creatorEmail": "lisa.anderson@ironpack.pl",
+      "assigneeEmail": "robert.brown@ironpack.pl",
+      "attachments": [],
+      "comments": [
+        { "content": "Email notification sent to all staff. Posters placed in common areas.", "isInternal": false, "authorEmail": "robert.brown@ironpack.pl", "daysAgoFromCreation": 3 },
+        { "content": "Fire marshal requested rescheduling. Need new date from facilities.", "isInternal": true, "authorEmail": "robert.brown@ironpack.pl", "daysAgoFromCreation": 5 }
+      ]
+    }
+  ]
+}

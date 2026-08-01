@@ -1,0 +1,16 @@
+ID-649 - Ticketing of incidents and failures
+The goal is to create a tool that enables efficient registration, tracking, and management of incidents related to technical issues, failures, or other incidents within the company. The system should allow employees or users to create tickets, assign them to the appropriate individuals or teams, monitor the progress of their resolution, and provide notifications about their status.
+ 
+Ticketing System for Reports and Failures
+1.	Concept:
+The goal of the system is to create a tool for recording and tracking reports related to technical issues, failures, and other incidents within the company.
+2.	Planned Features:
+a.	Ability for employees to submit issues via a reporting form
+b.	Categorization of reports (e.g., IT, logistics, administration)
+c.	Automatic assignment of reports to the appropriate personnel or departments
+d.	Ticket statuses (e.g., "new," "in progress," "resolved")
+e.	Logging and history of reports
+f.	Email notifications about status changes
+g.	Ability to generate reports on the number of tickets, resolution time, etc.
+3.	Additional Notes:
+The system should be intuitive and easy to use for employees.

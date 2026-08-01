@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ include "ticketing-system.fullname" . }}-frontend-test
+  labels:
+    {{- include "ticketing-system.labels" . | nindent 4 }}
+    app.kubernetes.io/component: frontend-test
+  annotations:
+    helm.sh/hook: test
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+spec:
+  restartPolicy: Never
+  containers:
+    - name: frontend
+      image: busybox:1.36
+      command: ["wget"]
+      args:
+        - "-qO-"
+        - "http://{{ include "ticketing-system.frontendName" . }}:{{ .Values.frontend.service.port }}/"
+

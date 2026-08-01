@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="900" height="240" viewBox="0 0 900 240" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style><![CDATA[
+      .dark { stroke:#2B2B2B; fill:none; stroke-width:10; stroke-linejoin:round; stroke-linecap:round; }
+      .red  { stroke:#D71920; fill:none; stroke-width:10; stroke-linejoin:round; stroke-linecap:round; }
+      .fill-dark { fill:#2B2B2B; }
+      .text-dark { fill:#2B2B2B; font-family: Arial, Helvetica, sans-serif; font-weight:700; }
+      .text-red  { fill:#D71920; font-family: Arial, Helvetica, sans-serif; font-weight:700; }
+    ]]></style>
+  </defs>
+
+  <!-- Icon group: cube corner + tilted ticket (matches the liked PNG composition) -->
+  <g transform="translate(30,50)">
+    <!-- Cube "corner" behind ticket -->
+    <!-- Top rim (red) -->
+    <polyline class="red" points="20,30 85,0 150,30" />
+    <!-- Left face outline -->
+    <polyline class="dark" points="20,30 20,120 85,155 85,65 20,30" />
+    <!-- Right face outline -->
+    <polyline class="dark" points="150,30 150,120 85,155 85,65 150,30" />
+    <!-- Inner bevel lines (subtle) -->
+    <polyline class="dark" opacity="0.35" points="30,44 85,14 140,44" />
+    <line class="dark" opacity="0.35" x1="85" y1="65" x2="85" y2="150" />
+
+    <!-- Ticket (tilted, in front) -->
+    <g transform="translate(35,42) rotate(-18 75 55)">
+      <!-- Ticket outer -->
+      <path d="
+        M 15 35
+        Q 8 35 8 28
+        L 8 18
+        Q 8 12 15 12
+        L 135 12
+        Q 142 12 142 18
+        L 142 28
+        Q 142 35 135 35
+        Q 125 40 135 50
+        Q 142 50 142 57
+        L 142 67
+        Q 142 73 135 73
+        L 15 73
+        Q 8 73 8 67
+        L 8 57
+        Q 8 50 15 50
+        Q 25 45 15 35
+        Z" fill="white" stroke="#2B2B2B" stroke-width="8" stroke-linejoin="round"/>
+      <!-- Ticket inner red accent (top-left like IronPack red) -->
+      <path d="M 24 22 L 124 22" stroke="#D71920" stroke-width="8" stroke-linecap="round" opacity="0.9"/>
+      <!-- Stub square -->
+      <rect x="28" y="30" width="38" height="28" rx="3" fill="#2B2B2B" opacity="0.9"/>
+      <!-- Perforation -->
+      <line x1="92" y1="24" x2="92" y2="66" stroke="#2B2B2B" stroke-width="6" stroke-dasharray="8,8" opacity="0.85"/>
+    </g>
+  </g>
+
+  <!-- Text: tighter spacing to match reference -->
+  <text x="300" y="120" class="text-dark" font-size="96">ticketing</text>
+  <text x="300" y="195" class="text-red" font-size="96">system</text>
+
+  <!-- Optional registered mark like in the reference -->
+  <text x="690" y="198" class="text-red" font-size="44">®</text>
+</svg>

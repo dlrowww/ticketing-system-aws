@@ -1,0 +1,21 @@
+# 教学对照文件：当前不要部署，直到 EF Migration 从 API 启动流程中移出。
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: ticketing-system-api
+  namespace: ticketing-system
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: ticketing-system-api
+  minReplicas: 2
+  maxReplicas: 6
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+

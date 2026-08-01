@@ -1,0 +1,18 @@
+Ticketing System has been rendered for {{ .Values.global.environment }}.
+
+Resources:
+  Frontend Service: {{ include "ticketing-system.frontendName" . }}:{{ .Values.frontend.service.port }}
+  API Service:      {{ include "ticketing-system.apiServiceName" . }}:{{ .Values.api.service.port }}
+{{- if .Values.ingress.enabled }}
+  Application URL:  {{ if .Values.ingress.certificateArn }}https{{ else }}http{{ end }}://{{ .Values.global.domain }}
+{{- end }}
+
+Check the rollout:
+  kubectl get deploy,pod,svc,ingress -n {{ .Release.Namespace }}
+
+Run Helm connectivity tests:
+  helm test {{ .Release.Name }} -n {{ .Release.Namespace }}
+
+Important:
+  - Kubernetes Secret "{{ .Values.api.existingSecret }}" must exist before Pods can start.
+  - API replicas/HPA must remain at one/disabled while the application runs EF migrations during every process startup.

@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ticketing-system-frontend
+  namespace: ticketing-system
+  labels:
+    app.kubernetes.io/part-of: ticketing-system
+    app.kubernetes.io/component: frontend
+data:
+  NODE_ENV: production
+  HOST: "0.0.0.0"
+  PORT: "3000"
+  PUBLIC_API_BASE: /api
+  PUBLIC_DEFAULT_LOCALE: en-US
+  ORIGIN: https://tickets.example.com
+  BACKEND_URL: http://api:8080
+  LOOKUPS_API: http://api:8080
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ticketing-system-api
+  namespace: ticketing-system
+  labels:
+    app.kubernetes.io/part-of: ticketing-system
+    app.kubernetes.io/component: api
+data:
+  ASPNETCORE_ENVIRONMENT: Production
+  ASPNETCORE_HTTP_PORTS: "8080"
+  Jwt__Issuer: TicketingSystem
+  Jwt__Audience: TicketingSystemFrontend
+  Cors__AllowedOrigins__0: https://tickets.example.com
+  Email__SmtpHost: smtp.gmail.com
+  Email__SmtpPort: "587"
+  Email__UseSsl: "true"
+  Email__FromAddress: noreply@example.com
+  Email__FromName: Ticketing System
+  Email__BaseUrl: https://tickets.example.com
+  Email__TemplatesPath: EmailTemplates
+  Email__UsePickupDirectory: "false"
+  SEED_DEMO_DATA: "false"
+  Backup__Enabled: "false"
+

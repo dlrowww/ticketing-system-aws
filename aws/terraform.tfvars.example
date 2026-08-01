@@ -1,0 +1,28 @@
+# Copy this file to a local environment-specific tfvars file, then review every
+# value before terraform plan/apply. No secret values belong in this file.
+
+aws_region   = "us-east-1"
+environment  = "dev"
+project_name = "ticketing-system"
+owner        = "simon"
+
+# Small development defaults. Use Multi-AZ, deletion protection and a suitable
+# instance size before treating this as production.
+db_instance_class        = "db.t4g.micro"
+db_multi_az              = false
+db_deletion_protection   = false
+db_skip_final_snapshot   = true
+db_backup_retention_days = 7
+
+enable_cloudwatch_observability = true
+cloudwatch_log_retention_days   = 30
+
+# Enable these two lines only after a real public Route 53 hosted zone exists.
+# route53_zone_id        = "Z0123456789EXAMPLE"
+# application_domain_name = "tickets.example.com"
+
+# Enable this second step only after Kubernetes Ingress creates the ALB.
+# create_route53_alb_record = true
+# alb_dns_name             = "k8s-example-123456.us-east-1.elb.amazonaws.com"
+# alb_zone_id              = "Z35SXDOTRQ7X7K"
+

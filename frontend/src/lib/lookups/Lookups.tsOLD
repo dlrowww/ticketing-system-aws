@@ -1,0 +1,73 @@
+import { Category, Priority, TicketStatus, UserRole } from '$lib/types/tickets';
+
+export type LookupItem<T extends number> = {
+  id: T;        // numeric enum value
+  name: string;  // i18n key (pass to t(key))
+};
+
+// ---- Ticket Status ----
+const TICKET_STATUS: readonly LookupItem<TicketStatus>[] = [
+  { id: TicketStatus.New,        name: 'ticket_status_new' },
+  { id: TicketStatus.Open,       name: 'ticket_status_open' },
+  { id: TicketStatus.InProcess,  name: 'ticket_status_in_process' },
+  { id: TicketStatus.Resolved,   name: 'ticket_status_resolved' },
+  { id: TicketStatus.Cancelled,  name: 'ticket_status_cancelled' },
+  { id: TicketStatus.Postponed,  name: 'ticket_status_postponed' },
+  { id: TicketStatus.Returned,   name: 'ticket_status_returned' }
+];
+
+// ---- Priority ----
+const PRIORITIES: readonly LookupItem<Priority>[] = [
+  { id: Priority.Low,      name: 'priority_low' },
+  { id: Priority.Medium,   name: 'priority_medium' },
+  { id: Priority.High,     name: 'priority_high' },
+  { id: Priority.Critical, name: 'priority_critical' }
+];
+
+// ---- Category ----
+const CATEGORIES: readonly LookupItem<Category>[] = [
+  { id: Category.IT,            name: 'category_it' },
+  { id: Category.Logistics,     name: 'category_logistics' },
+  { id: Category.Administration,name: 'category_administration' }
+];
+
+// ---- User Role ----
+const USER_ROLES: readonly LookupItem<UserRole>[] = [
+  { id: UserRole.Employee,   name: 'role_employee' },
+  { id: UserRole.Support,    name: 'role_support' },
+  { id: UserRole.TeamLeader, name: 'role_team_leader' },
+  { id: UserRole.Admin,      name: 'role_admin' }
+];
+
+// ---------- Fast ID lookups ----------
+function byId<T extends number>(arr: readonly LookupItem<T>[]) {
+  return arr.reduce<Record<T, LookupItem<T>>>((acc, item) => {
+    acc[item.id] = item;
+    return acc;
+  }, {} as any);
+}
+
+const TICKET_STATUS_BY_ID = byId(TICKET_STATUS);
+const PRIORITIES_BY_ID    = byId(PRIORITIES);
+const CATEGORIES_BY_ID    = byId(CATEGORIES);
+const USER_ROLES_BY_ID    = byId(USER_ROLES);
+
+// ---------- Public API ----------
+export const lookups = {
+  ticketStatus(): readonly LookupItem<TicketStatus>[] { return TICKET_STATUS; },
+  priority(): readonly LookupItem<Priority>[] { return PRIORITIES; },
+  category(): readonly LookupItem<Category>[] { return CATEGORIES; },
+  userRole(): readonly LookupItem<UserRole>[] { return USER_ROLES; },
+
+  // optional helpers (ID -> i18n key) - TODO - check??
+  statusKey(id: TicketStatus)   { return TICKET_STATUS_BY_ID[id]?.name; },
+  priorityKey(id: Priority)     { return PRIORITIES_BY_ID[id]?.name; },
+  categoryKey(id: Category)     { return CATEGORIES_BY_ID[id]?.name; },
+  roleKey(id: UserRole)         { return USER_ROLES_BY_ID[id]?.name; }
+};
+
+// If you like a generic helper for building dropdown options:
+// map to { value, labelKey } so UI can do t(labelKey)
+// export function toOptions<T extends number>(items: readonly LookupItem<T>[]) {
+//   return items.map(i => ({ value: i.id, labelKey: i.name }));
+// }

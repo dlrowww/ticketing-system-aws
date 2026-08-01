@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "ticketing-system.frontendName" . }}
+  labels:
+    {{- include "ticketing-system.labels" . | nindent 4 }}
+    app.kubernetes.io/component: frontend
+  annotations:
+    alb.ingress.kubernetes.io/healthcheck-path: {{ .Values.frontend.probes.readiness.path | quote }}
+spec:
+  type: {{ .Values.frontend.service.type }}
+  selector:
+    {{- include "ticketing-system.frontendSelectorLabels" . | nindent 4 }}
+  ports:
+    - name: http
+      port: {{ .Values.frontend.service.port }}
+      targetPort: http
+      protocol: TCP
