@@ -106,8 +106,7 @@ api:
     tag: ""
     pullPolicy: IfNotPresent
   service:
-    # Kept as "api" for the current frontend image, which compiles
-    # BACKEND_URL=http://api:8080 through $env/static/private.
+    # The frontend ConfigMap builds its runtime BACKEND_URL from this name.
     name: api
     type: ClusterIP
     port: 8080

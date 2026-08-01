@@ -70,20 +70,16 @@ all four remote references.
 
 Do not commit real secret values to this repository.
 
-## Current frontend image constraint
+## Frontend runtime configuration
 
-The frontend currently imports `JWT_SECRET`, `BACKEND_URL`, and `LOOKUPS_API`
-from SvelteKit `$env/static/private`, while its Dockerfile supplies them during
-the image build. Those values are compiled into the image and cannot reliably
-be replaced by Deployment runtime environment variables.
+The adapter-node frontend reads `JWT_SECRET`, `BACKEND_URL`, and the optional
+`LOOKUPS_API` fallback through SvelteKit `$env/dynamic/private`. The Docker image
+contains no private environment values; the Deployment ConfigMap and Secret are
+authoritative at Pod startup.
 
-For compatibility, the API Service defaults to the fixed name `api`, matching
-the currently compiled `http://api:8080` backend URL. Before production:
-
-1. change private runtime settings to `$env/dynamic/private`;
-2. remove the development JWT value from the frontend Dockerfile;
-3. rebuild the frontend image;
-4. then runtime Secret/ConfigMap values in this chart become authoritative.
+The API Service defaults to `api`, and the ConfigMap builds the internal URL
+`http://api:8080`. A Secret update does not change environment variables in an
+already-running process, so roll out the frontend Deployment after JWT rotation.
 
 ## Render locally
 

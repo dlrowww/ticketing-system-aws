@@ -1,6 +1,10 @@
-import { LOOKUPS_API } from '$env/static/private';
-
-import type { PagedResult, TicketListItem, TicketQuery, TicketSortableField } from '$lib/types/tickets';
+import { getBackendUrl } from '$lib/server/runtimeEnv';
+import type {
+	PagedResult,
+	TicketListItem,
+	TicketQuery,
+	TicketSortableField
+} from '$lib/types/tickets';
 
 export type FixedTicketFilters = {
 	createdByUserId?: number;
@@ -29,7 +33,9 @@ const ticketSortableFields: readonly TicketSortableField[] = [
 
 function toTicketSortableField(v: string | null): TicketSortableField | undefined {
 	if (!v) return undefined;
-	return (ticketSortableFields as readonly string[]).includes(v) ? (v as TicketSortableField) : undefined;
+	return (ticketSortableFields as readonly string[]).includes(v)
+		? (v as TicketSortableField)
+		: undefined;
 }
 
 export function buildTicketsSearchParams(url: URL, fixed?: FixedTicketFilters): URLSearchParams {
@@ -76,7 +82,7 @@ export async function loadTicketsListPage(args: {
 	url: URL;
 	fixed?: FixedTicketFilters;
 }): Promise<{ initial: PagedResult<TicketListItem>; query: TicketQuery; error?: string }> {
-	const backend = LOOKUPS_API || 'http://localhost:5192';
+	const backend = getBackendUrl();
 	const params = buildTicketsSearchParams(args.url, args.fixed);
 	const qs = params.toString();
 
@@ -97,7 +103,8 @@ export async function loadTicketsListPage(args: {
 		dateFrom: params.get('dateFrom') ?? undefined,
 		dateTo: params.get('dateTo') ?? undefined,
 		createdByUserId: args.fixed?.createdByUserId,
-		assignedToUserId: args.fixed && 'assignedToUserId' in args.fixed ? args.fixed.assignedToUserId : undefined
+		assignedToUserId:
+			args.fixed && 'assignedToUserId' in args.fixed ? args.fixed.assignedToUserId : undefined
 	};
 
 	try {
