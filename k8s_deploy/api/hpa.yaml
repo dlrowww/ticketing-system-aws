@@ -1,4 +1,4 @@
-# 教学对照文件：当前不要部署，直到 EF Migration 从 API 启动流程中移出。
+# Apply only after the migration Job has completed and the API Deployment is healthy.
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
@@ -18,4 +18,3 @@ spec:
         target:
           type: Utilization
           averageUtilization: 70
-

@@ -58,6 +58,10 @@ app.kubernetes.io/component: api
 {{- end }}
 {{- end }}
 
+{{- define "ticketing-system.externalSecretStoreName" -}}
+{{- default (printf "%s-aws-secrets-manager" (include "ticketing-system.fullname" .)) .Values.externalSecrets.secretStore.name | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
 {{- define "ticketing-system.image" -}}
 {{- $root := index . 0 -}}
 {{- $image := index . 1 -}}

@@ -1,4 +1,4 @@
-# 教学对照文件：API 只有一个副本时不建议启用这个 PDB。
+# The API Deployment starts with two replicas, so one Pod can remain available.
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
@@ -10,4 +10,3 @@ spec:
     matchLabels:
       app.kubernetes.io/name: ticketing-system-api
       app.kubernetes.io/component: api
-

@@ -131,20 +131,27 @@ pnpm run format
 ## Environment Variables
 
 ### Development (`.env.development`)
+
 ```bash
 PUBLIC_API_BASE=/api
 LOOKUPS_API=http://localhost:5192
+BACKEND_URL=http://localhost:5192
+JWT_SECRET=<same-64-character-or-longer-key-used-by-the-development-api>
 PUBLIC_DEFAULT_LOCALE=en-US
 ```
 
-### Production (`.env.production`)
+`LOOKUPS_API` configures the Vite development proxy. Server-side application
+code prefers `BACKEND_URL` and falls back to `LOOKUPS_API` in development.
+
+### Production runtime
+
 ```bash
-PUBLIC_API_BASE=/api
-LOOKUPS_API=http://api:8080
-PUBLIC_DEFAULT_LOCALE=en-US
+BACKEND_URL=http://api:8080
+JWT_SECRET=<injected-at-runtime>
 ```
 
-**Note:** Only `PUBLIC_*` variables are exposed to browser. Others are server-only.
+Private values are read through SvelteKit `$env/dynamic/private` by the
+adapter-node server. Only `PUBLIC_*` variables are exposed to browser code.
 
 ---
 
@@ -154,12 +161,12 @@ PUBLIC_DEFAULT_LOCALE=en-US
 
 ```bash
 # Build image
-docker build -t ticketing-frontend .
+docker build -f frontend/Dockerfile -t ticketing-frontend .
 
-# Run container
+# Inject private values only when the container starts
 docker run -p 3000:3000 \
-  -e PUBLIC_API_BASE=/api \
-  -e LOOKUPS_API=http://backend:8080 \
+  -e BACKEND_URL=http://backend:8080 \
+  -e JWT_SECRET='<same-64-character-or-longer-key-used-by-the-api>' \
   ticketing-frontend
 ```
 

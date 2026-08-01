@@ -21,10 +21,4 @@ declare global {
 	}
 }
 
-declare module '$env/static/private' {
-	export const LOOKUPS_API: string;
-	export const BACKEND_URL: string;
-	export const JWT_SECRET: string;
-}
-
 export {};

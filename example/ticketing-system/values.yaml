@@ -13,6 +13,38 @@ namespace:
   labels: {}
   annotations: {}
 
+# External Secrets Operator is installed by Terraform. When enabled, these
+# settings create a namespaced SecretStore and synchronize AWS Secrets Manager
+# values into api.existingSecret. Supply remoteRefs with terraform outputs.
+externalSecrets:
+  enabled: false
+  refreshInterval: 1h
+  secretStore:
+    name: ""
+    region: us-east-1
+  remoteRefs:
+    rdsMaster: ""
+    jwt: ""
+    smtp: ""
+    initialAdmin: ""
+  properties:
+    rds:
+      host: host
+      port: port
+      username: username
+      password: password
+    jwt:
+      key: key
+    smtp:
+      username: username
+      password: password
+    initialAdmin:
+      email: email
+      password: password
+  database:
+    name: ticketing_system
+    extraParameters: SSL Mode=Require
+
 frontend:
   replicaCount: 1
   image:
@@ -74,8 +106,7 @@ api:
     tag: ""
     pullPolicy: IfNotPresent
   service:
-    # Kept as "api" for the current frontend image, which compiles
-    # BACKEND_URL=http://api:8080 through $env/static/private.
+    # The frontend ConfigMap builds its runtime BACKEND_URL from this name.
     name: api
     type: ClusterIP
     port: 8080
@@ -83,11 +114,9 @@ api:
   serviceAccount:
     create: true
     name: ticketing-api
-    automount: true
+    # The API no longer reads AWS directly; ESO owns the IRSA role.
+    automount: false
     annotations: {}
-      # Set to the Terraform api_secrets_irsa_role_arn output when the
-      # application reads AWS Secrets Manager directly.
-      # eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/...
   config:
     aspnetcoreEnvironment: Production
     jwtIssuer: TicketingSystem

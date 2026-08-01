@@ -1,7 +1,8 @@
 # Ticketing System AWS application infrastructure
 
-The `t6-*` Terraform files extend the existing VPC/EKS foundation with the
-AWS resources required by the application.
+The `t6-*` through `t9-*` Terraform stages extend the existing VPC/EKS
+foundation with application resources, secret synchronization, DNS/TLS and
+observability.
 
 ## Managed resources
 
@@ -11,8 +12,9 @@ AWS resources required by the application.
 - RDS-managed master password in AWS Secrets Manager.
 - Empty Secrets Manager containers for JWT, SMTP and initial-admin runtime
   configuration.
-- A least-privilege IRSA role that the future `ticketing-api` Kubernetes
-  ServiceAccount can use to read only those secrets.
+- External Secrets Operator, installed through Helm with its CRDs.
+- A least-privilege IRSA role used only by the External Secrets Operator
+  ServiceAccount to read those secrets.
 - Optional ACM DNS-validated certificate.
 - Optional Route 53 alias from the application hostname to the ALB.
 - CloudWatch Observability EKS add-on, IAM role and application log retention.
@@ -58,10 +60,60 @@ shapes are:
 {"email":"admin@example.com","password":"initial-password"}
 ```
 
-RDS creates and rotates its master credential secret itself. The application
-still needs Kubernetes-side integration (for example External Secrets or the
-Secrets Store CSI Driver) to transform these values into the ASP.NET
-environment variables expected by the current application.
+RDS creates and rotates its master credential secret itself. Terraform installs
+External Secrets Operator with a dedicated IRSA role. The application Helm
+chart then creates a `SecretStore` and `ExternalSecret` which combine the four
+AWS secrets into the `ticketing-system-runtime` Kubernetes Secret expected by
+the Deployments.
+
+The API ServiceAccount has no AWS role. Secret-reading responsibility belongs
+only to the External Secrets Operator controller in the `external-secrets`
+namespace.
+
+Pass these Terraform outputs to the application Helm release:
+
+```text
+rds_master_user_secret_arn
+application_secret_names["jwt"]
+application_secret_names["smtp"]
+application_secret_names["initial-admin"]
+```
+
+External Secrets refreshes the Kubernetes Secret hourly by default. Kubernetes
+does not update environment variables inside already-running containers, so
+restart or roll out the application Deployments after rotating a secret.
+
+## Terraform stage structure
+
+The application layer keeps declarations separated by responsibility:
+
+```text
+t6  Application resources
+    t6-01  variables
+    t6-02  ECR
+    t6-03  RDS PostgreSQL
+    t6-04  application Secrets Manager containers
+    t6-05  outputs
+
+t7  External Secrets Operator
+    t7-01  variables
+    t7-02  IAM/IRSA
+    t7-03  Helm release
+    t7-04  outputs
+
+t8  DNS and TLS
+    t8-01  variables
+    t8-02  ACM and Route 53
+    t8-03  outputs
+
+t9  Observability
+    t9-01  variables
+    t9-02  CloudWatch Observability
+    t9-03  outputs
+```
+
+Terraform still loads every `.tf` file as one configuration. These stage names
+document responsibility and dependency flow; they do not control apply order.
 
 ## DNS deployment is intentionally two-phase
 
@@ -90,4 +142,3 @@ terraform -chdir=aws plan
 Do not apply a plan that unexpectedly recreates the existing VPC or EKS
 cluster. Import existing resources or select the correct backend/workspace
 before applying.
-

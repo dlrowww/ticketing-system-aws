@@ -55,11 +55,3 @@ resource "aws_ecr_lifecycle_policy" "application" {
   })
 }
 
-output "ecr_repository_urls" {
-  description = "ECR repository URLs used by the backend and frontend Kubernetes Deployments."
-  value = {
-    for name, repository in aws_ecr_repository.application :
-    name => repository.repository_url
-  }
-}
-

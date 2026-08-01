@@ -2,7 +2,7 @@ import type { PageServerLoad } from './$types';
 
 import { redirect } from '@sveltejs/kit';
 
-import { LOOKUPS_API } from '$env/static/private';
+import { getBackendUrl } from '$lib/server/runtimeEnv';
 import { UserRole } from '$lib/types/enums';
 import type { PagedResult, UserListItemDto, UserQuery } from '$lib/types/users';
 
@@ -67,7 +67,7 @@ export const load: PageServerLoad = async ({ fetch, url, parent }) => {
 		throw redirect(303, '/app/unauthorized');
 	}
 
-	const backend = LOOKUPS_API || 'http://localhost:5192';
+	const backend = getBackendUrl();
 	const params = new URLSearchParams(url.searchParams);
 	const qs = toUsersQueryString(params);
 

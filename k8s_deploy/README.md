@@ -9,11 +9,13 @@
 |---|---|
 | `templates/namespace.yaml` | `namespace.yaml` |
 | `templates/configmap.yaml` | `configmap.yaml` |
+| `templates/external-secrets.yaml` | `external-secrets.yaml` |
 | `templates/frontend/deployment.yaml` | `frontend/deployment.yaml` |
 | `templates/frontend/service.yaml` | `frontend/service.yaml` |
 | `templates/frontend/hpa.yaml` | `frontend/hpa.yaml` |
 | `templates/frontend/pdb.yaml` | `frontend/pdb.yaml` |
 | `templates/api/deployment.yaml` | `api/deployment.yaml` |
+| 独立数据库迁移资源 | `api/migration-job.yaml` |
 | `templates/api/service.yaml` | `api/service.yaml` |
 | `templates/api/serviceaccount.yaml` | `api/serviceaccount.yaml` |
 | `templates/api/hpa.yaml` | `api/hpa.yaml` |
@@ -22,8 +24,9 @@
 | `templates/tests/*` | `tests/*` |
 | `values.yaml` | 具体值已经写进各 YAML |
 
-`secret.example.yaml` 没有对应的 Helm 模板，因为 Helm Chart 当前要求 Secret 通过
-AWS Secrets Manager 同步或由部署流程提前创建。
+`secret.example.yaml` 是不使用 External Secrets Operator 时的本地/教学备用方案。
+AWS/EKS 部署推荐使用 `external-secrets.yaml`，由 Terraform 安装的 Operator 自动生成
+`ticketing-system-runtime`。
 
 ## 资源关系
 
@@ -40,7 +43,10 @@ Namespace: ticketing-system
 │              Frontend Deployment → Frontend Pod:3000
 │
 ├── ConfigMaps → 非敏感环境变量
-└── Secret → 数据库、JWT、SMTP、管理员凭证
+├── ExternalSecret
+│   └── AWS Secrets Manager → ticketing-system-runtime
+└── API Migration Job
+    └── EF Migration + 初始管理员 + 可选 Demo Seed
 ```
 
 ## 先替换示例值
@@ -48,8 +54,9 @@ Namespace: ticketing-system
 正式部署前至少修改：
 
 - `frontend/deployment.yaml` 中的前端 ECR 镜像；
-- `api/deployment.yaml` 中的后端 ECR 镜像；
-- `secret.example.yaml` 中的所有占位值；
+- `api/deployment.yaml` 和 `api/migration-job.yaml` 中的后端 ECR 镜像，并确保二者使用
+  完全相同的不可变 tag；
+- 如果不使用自动化脚本，修改 `external-secrets.yaml` 中四个 `REPLACE_WITH_*` 引用；
 - `ingress.yaml` 中的域名和 ACM ARN；
 - `configmap.yaml` 中的域名、邮件地址。
 
@@ -57,25 +64,46 @@ Namespace: ticketing-system
 
 ## 基础部署顺序
 
-先复制 Secret 示例到一个不提交 Git 的临时文件并填写真实值：
+先确保 Terraform 已安装 External Secrets Operator，并且 AWS Secrets Manager 的三个
+应用 Secret 已填入值。然后依次部署：
 
-```bash
-cp k8s_deploy/secret.example.yaml /tmp/ticketing-system-secret.yaml
-```
-
-然后依次部署：
+推荐使用仓库脚本自动读取 Terraform outputs、初始化 Secret 值并渲染/应用清单：
 
 ```bash
 kubectl apply -f k8s_deploy/namespace.yaml
-kubectl apply -f /tmp/ticketing-system-secret.yaml
+./devops_scripts/bootstrap-secrets.sh
+./devops_scripts/render-external-secrets.sh --apply
+```
+
+如果不用脚本，才需要手动替换 `external-secrets.yaml` 中的占位符。
+
+```bash
 kubectl apply -f k8s_deploy/configmap.yaml
 kubectl apply -f k8s_deploy/api/serviceaccount.yaml
+kubectl get secret ticketing-system-runtime -n ticketing-system
+
+# Job 名称固定；每次发布新镜像前删除上一次已完成的 Job，再重新创建。
+kubectl delete -f k8s_deploy/api/migration-job.yaml --ignore-not-found
+kubectl apply -f k8s_deploy/api/migration-job.yaml
+kubectl wait --for=condition=complete \
+  job/ticketing-system-api-migration \
+  -n ticketing-system \
+  --timeout=15m
+kubectl logs -n ticketing-system job/ticketing-system-api-migration
+
+# 只有 Migration Job 成功后才更新 API Deployment。
 kubectl apply -f k8s_deploy/api/deployment.yaml
 kubectl apply -f k8s_deploy/api/service.yaml
 kubectl apply -f k8s_deploy/frontend/deployment.yaml
 kubectl apply -f k8s_deploy/frontend/service.yaml
 kubectl apply -f k8s_deploy/ingress.yaml
 ```
+
+手动模式才执行 `kubectl apply -f k8s_deploy/external-secrets.yaml`；使用脚本时不要重复
+应用这个占位符版本。
+
+如果只做本地教学且不使用 AWS，可以继续复制 `secret.example.yaml` 到临时文件并手动
+创建 Secret，但不要同时应用手动 Secret 与 ExternalSecret。
 
 检查：
 
@@ -84,6 +112,15 @@ kubectl get deploy,pod,svc,ingress -n ticketing-system
 kubectl get endpoints -n ticketing-system
 ```
 
+`migration-job.yaml` 给 API 镜像传入 `--migrate-only`。该模式执行所有待处理 EF
+Migration，然后完成一次性管理员创建和可选 Demo Seed，成功后以退出码 `0` 结束。普通
+API Pod 不再执行这些数据库初始化操作。如果 Job 失败，不要继续发布 Deployment；先查看
+Job 日志并修复数据库连接或迁移错误。
+
+不要对整个 `k8s_deploy` 目录执行递归 apply；普通 Kubernetes YAML 不提供 Job 与
+Deployment 之间的依赖关系，递归 apply 可能让新 API Pod 在迁移完成前启动。请保持上面的
+`apply Job → wait complete → apply Deployment` 顺序。
+
 ## 可选资源
 
 HPA 和 PDB 没有包含在基础部署命令中：
@@ -91,10 +128,12 @@ HPA 和 PDB 没有包含在基础部署命令中：
 ```bash
 kubectl apply -f k8s_deploy/frontend/hpa.yaml
 kubectl apply -f k8s_deploy/frontend/pdb.yaml
+kubectl apply -f k8s_deploy/api/hpa.yaml
+kubectl apply -f k8s_deploy/api/pdb.yaml
 ```
 
-API 当前会在每个进程启动时执行 EF Migration，所以暂时不要部署 API HPA，也不要把
-API 扩展为多个副本。`api/hpa.yaml` 和 `api/pdb.yaml` 仅用于和 Helm 模板对照。
+API Deployment 默认运行两个副本。启用 API HPA/PDB 前，应先确认 Migration Job 成功、
+两个 API Pod 均为 Ready，并确认集群已安装 Metrics Server。
 
 ## 测试
 

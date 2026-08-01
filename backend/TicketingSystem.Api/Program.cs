@@ -54,7 +54,13 @@ Log.Logger = new LoggerConfiguration()
 
 try
 {
-    Log.Information("Starting Ticketing System API");
+    var runDatabaseInitialization = args.Any(arg =>
+        string.Equals(arg, "--migrate-only", StringComparison.OrdinalIgnoreCase));
+
+    Log.Information(
+        runDatabaseInitialization
+            ? "Starting Ticketing System database migration"
+            : "Starting Ticketing System API");
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -67,7 +73,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Ticketing System API", Version = "v1" });
-    
+
     // Add JWT Bearer authentication to Swagger
     c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
@@ -180,7 +186,7 @@ builder.Services.AddQuartz(q =>
     q.AddJob<TicketingSystem.Api.Jobs.DatabaseBackupJob>(opts => opts
         .WithIdentity(backupJobKey)
         .StoreDurably()); // Allow job without trigger when backups are disabled
-    
+
     // Schedule: Daily at 2:00 AM (configurable via appsettings)
     var cronSchedule = builder.Configuration["Backup:CronSchedule"] ?? "0 0 2 * * ?"; // Default: 2 AM daily
     var enableBackupSchedule = builder.Configuration.GetValue<bool>("Backup:Enabled", true);
@@ -253,30 +259,16 @@ builder.Services.AddAuthentication(options =>
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
+if (runDatabaseInitialization)
 {
-    var env = scope.ServiceProvider.GetRequiredService<IHostEnvironment>();
-    var db  = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await using var scope = app.Services.CreateAsyncScope();
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+    Log.Information("Applying pending Entity Framework database migrations");
     await db.Database.MigrateAsync();
+    Log.Information("Database migrations completed successfully");
 
-    // Validate translation files exist
-    var webEnv = scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>();
-    var localizationPath = Path.Combine(webEnv.ContentRootPath, "Localization");
-    var plTranslationsPath = Path.Combine(localizationPath, "translations.pl.json");
-    var enTranslationsPath = Path.Combine(localizationPath, "translations.en.json");
-    
-    if (!File.Exists(plTranslationsPath))
-        throw new FileNotFoundException($"Polish translation file not found: {plTranslationsPath}");
-    if (!File.Exists(enTranslationsPath))
-        throw new FileNotFoundException($"English translation file not found: {enTranslationsPath}");
-    
-    // Validate email templates folder exists
-    var emailOptions = scope.ServiceProvider.GetRequiredService<Microsoft.Extensions.Options.IOptions<TicketingSystem.Api.Infrastructure.Email.EmailOptions>>();
-    var templatesPath = Path.Combine(webEnv.ContentRootPath, emailOptions.Value.TemplatesPath);
-    if (!Directory.Exists(templatesPath))
-        throw new DirectoryNotFoundException($"Email templates directory not found: {templatesPath}");
-
-    // Bootstrap production admin (if configured via environment variables)
+    // Bootstrap the production administrator only in the one-shot database Job.
     var prodAdminEmail = builder.Configuration["ADMIN_EMAIL"];
     var prodAdminPassword = builder.Configuration["ADMIN_PASSWORD"];
 
@@ -299,21 +291,40 @@ using (var scope = app.Services.CreateScope())
         }
     }
 
-    // Seed demo data in Development OR Production (controlled by SEED_DEMO_DATA flag)
-    // This allows seeding in any environment when explicitly enabled via configuration
+    // Optional demo data is also a one-shot database initialization concern.
     var seedDemoData = builder.Configuration.GetValue<bool>("SEED_DEMO_DATA", false);
-    
     if (seedDemoData)
     {
-        var environment = env.EnvironmentName;
-        Log.Information("SEED_DEMO_DATA=true detected in {Environment} environment. Starting demo data seeding (49 tickets)...", environment);
+        var env = scope.ServiceProvider.GetRequiredService<IHostEnvironment>();
+        Log.Information(
+            "SEED_DEMO_DATA=true detected in {Environment} environment. Starting demo data seeding (49 tickets)...",
+            env.EnvironmentName);
         await TicketingSystem.Api.SeedData.DemoDataSeeder.SeedAsync(scope.ServiceProvider);
         Log.Information("Demo data seeding completed successfully with 49 sample tickets");
     }
-    else
-    {
-        Log.Information("SEED_DEMO_DATA not enabled. Database will start empty. Set SEED_DEMO_DATA=true to seed 49 demo tickets.");
-    }
+
+    Log.Information("Database initialization completed successfully");
+    return;
+}
+
+using (var scope = app.Services.CreateScope())
+{
+    // Validate translation files exist
+    var webEnv = scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>();
+    var localizationPath = Path.Combine(webEnv.ContentRootPath, "Localization");
+    var plTranslationsPath = Path.Combine(localizationPath, "translations.pl.json");
+    var enTranslationsPath = Path.Combine(localizationPath, "translations.en.json");
+
+    if (!File.Exists(plTranslationsPath))
+        throw new FileNotFoundException($"Polish translation file not found: {plTranslationsPath}");
+    if (!File.Exists(enTranslationsPath))
+        throw new FileNotFoundException($"English translation file not found: {enTranslationsPath}");
+
+    // Validate email templates folder exists
+    var emailOptions = scope.ServiceProvider.GetRequiredService<Microsoft.Extensions.Options.IOptions<TicketingSystem.Api.Infrastructure.Email.EmailOptions>>();
+    var templatesPath = Path.Combine(webEnv.ContentRootPath, emailOptions.Value.TemplatesPath);
+    if (!Directory.Exists(templatesPath))
+        throw new DirectoryNotFoundException($"Email templates directory not found: {templatesPath}");
 }
 
 
