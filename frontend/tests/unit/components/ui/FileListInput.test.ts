@@ -1,7 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/svelte';
-// TODO: Install @testing-library/user-event dependency
-// import userEvent from '@testing-library/user-event';
+import { fireEvent, render, screen } from '@testing-library/svelte';
 import FileListInput from '$lib/components/ui/FileListInput.svelte';
 
 describe.skip('FileListInput', () => {
@@ -20,8 +18,7 @@ describe.skip('FileListInput', () => {
 	});
 
 	it('shows selected files list when files are selected', async () => {
-		const user = userEvent.setup();
-		const { component } = render(FileListInput, {
+		const { rerender } = render(FileListInput, {
 			props: {
 				id: 'test-input',
 				value: []
@@ -33,7 +30,7 @@ describe.skip('FileListInput', () => {
 		const file2 = new File(['content2'], 'test2.jpg', { type: 'image/jpeg' });
 
 		// Simulate file selection
-		component.$set({ value: [file1, file2] });
+		await rerender({ value: [file1, file2] });
 		await vi.waitFor(() => {
 			expect(screen.getByText(/test1\.pdf/)).toBeInTheDocument();
 			expect(screen.getByText(/test2\.jpg/)).toBeInTheDocument();
@@ -41,7 +38,6 @@ describe.skip('FileListInput', () => {
 	});
 
 	it('removes file when remove button is clicked', async () => {
-		const user = userEvent.setup();
 		const file1 = new File(['content1'], 'test1.pdf', { type: 'application/pdf' });
 		const file2 = new File(['content2'], 'test2.jpg', { type: 'image/jpeg' });
 
@@ -60,7 +56,7 @@ describe.skip('FileListInput', () => {
 
 		// Find and click the first remove button
 		const removeButtons = screen.getAllByRole('button', { name: /attachment_remove_file/ });
-		await user.click(removeButtons[0]);
+		await fireEvent.click(removeButtons[0]);
 
 		// onChange should be called with remaining files
 		expect(onChange).toHaveBeenCalledWith([file2]);

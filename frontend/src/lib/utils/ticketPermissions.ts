@@ -27,17 +27,37 @@ export function computeEditCapabilities(
 	ticket: TicketDetail,
 	user: User | null | undefined
 ): TicketEditCapabilities {
+	if (ticket.capabilities) {
+		const {
+			canEditTitle,
+			canEditDescription,
+			canEditCategory,
+			canEditPriority,
+			canEditStatus,
+			canEditAssignment
+		} = ticket.capabilities;
+
+		return {
+			canEditTitle,
+			canEditDescription,
+			canEditCategory,
+			canEditPriority,
+			canEditStatus,
+			canEditAssignment
+		};
+	}
+
 	// Fallback: client-side computation (mirrors backend logic)
 	if (!user) {
 		return noPermissions();
 	}
 
-	const role = user.roleId as UserRole;
-	const userId = user.id;
+	const role = Number(user.roleId) as UserRole;
+	const userId = Number(user.id);
 	const isCreator = ticket.createdById === userId;
 	const isAssignee = ticket.assignedToId === userId;
 	const ticketCategory = ticket.categoryId;
-	const userCategory = user.categoryId;
+	const userCategory = user.categoryId == null ? null : Number(user.categoryId);
 	const ticketStatus = ticket.status as TicketStatus;
 
 	// Terminal states (Resolved, Cancelled) block ALL edits

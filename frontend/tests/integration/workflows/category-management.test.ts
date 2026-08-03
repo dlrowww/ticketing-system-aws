@@ -114,7 +114,7 @@ describe('Phase T.4 - Category Management Integration Tests', () => {
 
 		it('loads and displays categories for Admin users', async () => {
 			const fetchSpy = createFetchSpy(mockCategories);
-			const result = await loadCategories({
+			const result: any = await loadCategories({
 				fetch: fetchSpy as any,
 				url: makeUrl('/app/admin/categories'),
 				locals: makeLocals({ id: '1', roleId: String(UserRole.Admin) }),
@@ -138,7 +138,7 @@ describe('Phase T.4 - Category Management Integration Tests', () => {
 	describe('Query Parameter Handling', () => {
 		it('applies includeInactive filter from query string', async () => {
 			const fetchSpy = createFetchSpy(mockCategories);
-			const result = await loadCategories({
+			const result: any = await loadCategories({
 				fetch: fetchSpy as any,
 				url: makeUrl('/app/admin/categories', 'includeInactive=true'),
 				locals: makeLocals({ id: '1', roleId: String(UserRole.Admin) }),
@@ -153,7 +153,7 @@ describe('Phase T.4 - Category Management Integration Tests', () => {
 
 		it('applies sortBy and sortDir from query string', async () => {
 			const fetchSpy = createFetchSpy(mockCategories);
-			const result = await loadCategories({
+			const result: any = await loadCategories({
 				fetch: fetchSpy as any,
 				url: makeUrl('/app/admin/categories', 'sortBy=namePl&sortDir=desc'),
 				locals: makeLocals({ id: '1', roleId: String(UserRole.Admin) }),
@@ -170,7 +170,7 @@ describe('Phase T.4 - Category Management Integration Tests', () => {
 
 		it('uses default query params when none provided', async () => {
 			const fetchSpy = createFetchSpy(mockCategories);
-			const result = await loadCategories({
+			const result: any = await loadCategories({
 				fetch: fetchSpy as any,
 				url: makeUrl('/app/admin/categories'),
 				locals: makeLocals({ id: '1', roleId: String(UserRole.Admin) }),
@@ -207,7 +207,7 @@ describe('Phase T.4 - Category Management Integration Tests', () => {
 				throw new Error('Network error');
 			});
 
-			const result = await loadCategories({
+			const result: any = await loadCategories({
 				fetch: fetchSpy as any,
 				url: makeUrl('/app/admin/categories'),
 				locals: makeLocals({ id: '1', roleId: String(UserRole.Admin) }),
@@ -231,7 +231,7 @@ describe('Phase T.4 - Category Management Integration Tests', () => {
 				json: async () => ({ error: 'Database error' })
 			}));
 
-			const result = await loadCategories({
+			const result: any = await loadCategories({
 				fetch: fetchSpy as any,
 				url: makeUrl('/app/admin/categories'),
 				locals: makeLocals({ id: '1', roleId: String(UserRole.Admin) }),
@@ -248,7 +248,7 @@ describe('Phase T.4 - Category Management Integration Tests', () => {
 			const activeOnly = mockCategories.filter((c) => c.isActive);
 			const fetchSpy = createFetchSpy(activeOnly);
 
-			const result = await loadCategories({
+			const result: any = await loadCategories({
 				fetch: fetchSpy as any,
 				url: makeUrl('/app/admin/categories'),
 				locals: makeLocals({ id: '1', roleId: String(UserRole.Admin) }),
@@ -256,13 +256,13 @@ describe('Phase T.4 - Category Management Integration Tests', () => {
 			} as any);
 
 			expect(result.initial).toHaveLength(2);
-			expect(result.initial.every((c) => c.isActive)).toBe(true);
+			expect(result.initial.every((c: CategoryDto) => c.isActive)).toBe(true);
 		});
 
 		it('returns all categories when includeInactive is true', async () => {
 			const fetchSpy = createFetchSpy(mockCategories);
 
-			const result = await loadCategories({
+			const result: any = await loadCategories({
 				fetch: fetchSpy as any,
 				url: makeUrl('/app/admin/categories', 'includeInactive=true'),
 				locals: makeLocals({ id: '1', roleId: String(UserRole.Admin) }),
@@ -270,13 +270,13 @@ describe('Phase T.4 - Category Management Integration Tests', () => {
 			} as any);
 
 			expect(result.initial).toHaveLength(3);
-			expect(result.initial.some((c) => !c.isActive)).toBe(true);
+			expect(result.initial.some((c: CategoryDto) => !c.isActive)).toBe(true);
 		});
 
 		it('preserves category metadata (ticketCount, timestamps)', async () => {
 			const fetchSpy = createFetchSpy(mockCategories);
 
-			const result = await loadCategories({
+			const result: any = await loadCategories({
 				fetch: fetchSpy as any,
 				url: makeUrl('/app/admin/categories'),
 				locals: makeLocals({ id: '1', roleId: String(UserRole.Admin) }),
@@ -293,14 +293,14 @@ describe('Phase T.4 - Category Management Integration Tests', () => {
 		it('correctly formats category data for frontend consumption', async () => {
 			const fetchSpy = createFetchSpy(mockCategories);
 
-			const result = await loadCategories({
+			const result: any = await loadCategories({
 				fetch: fetchSpy as any,
 				url: makeUrl('/app/admin/categories'),
 				locals: makeLocals({ id: '1', roleId: String(UserRole.Admin) }),
 				parent: makeParent({ id: '1', roleId: String(UserRole.Admin) })
 			} as any);
 
-			result.initial.forEach((category) => {
+			result.initial.forEach((category: CategoryDto) => {
 				expect(category).toHaveProperty('categoryId');
 				expect(category).toHaveProperty('namePl');
 				expect(category).toHaveProperty('nameEn');
@@ -318,7 +318,7 @@ describe('Phase T.4 - Category Management Integration Tests', () => {
 			const sorted = [...mockCategories].sort((a, b) => a.categoryId - b.categoryId);
 			const fetchSpy = createFetchSpy(sorted);
 
-			const result = await loadCategories({
+			const result: any = await loadCategories({
 				fetch: fetchSpy as any,
 				url: makeUrl('/app/admin/categories'),
 				locals: makeLocals({ id: '1', roleId: String(UserRole.Admin) }),

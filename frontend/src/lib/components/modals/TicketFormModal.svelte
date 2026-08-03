@@ -183,7 +183,7 @@
 			toastStore.success(getMessage('ticket_create_success'));
 
 			// Ensure the user is on the tickets list, then refresh it.
-			if (page.url.pathname !== '/app/tickets') {
+			if ($page.url.pathname !== '/app/tickets') {
 				await goto('/app/tickets');
 			}
 

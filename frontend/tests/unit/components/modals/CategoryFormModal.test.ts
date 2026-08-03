@@ -35,8 +35,8 @@ describe('CategoryFormModal', () => {
 		createCategoryMock.mockReset();
 		updateCategoryMock.mockReset();
 		deleteCategoryMock.mockReset();
-		vi.spyOn(toastStore, 'success').mockImplementation(() => {});
-		vi.spyOn(toastStore, 'error').mockImplementation(() => {});
+		vi.spyOn(toastStore, 'success').mockImplementation(() => 'test-toast');
+		vi.spyOn(toastStore, 'error').mockImplementation(() => 'test-toast');
 	});
 
 	afterEach(() => {
@@ -75,7 +75,7 @@ describe('CategoryFormModal', () => {
 				target: { value: 'Finance' }
 			});
 
-				await fireEvent.click(screen.getByText('create'));
+			await fireEvent.submit(screen.getByText('create').closest('form')!);
 
 			expect(createCategoryMock).toHaveBeenCalledWith(
 				{ namePl: 'Finanse', nameEn: 'Finance' },
@@ -108,7 +108,7 @@ describe('CategoryFormModal', () => {
 
 			await fireEvent.input(screen.getByLabelText(/category_name_pl/), { target: { value: 'A' } });
 			await fireEvent.input(screen.getByLabelText(/category_name_en/), { target: { value: '' } });
-			await fireEvent.click(screen.getByText('create'));
+			await fireEvent.submit(screen.getByText('create').closest('form')!);
 
 			await waitFor(() => {
 				expect(screen.getByText('error_code_CATEGORY_NAME_TOO_SHORT')).toBeTruthy();
@@ -175,7 +175,7 @@ describe('CategoryFormModal', () => {
 				target: { value: 'Logistics Updated' }
 			});
 
-			await fireEvent.click(screen.getByText('save'));
+			await fireEvent.submit(screen.getByText('save').closest('form')!);
 
 			expect(updateCategoryMock).toHaveBeenCalledWith(
 				2,
@@ -215,7 +215,7 @@ describe('CategoryFormModal', () => {
 			await fireEvent.input(screen.getByLabelText(/category_name_pl/), {
 				target: { value: 'Logistyka Updated' }
 			});
-			await fireEvent.click(screen.getByText('save'));
+			await fireEvent.submit(screen.getByText('save').closest('form')!);
 
 			await waitFor(() => {
 				expect(screen.getByText('error_code_CATEGORY_IN_USE')).toBeTruthy();

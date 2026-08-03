@@ -91,7 +91,7 @@
 	);
 
 	async function ensureListAndRefresh() {
-		if (page.url.pathname !== '/app/admin/users') {
+		if ($page.url.pathname !== '/app/admin/users') {
 			await goto('/app/admin/users');
 		}
 		setTimeout(() => {
@@ -246,7 +246,7 @@
 		</button>
 	</div>
 
-	<FormError message={formError} />
+	<FormError message={formError ?? undefined} />
 
 	{#if isEdit && loadingDetails}
 		<div class="d-flex align-items-center gap-2 text-muted">

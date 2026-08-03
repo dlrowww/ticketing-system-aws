@@ -19,5 +19,5 @@
   {name}
   value={value ?? ''}
   placeholder={placeholder}
-  on:input={handleInput}
+	oninput={handleInput}
 />

@@ -128,8 +128,8 @@
     let suppressDateEffect = $state(false);
 
     let lastDateFieldChanged = $state<'from' | 'to' | null>(null);
-    let previousFromValue = $state<string | undefined>(formDateFrom);
-    let previousToValue = $state<string | undefined>(formDateTo);
+    let previousFromValue = $state<string | undefined>(data.filters.from ?? undefined);
+    let previousToValue = $state<string | undefined>(data.filters.to ?? undefined);
 
     $effect(() => {
         const range = quickRange;
@@ -433,8 +433,8 @@
                                 const background = Array.isArray(dataset.backgroundColor)
                                     ? dataset.backgroundColor
                                     : [];
-                                return chart.data.labels.map((text, index) => ({
-                                    text,
+                                return (chart.data.labels ?? []).map((text, index) => ({
+                                    text: String(text ?? ''),
                                     fillStyle: background[index] ?? pastelColors[index % pastelColors.length],
                                     strokeStyle: background[index] ?? pastelColors[index % pastelColors.length],
                                     hidden: false,
@@ -500,8 +500,8 @@
                                 const background = Array.isArray(dataset.backgroundColor)
                                     ? dataset.backgroundColor
                                     : [];
-                                return chart.data.labels.map((text, index) => ({
-                                    text,
+                                return (chart.data.labels ?? []).map((text, index) => ({
+                                    text: String(text ?? ''),
                                     fillStyle: background[index] ?? '#e9ecef',
                                     strokeStyle: background[index] ?? '#e9ecef',
                                     hidden: false,

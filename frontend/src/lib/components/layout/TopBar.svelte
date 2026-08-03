@@ -153,16 +153,6 @@
 		color: var(--ironpack-red);
 	}
 
-	.logo-text {
-		display: none;
-	}
-
-	@media (min-width: 576px) {
-		.logo-text {
-			display: inline;
-		}
-	}
-
 	.top-bar-actions {
 		display: flex;
 		align-items: center;

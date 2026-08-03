@@ -49,6 +49,9 @@ describe('Dashboard (Charts) +page.server load', () => {
 		expect(reports.fetchDashboardStats).toHaveBeenCalledWith({ from: '2025-01-01', to: '2025-01-31' }, expect.any(Function));
 		expect(reports.fetchTicketsByCategory).toHaveBeenCalledWith({ from: '2025-01-01', to: '2025-01-31' }, expect.any(Function));
 		expect(reports.fetchTicketsByStatus).toHaveBeenCalledWith({ from: '2025-01-01', to: '2025-01-31' }, expect.any(Function));
-		expect(reports.fetchTicketTrend).toHaveBeenCalledWith({ days: 365 }, expect.any(Function));
+		expect(reports.fetchTicketTrend).toHaveBeenCalledWith(
+			{ from: '2025-01-01', to: '2025-01-31', days: 365 },
+			expect.any(Function)
+		);
 	});
 });

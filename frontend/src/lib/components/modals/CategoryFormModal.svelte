@@ -76,7 +76,7 @@
 	);
 
 	async function ensureListAndRefresh() {
-		if (page.url.pathname !== '/app/admin/categories') {
+		if ($page.url.pathname !== '/app/admin/categories') {
 			await goto('/app/admin/categories');
 		}
 		setTimeout(() => {
@@ -203,6 +203,12 @@
 	function handleCancelDelete() {
 		showDeleteConfirm = false;
 	}
+
+	function handleDeleteBackdropClick(event: MouseEvent) {
+		if (event.target === event.currentTarget) {
+			handleCancelDelete();
+		}
+	}
 </script>
 
 <div class="p-3">
@@ -230,7 +236,7 @@
 		</button>
 	</div>
 
-	<FormError message={formError} />
+	<FormError message={formError ?? undefined} />
 
 	{#if isEdit && loadingDetails}
 		<div class="d-flex align-items-center gap-2 text-muted">
@@ -319,8 +325,8 @@
 </div>
 
 {#if showDeleteConfirm}
-	<div class="confirm-overlay" onclick={handleCancelDelete}>
-		<div class="confirm-dialog" onclick={(e) => e.stopPropagation()}>
+	<div class="confirm-overlay" role="presentation" onclick={handleDeleteBackdropClick}>
+		<div class="confirm-dialog">
 			<div class="modal-header">
 				<h5 class="modal-title">{getMessage('category_delete_confirm_title')}</h5>
 				<button

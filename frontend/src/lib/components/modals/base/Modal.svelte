@@ -18,6 +18,7 @@
     };
 
     const modalSizeClass = $derived(sizeClasses[options.size || 'md']);
+    const Component = $derived(options.component);
 
     onMount(() => {
         // Store the currently focused element to restore focus when modal closes
@@ -79,9 +80,9 @@
         aria-modal="true"
         tabindex="-1"
     >
-        <div class="modal-content">
-            <!-- Render the component passed in options -->
-            <svelte:component this={options.component} {...(options.props || {})} onClose={handleClose} />
+		<div class="modal-content">
+			<!-- Render the component passed in options -->
+			<Component {...(options.props || {})} onClose={handleClose} />
         </div>
     </div>
 </div>

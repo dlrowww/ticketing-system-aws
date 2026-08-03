@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/svelte';
 import { toastStore } from '$lib/stores/toast';
+import { categories } from '$lib/stores/categories';
 
 // Mock getMessage to return the key so we can query predictable text.
 // For keys with interpolation, return key_interpolated
@@ -52,12 +53,31 @@ async function selectDropdownValue(fieldId: string, optionText: string) {
 describe('TicketFormModal', () => {
 	beforeEach(() => {
 		vi.useFakeTimers();
+		categories.set([
+			{
+				categoryId: 1,
+				namePl: 'Kategoria 1',
+				nameEn: '1',
+				isActive: true,
+				createdAt: '2025-01-01T00:00:00Z',
+				updatedAt: null
+			},
+			{
+				categoryId: 2,
+				namePl: 'Kategoria 2',
+				nameEn: '2',
+				isActive: true,
+				createdAt: '2025-01-01T00:00:00Z',
+				updatedAt: null
+			}
+		]);
 		createTicketMock.mockReset();
 		vi.spyOn(toastStore, 'success');
 		vi.spyOn(toastStore, 'error');
 	});
 
 	afterEach(() => {
+		categories.set([]);
 		vi.restoreAllMocks();
 		vi.useRealTimers();
 	});
@@ -80,7 +100,7 @@ describe('TicketFormModal', () => {
 		await selectDropdownValue('ticket-category', '1');
 		await selectDropdownValue('ticket-priority', '2');
 
-		await fireEvent.click(screen.getByText('ticket_create_submit'));
+		await fireEvent.submit(screen.getByText('ticket_create_submit').closest('form')!);
 
 		expect(createTicketMock).toHaveBeenCalledTimes(1);
 		const [formDataArg] = createTicketMock.mock.calls[0];
@@ -136,7 +156,7 @@ describe('TicketFormModal', () => {
 		await selectDropdownValue('ticket-category', '1');
 		await selectDropdownValue('ticket-priority', '2');
 
-		await fireEvent.click(screen.getByText('ticket_create_submit'));
+		await fireEvent.submit(screen.getByText('ticket_create_submit').closest('form')!);
 
 		expect(createTicketMock).toHaveBeenCalledTimes(1);
 		expect(toastStore.error).toHaveBeenCalledWith('ticket_create_fix_errors');

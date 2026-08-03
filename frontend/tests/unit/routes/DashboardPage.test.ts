@@ -1,8 +1,12 @@
 import { render, within } from '@testing-library/svelte';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
+
+vi.mock('$lib/i18n', () => ({
+	getMessage: (key: string) => key
+}));
 
 import DashboardPage from '../../../src/routes/app/dashboard/+page.svelte';
-import { Category, TicketStatus } from '$lib/types/enums';
+import { TicketStatus } from '$lib/types/enums';
 
 describe('Dashboard +page.svelte', () => {
 	it('renders KPI cards and aggregations', () => {
@@ -17,8 +21,8 @@ describe('Dashboard +page.svelte', () => {
 						resolvedTickets: 5,
 						averageResolutionTimeHours: 12.5
 					},
-					byCategory: [{ category: Category.It, count: 4 }],
-					byStatus: [{ status: TicketStatus.StatusOpen, count: 2 }],
+					byCategory: [{ categoryId: 1, count: 4 }],
+					byStatus: [{ status: TicketStatus.Open, count: 2 }],
 					trend: [{ date: '2025-01-01', count: 1 }]
 				} as any)
 			}

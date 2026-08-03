@@ -3,7 +3,7 @@ WORKDIR /app
 
 # Copy package files first for better caching
 COPY frontend/package.json frontend/pnpm-lock.yaml ./
-RUN npm install -g pnpm && pnpm install --frozen-lockfile
+RUN corepack enable && corepack prepare pnpm@10.20.0 --activate && pnpm install --frozen-lockfile
 
 # Copy source files
 COPY frontend/svelte.config.js frontend/vite.config.ts frontend/tsconfig.json ./
@@ -26,7 +26,7 @@ WORKDIR /app
 COPY --from=build /app/package.json /app/pnpm-lock.yaml ./
 
 # Install pnpm and production dependencies
-RUN npm install -g pnpm && pnpm install --prod --frozen-lockfile
+RUN corepack enable && corepack prepare pnpm@10.20.0 --activate && pnpm install --prod --frozen-lockfile
 
 # Copy built app (SvelteKit adapter-node output)
 COPY --from=build /app/build ./build

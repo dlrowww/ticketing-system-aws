@@ -10,10 +10,10 @@ import {
 import type { CategoryDto, CreateCategoryRequest, UpdateCategoryRequest } from '$lib/types/categories';
 
 describe('Categories Service', () => {
-	let mockFetch: ReturnType<typeof vi.fn>;
+	let mockFetch: ReturnType<typeof vi.fn> & typeof fetch;
 
 	beforeEach(() => {
-		mockFetch = vi.fn();
+		mockFetch = vi.fn() as ReturnType<typeof vi.fn> & typeof fetch;
 	});
 
 	describe('fetchCategories', () => {

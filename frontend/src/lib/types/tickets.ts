@@ -121,8 +121,17 @@ export interface TicketDetail {
   updatedAt?: string | null;
   createdById: number;
   assignedToId?: number | null;
-  createdByName?: string;
-  assignedToName?: string;
+  createdByName?: string | null;
+  assignedToName?: string | null;
+  capabilities?: {
+    canEdit?: boolean;
+    canEditTitle: boolean;
+    canEditDescription: boolean;
+    canEditCategory: boolean;
+    canEditPriority: boolean;
+    canEditStatus: boolean;
+    canEditAssignment: boolean;
+  };
 }
 
 export interface TicketFileDto {

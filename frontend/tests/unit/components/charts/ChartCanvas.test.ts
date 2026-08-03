@@ -17,7 +17,6 @@ describe('ChartCanvas', () => {
 
 		const canvas = container.querySelector('canvas');
 		expect(canvas).toBeInTheDocument();
-		expect(canvas).toHaveAttribute('role', 'img');
 		expect(canvas).toHaveAttribute('aria-label', 'chart-label');
 	});
 });

@@ -1,7 +1,6 @@
-import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render } from '@testing-library/svelte';
-import { Category, TicketStatus } from '$lib/types/enums';
-import { locale } from 'svelte-i18n';
+import { TicketStatus } from '$lib/types/enums';
 
 vi.mock('$lib/i18n', () => ({
     getMessage: (key: string, params?: Record<string, string>) => {
@@ -21,20 +20,6 @@ afterEach(() => {
     vi.useRealTimers();
 });
 
-const localeSubscribe = locale.subscribe as unknown as vi.Mock;
-
-function mockLocale(value: string) {
-    localeSubscribe.mockImplementation((run: (val: string | null) => void) => {
-        run(value);
-        return () => undefined;
-    });
-}
-
-beforeEach(() => {
-    localeSubscribe.mockReset();
-    mockLocale('en-US');
-});
-
 describe('Dashboard filters summary', () => {
     it('shows quick range label when filters match predefined range', async () => {
         vi.useFakeTimers();
@@ -43,7 +28,7 @@ describe('Dashboard filters summary', () => {
 
         const { getByText } = render(DashboardPage, {
             props: {
-                data: {
+				data: ({
                     filters: { from: '2025-01-02', to: '2025-02-01', days: 30 },
                     stats: {
                         totalTickets: 0,
@@ -52,10 +37,10 @@ describe('Dashboard filters summary', () => {
                         resolvedTickets: 0,
                         averageResolutionTimeHours: 0
                     },
-                    byCategory: [{ categoryId: Category.It, count: 0 }],
-                    byStatus: [{ status: TicketStatus.StatusOpen, count: 0 }],
+                    byCategory: [{ categoryId: 1, count: 0 }],
+                    byStatus: [{ status: TicketStatus.Open, count: 0 }],
                     trend: []
-                }
+				} as any)
             }
         });
 
@@ -72,7 +57,7 @@ describe('Dashboard filters summary', () => {
 
         const { getByText } = render(DashboardPage, {
             props: {
-                data: {
+				data: ({
                     filters: { from: '2025-01-05', to: '2025-01-10', days: 6 },
                     stats: {
                         totalTickets: 0,
@@ -81,10 +66,10 @@ describe('Dashboard filters summary', () => {
                         resolvedTickets: 0,
                         averageResolutionTimeHours: 0
                     },
-                    byCategory: [{ categoryId: Category.It, count: 0 }],
-                    byStatus: [{ status: TicketStatus.StatusOpen, count: 0 }],
+                    byCategory: [{ categoryId: 1, count: 0 }],
+                    byStatus: [{ status: TicketStatus.Open, count: 0 }],
                     trend: []
-                }
+				} as any)
             }
         });
 
@@ -98,7 +83,7 @@ describe('Dashboard filters summary', () => {
 
         const { getByText } = render(DashboardPage, {
             props: {
-                data: {
+				data: ({
                     filters: { from: '2025-01-05', to: null, days: 1 },
                     stats: {
                         totalTickets: 0,
@@ -107,10 +92,10 @@ describe('Dashboard filters summary', () => {
                         resolvedTickets: 0,
                         averageResolutionTimeHours: 0
                     },
-                    byCategory: [{ categoryId: Category.It, count: 0 }],
-                    byStatus: [{ status: TicketStatus.StatusOpen, count: 0 }],
+                    byCategory: [{ categoryId: 1, count: 0 }],
+                    byStatus: [{ status: TicketStatus.Open, count: 0 }],
                     trend: []
-                }
+				} as any)
             }
         });
 

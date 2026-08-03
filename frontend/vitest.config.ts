@@ -1,14 +1,46 @@
 import { defineConfig } from 'vitest/config';
-import { svelte } from '@sveltejs/vite-plugin-svelte';
-import path from 'path';
+import { sveltekit } from '@sveltejs/kit/vite';
 
 export default defineConfig({
-	plugins: [svelte({ hot: !process.env.VITEST })],
+	plugins: [sveltekit()],
 	test: {
 		globals: true,
-		environment: 'happy-dom',
 		setupFiles: ['./tests/setup.ts'],
-		include: ['tests/**/*.test.ts'],
+		projects: [
+			{
+				extends: true,
+				test: {
+					name: 'node',
+					environment: 'node',
+					include: [
+						'tests/unit/helpers/**/*.test.ts',
+						'tests/unit/services/**/*.test.ts',
+						'tests/unit/stores/**/*.test.ts',
+						'tests/unit/utils/**/*.test.ts',
+						'tests/unit/routes/**/*Server.test.ts',
+						'tests/unit/routes/RootRedirects.test.ts',
+						'tests/integration/workflows/{api-set-locale,category-management,m24-dashboard-charts,m24-dashboard-reports,m8-role-based-views,mXX-admin-users}.test.ts'
+					]
+				}
+			},
+			{
+				extends: true,
+				resolve: {
+					conditions: ['browser']
+				},
+				test: {
+					name: 'components',
+					environment: 'happy-dom',
+					include: [
+						'tests/unit/components/**/*.test.ts',
+						'tests/unit/routes/DashboardPage.test.ts',
+						'tests/unit/routes/DashboardChartsPage.test.ts',
+						'tests/unit/routes/DashboardPage.filtersSummary.test.ts',
+						'tests/integration/workflows/ticket-assignment.test.ts'
+					]
+				}
+			}
+		],
 		coverage: {
 			provider: 'v8',
 			reporter: ['text', 'html', 'lcov'],
@@ -19,12 +51,6 @@ export default defineConfig({
 				'*.config.*',
 				'**/*.d.ts'
 			]
-		}
-	},
-	resolve: {
-		alias: {
-			$lib: path.resolve(__dirname, './src/lib'),
-			$app: path.resolve(__dirname, './node_modules/@sveltejs/kit/src/runtime/app')
 		}
 	}
 });
