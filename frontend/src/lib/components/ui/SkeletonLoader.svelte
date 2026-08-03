@@ -60,10 +60,6 @@
 		margin-bottom: 0.5rem;
 	}
 
-	.skeleton-rect {
-		/* Custom width/height via props */
-	}
-
 	.skeleton-circle {
 		border-radius: 50%;
 	}

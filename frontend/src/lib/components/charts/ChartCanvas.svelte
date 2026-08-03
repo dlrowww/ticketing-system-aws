@@ -53,7 +53,7 @@
 
 
 <div class={['chart-canvas', className].filter(Boolean).join(' ')}>
-	<canvas bind:this={canvasEl} role="img" aria-label={ariaLabel}></canvas>
+	<canvas bind:this={canvasEl} aria-label={ariaLabel}></canvas>
 </div>
 
 <style>

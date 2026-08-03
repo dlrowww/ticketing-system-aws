@@ -33,8 +33,9 @@
 	//on:blur={handleBlur}
 </script>
 
-<div class="ironpack-custom-select" tabIndex="0" >
-	<div
+<div class="ironpack-custom-select">
+	<button
+		type="button"
 		class="select-display {open ? 'active' : ''}"
 		onclick={toggleDropdown}
 		aria-haspopup="listbox"
@@ -50,15 +51,19 @@
 			stroke-width="2"
 			viewBox="0 0 20 20"><path d="M5 8l5 5 5-5" /></svg
 		>
-	</div>
+	</button>
 	<ul class="select-options" class:open tabindex="-1" role="listbox" aria-hidden={!open}>
 		{#each options as option}
-			<li
+			<li>
+				<button
+					type="button"
 				class="select-option {option.id === selected ? 'selected' : ''}"
 				onclick={() => handleSelect(option.id)}
-				tabindex="0"
-			>
-				{option.name}
+					role="option"
+					aria-selected={option.id === selected}
+				>
+					{option.name}
+				</button>
 			</li>
 		{/each}
 	</ul>
@@ -74,6 +79,7 @@
 		border-radius: 0.4em !important; /** 0.98em; */
 	}
 	.select-display {
+		width: 100%;
 		border: 2px solid #b32c2c;
 		border-radius: 0.4em !important; /** 0.98em; */
 		padding: 0.38em 2.2em 0.38em 0.8em;
@@ -127,6 +133,11 @@
 		pointer-events: auto;
 	}
 	.select-option {
+		display: block;
+		width: calc(100% - 0.2em);
+		border: 0;
+		text-align: left;
+		font: inherit;
 		padding: 0.5em 1.3em 0.5em 1.3em; /* More space left/right */
 		cursor: pointer;
 		border-radius: 0.3em; /* Subtle rounding */

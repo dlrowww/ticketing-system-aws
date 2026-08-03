@@ -128,7 +128,7 @@ describe('TicketDetailModal - Assignment Integration', () => {
 	const mockTicket: TicketDetail = {
 		ticketId: 1,
 		title: 'Test Ticket',
-		description: 'Test Description',
+		description: 'Test description long enough for editing',
 		categoryId: 1,
 		priority: 2,
 		status: 1,
@@ -185,7 +185,7 @@ describe('TicketDetailModal - Assignment Integration', () => {
 		render(TicketDetailModal, {
 			props: {
 				ticketId: 1,
-				user: { userId: 5, roleId: 1 }
+				user: { id: '5', name: 'Test User', email: 'test@example.com', roleId: '1' }
 			}
 		});
 

@@ -2,7 +2,7 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-RUN npm install --global pnpm
+RUN corepack enable && corepack prepare pnpm@10.20.0 --activate
 
 COPY frontend/package.json frontend/pnpm-lock.yaml ./
 COPY frontend/svelte.config.js frontend/vite.config.ts frontend/tsconfig.json ./

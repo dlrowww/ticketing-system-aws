@@ -18,7 +18,8 @@ export interface CategoryDto {
 	nameEn: string;
 	isActive: boolean;
 	createdAt: ISODate;
-	updatedAt: ISODate;
+	updatedAt: ISODate | null;
+	ticketCount?: number;
 }
 
 export interface CreateCategoryRequest {

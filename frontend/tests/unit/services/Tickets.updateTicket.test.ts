@@ -280,7 +280,7 @@ describe('Tickets Service - updateTicket', () => {
 			createdByName: 'Creator',
 			createdAt: '2025-01-01T10:00:00Z',
 			updatedAt: '2025-01-01T10:00:00Z',
-			assignedToUserId: null,
+			assignedToId: null,
 			assignedToName: null,
 			capabilities: {
 				canEditTitle: true,
@@ -328,7 +328,7 @@ describe('Tickets Service - updateTicket', () => {
 			createdByName: 'Creator',
 			createdAt: '2025-01-01T10:00:00Z',
 			updatedAt: '2025-01-04T14:45:00Z',
-			assignedToUserId: null,
+			assignedToId: null,
 			assignedToName: null,
 			capabilities: {
 				canEditTitle: true,
@@ -348,7 +348,7 @@ describe('Tickets Service - updateTicket', () => {
 
 		const result = await updateTicket(123, { assignedToUserId: null });
 
-		expect(result.assignedToUserId).toBeNull();
+		expect(result.assignedToId).toBeNull();
 		expect(result.assignedToName).toBeNull();
 	});
 });

@@ -102,7 +102,7 @@
 
 			{#if hasError}
 				<div class="invalid-feedback d-block">
-					{#each error as message}
+					{#each error ?? [] as message}
 						<div>{message}</div>
 					{/each}
 				</div>

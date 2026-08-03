@@ -33,6 +33,12 @@
 		}
 	}
 
+	function handleDialogKeydown(e: KeyboardEvent) {
+		if (e.key === 'Escape') {
+			close();
+		}
+	}
+
 	function zoomIn() {
 		zoomLevel = Math.min(zoomLevel + 0.25, 3);
 	}
@@ -58,8 +64,9 @@
 	role="dialog" 
 	aria-modal="true"
 	onclick={handleBackdropClick}
+	onkeydown={handleDialogKeydown}
 >
-	<div class="modal-dialog modal-xl modal-dialog-centered" onclick={(e) => e.stopPropagation()}>
+	<div class="modal-dialog modal-xl modal-dialog-centered">
 		<div class="modal-content">
 			<!-- Header -->
 			<div class="modal-header">

@@ -875,12 +875,12 @@
 		padding-right: 0.5rem;
 		
 		/* Card container provides borders during scroll */
-		.card {
+		:global(.card) {
 			height: 100%;
 			overflow: hidden;
 		}
 		
-		.card-body {
+		:global(.card-body) {
 			height: 100%;
 			overflow-y: auto;
 		}

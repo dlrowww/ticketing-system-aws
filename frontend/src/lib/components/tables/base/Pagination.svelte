@@ -50,7 +50,7 @@
 
 <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mt-3">
     <!-- Rows per page selector -->
-    <!-- <div class="d-flex align-items-center gap-2">
+    <div class="d-flex align-items-center gap-2">
         <span class="text-nowrap">{getMessage('rows_per_page')}:</span>
         <Select
             bind:value={selectedPageSize}
@@ -63,7 +63,7 @@
             class="form-select-sm"
             style="width: auto;"
         />
-    </div> -->
+    </div>
     
     <!-- Display current range -->
     <div class="text-muted text-nowrap">
