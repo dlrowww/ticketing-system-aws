@@ -3,14 +3,25 @@
 
 	/**
 	 * Generic Button component - reusable UI primitive
-	 * 
+	 *
 	 * @example
 	 * <Button variant="primary" onclick={() => alert('clicked')}>Submit</Button>
 	 * <Button variant="secondary" size="sm" disabled>Cancel</Button>
 	 * <Button variant="primary" loading>Saving...</Button>
 	 */
 
-	type Variant = 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark' | 'link' | 'outline-primary' | 'outline-secondary';
+	type Variant =
+		| 'primary'
+		| 'secondary'
+		| 'success'
+		| 'danger'
+		| 'warning'
+		| 'info'
+		| 'light'
+		| 'dark'
+		| 'link'
+		| 'outline-primary'
+		| 'outline-secondary';
 	type Size = 'sm' | 'md' | 'lg';
 	type ButtonType = 'button' | 'submit' | 'reset';
 
@@ -45,7 +56,7 @@
 
 	// Spinner size based on button size
 	const spinnerSize = $derived(size === 'sm' ? 'sm' : size === 'lg' ? 'md' : 'sm');
-	
+
 	// Spinner variant based on button variant
 	const spinnerVariant = $derived(() => {
 		if (variant.includes('outline') || variant === 'light' || variant === 'link') {
@@ -55,12 +66,7 @@
 	});
 </script>
 
-<button
-	{type}
-	disabled={isDisabled}
-	class={classes}
-	onclick={onclick}
->
+<button {type} disabled={isDisabled} class={classes} {onclick}>
 	{#if loading}
 		<span class="btn-spinner">
 			<Spinner size={spinnerSize} variant={spinnerVariant()} />
@@ -88,8 +94,11 @@
 		text-decoration: none;
 		vertical-align: middle;
 		user-select: none;
-		transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
-			border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+		transition:
+			color 0.15s ease-in-out,
+			background-color 0.15s ease-in-out,
+			border-color 0.15s ease-in-out,
+			box-shadow 0.15s ease-in-out;
 	}
 
 	.btn:disabled {

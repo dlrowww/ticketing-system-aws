@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { getMessage } from '$lib/i18n';
-	
+
 	/**
 	 * Password Input component with visibility toggle
-	 * 
+	 *
 	 * @example
 	 * <PasswordInput bind:value={password} placeholder="Enter password" />
 	 * <PasswordInput bind:value={password} error="Password required" />
@@ -40,9 +40,7 @@
 	let showPassword = $state(false);
 
 	const inputClass = $derived(
-		['form-control', error ? 'is-invalid' : '', className]
-			.filter(Boolean)
-			.join(' ')
+		['form-control', error ? 'is-invalid' : '', className].filter(Boolean).join(' ')
 	);
 
 	function toggleVisibility(e: MouseEvent) {
@@ -50,8 +48,10 @@
 		e.stopPropagation();
 		showPassword = !showPassword;
 	}
-	
-	const toggleLabel = $derived(showPassword ? getMessage('hide_password') : getMessage('show_password'));
+
+	const toggleLabel = $derived(
+		showPassword ? getMessage('hide_password') : getMessage('show_password')
+	);
 </script>
 
 <div class="password-input-wrapper">
@@ -74,7 +74,7 @@
 		type="button"
 		class="password-toggle-btn"
 		onclick={toggleVisibility}
-		disabled={disabled}
+		{disabled}
 		aria-label={toggleLabel}
 		tabindex="-1"
 	>

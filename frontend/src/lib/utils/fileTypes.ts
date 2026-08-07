@@ -25,7 +25,7 @@ export function getFileTypeInfo(mimeType: string): FileTypeInfo {
 			'image/gif',
 			'image/webp'
 		].includes(mime);
-		
+
 		return {
 			type: 'image',
 			i18nKey: 'file_type_image',

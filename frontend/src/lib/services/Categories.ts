@@ -59,8 +59,7 @@ export async function fetchCategories(
 		signal
 	});
 
-	if (!res.ok)
-		throw new Error(`Failed to load categories: ${res.status} ${res.statusText}`);
+	if (!res.ok) throw new Error(`Failed to load categories: ${res.status} ${res.statusText}`);
 
 	return (await res.json()) as CategoryDto[];
 }
@@ -71,8 +70,7 @@ export async function getCategoryById(
 	signal?: AbortSignal
 ): Promise<CategoryDto> {
 	const res = await fetchFn(`${API}/${id}`, { credentials: 'include', signal });
-	if (!res.ok)
-		throw new Error(`Failed to load category #${id}: ${res.status} ${res.statusText}`);
+	if (!res.ok) throw new Error(`Failed to load category #${id}: ${res.status} ${res.statusText}`);
 	return (await res.json()) as CategoryDto;
 }
 
@@ -108,7 +106,7 @@ export async function createCategory(
 		// Handle simple error code from ProblemDetails
 		const errorCode = (payload as any)?.code;
 		console.log('[Categories.createCategory] Extracted error code:', errorCode);
-		throw createApiError('Validation failed', { 
+		throw createApiError('Validation failed', {
 			code: errorCode || 'VALIDATION_FAILED',
 			traceId: (payload as any)?.traceId
 		});
@@ -168,7 +166,7 @@ export async function updateCategory(
 
 		// Handle simple error code from ProblemDetails
 		const errorCode = (payload as any)?.code;
-		throw createApiError('Validation failed', { 
+		throw createApiError('Validation failed', {
 			code: errorCode || 'VALIDATION_FAILED',
 			traceId: (payload as any)?.traceId
 		});

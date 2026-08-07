@@ -51,7 +51,6 @@
 	});
 </script>
 
-
 <div class={['chart-canvas', className].filter(Boolean).join(' ')}>
 	<canvas bind:this={canvasEl} aria-label={ariaLabel}></canvas>
 </div>

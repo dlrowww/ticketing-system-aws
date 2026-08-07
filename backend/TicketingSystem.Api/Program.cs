@@ -56,13 +56,19 @@ try
 {
     var runDatabaseInitialization = args.Any(arg =>
         string.Equals(arg, "--migrate-only", StringComparison.OrdinalIgnoreCase));
+    var applicationArgs = args
+        .Where(arg => !string.Equals(
+            arg,
+            "--migrate-only",
+            StringComparison.OrdinalIgnoreCase))
+        .ToArray();
 
     Log.Information(
         runDatabaseInitialization
             ? "Starting Ticketing System database migration"
             : "Starting Ticketing System API");
 
-var builder = WebApplication.CreateBuilder(args);
+    var builder = WebApplication.CreateBuilder(applicationArgs);
 
 // Use Serilog for logging
 builder.Host.UseSerilog();

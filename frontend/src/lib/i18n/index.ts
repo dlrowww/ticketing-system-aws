@@ -1,15 +1,15 @@
 import { get } from 'svelte/store';
 import {
-    register,
-    init as _init,
-    waitLocale as _waitLocale,
-    format,
-    //getLocaleFromNavigator,
-    t,
-    locale as _locale
+	register,
+	init as _init,
+	waitLocale as _waitLocale,
+	format,
+	//getLocaleFromNavigator,
+	t,
+	locale as _locale
 } from 'svelte-i18n';
 
-const defaultLocale = 'en-US'
+const defaultLocale = 'en-US';
 let currentLocale: string | undefined;
 let readyPromise: Promise<void> | null = null;
 
@@ -24,30 +24,30 @@ register('pl-PL', () => import('./locales/pl.json'));
 //     //initialLocale: browser ? window.navigator.language : defaultLocale, //getLocaleFromNavigator()
 // });
 
-_locale.subscribe(value => {
-    console.error('locale changed = ' + value);
-	  currentLocale = value || undefined;
-    readyPromise = null;
+_locale.subscribe((value) => {
+	console.error('locale changed = ' + value);
+	currentLocale = value || undefined;
+	readyPromise = null;
 });
 
 function ensureReady() {
-  if (!readyPromise) readyPromise = _waitLocale();
-  return readyPromise;
+	if (!readyPromise) readyPromise = _waitLocale();
+	return readyPromise;
 }
 
 // Call this once at app start (layout) with the SSR-provided locale
 export function init(opts: { initialLocale?: string; fallbackLocale?: string } = {}) {
-  _init({
-    fallbackLocale: opts.fallbackLocale ?? defaultLocale,
-    initialLocale: opts.initialLocale ?? defaultLocale
-  });
+	_init({
+		fallbackLocale: opts.fallbackLocale ?? defaultLocale,
+		initialLocale: opts.initialLocale ?? defaultLocale
+	});
 }
 
 export function getMessage(key: string, values?: Record<string, any>): string {
-  const translate = get(t);
-  // translate(key) will return the key itself if not ready,
-  // which is why layouts must await waitLocale() before rendering.
-  return translate ? translate(key, values ? { values } : undefined) : key;
+	const translate = get(t);
+	// translate(key) will return the key itself if not ready,
+	// which is why layouts must await waitLocale() before rendering.
+	return translate ? translate(key, values ? { values } : undefined) : key;
 }
 
 // export function getMessage(key: string, values?: Record<string, any>): string {
@@ -81,20 +81,20 @@ export function getMessage(key: string, values?: Record<string, any>): string {
 // }
 
 export function setLocale(inLocale: string | undefined) {
-    if (inLocale && inLocale !== currentLocale) {
-        _locale.set(inLocale);
-        readyPromise = null;
-    }
+	if (inLocale && inLocale !== currentLocale) {
+		_locale.set(inLocale);
+		readyPromise = null;
+	}
 }
 
 // For layouts to await before rendering
 export function waitLocale() {
-    return ensureReady();
+	return ensureReady();
 }
 
 export default {
-    getMessage,
-    init,
-    setLocale,
-    waitLocale
-}
+	getMessage,
+	init,
+	setLocale,
+	waitLocale
+};

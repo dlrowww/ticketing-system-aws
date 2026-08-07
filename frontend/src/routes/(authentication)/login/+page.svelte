@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-    import { getMessage } from '$lib/i18n';
+	import { getMessage } from '$lib/i18n';
 	import { API_BASE } from '$lib/config';
 	import { UserRole } from '$lib/types/enums';
 	import Input from '$lib/components/ui/Input.svelte';
@@ -9,9 +9,9 @@
 	import FormError from '$lib/components/ui/FormError.svelte';
 
 	let email = $state('');
-    let password = $state('');
-    let error = $state('');
-    let loading = $state(false);
+	let password = $state('');
+	let error = $state('');
+	let loading = $state(false);
 
 	async function handleLogin(e: SubmitEvent) {
 		e.preventDefault();
@@ -32,8 +32,8 @@
 				text = await res.text();
 				data = JSON.parse(text);
 			} catch (e) {
-				console.error("Raw backend response:", text);
-				error = "Login fails: backend error. See console for details.";
+				console.error('Raw backend response:', text);
+				error = 'Login fails: backend error. See console for details.';
 				return;
 			}
 
@@ -58,7 +58,6 @@
 			}
 
 			await goto('/app/my-tickets');
-
 		} catch (err) {
 			console.error('Login fails: ' + err);
 			error = 'Network error. Please try again.';
@@ -95,7 +94,7 @@
 	<FormError message={error} />
 	<div class="login-actions">
 		<div class="d-grid mb-3">
-			<Button type="submit" variant="primary" size="lg" loading={loading} disabled={loading}>
+			<Button type="submit" variant="primary" size="lg" {loading} disabled={loading}>
 				{getMessage('login')}
 			</Button>
 		</div>

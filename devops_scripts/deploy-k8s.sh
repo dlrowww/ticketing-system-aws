@@ -147,7 +147,6 @@ if [[ -n "$application_domain" || -n "$certificate_arn" ]]; then
 fi
 
 for manifest in \
-  namespace.yaml \
   configmap.yaml \
   api/serviceaccount.yaml \
   api/service.yaml \
@@ -195,8 +194,7 @@ if [[ -n "$kube_context" ]]; then
   kubectl_args+=(--context "$kube_context")
 fi
 
-info "Applying namespace and shared configuration"
-kubectl "${kubectl_args[@]}" apply -f "$k8s_dir/namespace.yaml"
+info "Applying namespaced application configuration"
 kubectl "${kubectl_args[@]}" apply -f "$temp_dir/configmap.yaml"
 kubectl "${kubectl_args[@]}" apply -f "$k8s_dir/api/serviceaccount.yaml"
 kubectl "${kubectl_args[@]}" apply -f "$k8s_dir/api/service.yaml"
@@ -206,6 +204,7 @@ external_secret_args=(
   --terraform-dir "$terraform_dir"
   --namespace "$namespace"
   --wait-timeout "$secret_timeout"
+  --skip-cluster-preflight
   --apply
 )
 if [[ -n "$kube_context" ]]; then

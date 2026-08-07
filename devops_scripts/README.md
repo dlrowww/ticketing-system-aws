@@ -22,11 +22,14 @@ terraform -chdir=aws init
 
 The domain and certificate options are optional as a pair. If omitted, Ingress
 is not applied. The script does not initialize secret values and never invokes
-the interactive `bootstrap-secrets.sh`.
+the interactive `bootstrap-secrets.sh`. It also does not create or modify the
+cluster-scoped Namespace; the Infrastructure workflow owns that step.
 
 ## Prerequisites
 
 - Terraform has already been initialized and applied in `aws/`.
+- The `ticketing-system` Namespace has already been created by Infrastructure
+  apply (or manually by a cluster administrator).
 - The caller can read Terraform state and update the three application Secrets.
 - `terraform`, `aws`, `jq`, `openssl`, `envsubst` and optionally `kubectl` are
   installed.
@@ -82,7 +85,10 @@ temporary file:
 ```
 
 Use `--context` when the current kubectl context is not the intended cluster.
-The script checks the Namespace and ESO CRD before applying anything.
+By default the script checks the Namespace and ESO CRD before applying
+anything. `deploy-k8s.sh` uses `--skip-cluster-preflight` because the application
+roles are intentionally limited to namespaced resources; the Infrastructure
+workflow is responsible for those cluster-scoped prerequisites.
 
 Do not use `--apply` if the application Helm release already owns these two
 resources. The script checks the existing `app.kubernetes.io/managed-by` label
@@ -91,7 +97,7 @@ equivalent `externalSecrets` values.
 
 ## Current architecture boundary
 
-These scripts automate the current project design; they do not solve two
+These scripts automate the current project design; they do not solve this
 follow-up architecture change:
 
 - the API connection string is still built from the RDS master credential;

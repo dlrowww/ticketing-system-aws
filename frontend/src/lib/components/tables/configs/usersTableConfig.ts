@@ -23,7 +23,13 @@ export const usersTableColumns: TableColumn<UserListItemDto>[] = [
 	{ key: 'name', label: 'name', width: '25%', sortable: true, formatter: (v: string) => v },
 	{ key: 'email', label: 'email', width: '30%', sortable: true, formatter: (v: string) => v },
 	{ key: 'role', label: 'role', width: 'auto', sortable: true, formatter: formatRole },
-	{ key: 'categoryId', label: 'category', width: 'auto', sortable: true, formatter: formatCategory },
+	{
+		key: 'categoryId',
+		label: 'category',
+		width: 'auto',
+		sortable: true,
+		formatter: formatCategory
+	},
 	{ key: 'isActive', label: 'user_status', width: 'auto', sortable: true, formatter: formatActive }
 ];
 

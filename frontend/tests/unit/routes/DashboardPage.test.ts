@@ -12,7 +12,7 @@ describe('Dashboard +page.svelte', () => {
 	it('renders KPI cards and aggregations', () => {
 		const { getByText, container } = render(DashboardPage, {
 			props: {
-				data: ({
+				data: {
 					filters: { from: null, to: null, days: 30 },
 					stats: {
 						totalTickets: 10,
@@ -24,7 +24,7 @@ describe('Dashboard +page.svelte', () => {
 					byCategory: [{ categoryId: 1, count: 4 }],
 					byStatus: [{ status: TicketStatus.Open, count: 2 }],
 					trend: [{ date: '2025-01-01', count: 1 }]
-				} as any)
+				} as any
 			}
 		});
 

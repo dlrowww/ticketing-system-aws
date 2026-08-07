@@ -16,10 +16,8 @@
 	import CategoryFormModal from '$lib/components/modals/CategoryFormModal.svelte';
 	import ConfirmModal from '$lib/components/modals/ConfirmModal.svelte';
 
-	let {
-		initial,
-		initialQuery
-	}: { initial?: CategoryDto[]; initialQuery?: CategoryQuery } = $props();
+	let { initial, initialQuery }: { initial?: CategoryDto[]; initialQuery?: CategoryQuery } =
+		$props();
 
 	let loading = $state(false);
 	let errorMsg = $state<string | null>(null);

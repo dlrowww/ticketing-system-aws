@@ -5,5 +5,11 @@ yarn.lock
 bun.lock
 bun.lockb
 
+# Generated output and installed dependencies
+.svelte-kit/
+build/
+coverage/
+node_modules/
+
 # Miscellaneous
 /static/

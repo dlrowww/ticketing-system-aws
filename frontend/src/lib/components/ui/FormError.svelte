@@ -2,7 +2,7 @@
 	/**
 	 * Form Error Display Component
 	 * Shows validation errors in a styled alert box
-	 * 
+	 *
 	 * @example
 	 * <FormError message="Invalid input" />
 	 * <FormError errors={['Error 1', 'Error 2']} />
@@ -14,11 +14,7 @@
 		class?: string;
 	}
 
-	let {
-		message,
-		errors = [],
-		class: className = ''
-	}: FormErrorProps = $props();
+	let { message, errors = [], class: className = '' }: FormErrorProps = $props();
 
 	const allErrors = $derived(() => {
 		const errs: string[] = [];

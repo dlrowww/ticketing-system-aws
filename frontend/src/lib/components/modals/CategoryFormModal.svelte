@@ -67,10 +67,7 @@
 			Object.entries(fieldErrors).map(([field, messages]) => {
 				// Backend returns string[] for field errors
 				const messageArray = Array.isArray(messages) ? messages : [messages];
-				return [
-					field,
-					messageArray.map((m) => toErrorMessage(m))
-				];
+				return [field, messageArray.map((m) => toErrorMessage(m))];
 			})
 		) as FieldErrors
 	);
@@ -157,18 +154,18 @@
 			console.log('[CategoryFormModal] Caught error:', err);
 			console.log('[CategoryFormModal] Error code:', err?.code);
 			console.log('[CategoryFormModal] Field errors:', err?.fieldErrors);
-			
+
 			const code = err?.code as string | undefined;
 			const fallback = isEdit
 				? getMessage('category_update_failed')
 				: getMessage('category_create_failed');
-			
+
 			if (err?.fieldErrors) {
 				fieldErrors = err.fieldErrors as FieldErrors;
 				// Validation errors are displayed inline in the form
 			} else {
 				// Display validation or general error at the top of modal
-				const msg = code ? getMessage(`error_code_${code}`) : err?.message ?? fallback;
+				const msg = code ? getMessage(`error_code_${code}`) : (err?.message ?? fallback);
 				console.log('[CategoryFormModal] Setting formError to:', msg);
 				formError = msg;
 			}
@@ -320,7 +317,7 @@
 			</div>
 		</form>
 	{/if}
-	
+
 	<LoadingOverlay show={submitting} message={getMessage('saving')} />
 </div>
 

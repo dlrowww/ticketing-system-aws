@@ -7,7 +7,8 @@
 <footer class="app-footer">
 	<div class="footer-content">
 		<div class="footer-text">
-			© {currentYear} {getMessage('company_name')} · {getMessage('footer_all_rights_reserved')}
+			© {currentYear}
+			{getMessage('company_name')} · {getMessage('footer_all_rights_reserved')}
 		</div>
 		<div class="footer-version">
 			{getMessage('footer_version')}: 1.0

@@ -69,4 +69,3 @@ export const attachmentsTableConfig: DataTableConfig<TicketFileDto> = {
 	enableSelection: false,
 	enableSorting: false
 };
-

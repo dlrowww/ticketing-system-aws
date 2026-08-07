@@ -89,9 +89,9 @@
 
 	const isFormValid = $derived(
 		title.trim().length >= 6 &&
-		description.trim().length >= 20 &&
-		category !== '' &&
-		priority !== ''
+			description.trim().length >= 20 &&
+			category !== '' &&
+			priority !== ''
 	);
 
 	function close() {
@@ -105,9 +105,7 @@
 		const trimmedDescription = description.trim();
 
 		if (!trimmedTitle || trimmedTitle.length < 6 || trimmedTitle.length > 120) {
-			fieldErrors['Title'] = [
-				getMessage('validation_ticket_title_length', { min: 6, max: 120 })
-			];
+			fieldErrors['Title'] = [getMessage('validation_ticket_title_length', { min: 6, max: 120 })];
 		}
 
 		if (!trimmedDescription || trimmedDescription.length < 20 || trimmedDescription.length > 5000) {
@@ -315,11 +313,16 @@
 			<Button variant="outline-secondary" type="button" onclick={onCancel} disabled={submitting}>
 				{getMessage('cancel')}
 			</Button>
-			<Button variant="primary" type="submit" loading={submitting} disabled={submitting || !isFormValid}>
+			<Button
+				variant="primary"
+				type="submit"
+				loading={submitting}
+				disabled={submitting || !isFormValid}
+			>
 				{getMessage('ticket_create_submit')}
 			</Button>
 		</div>
 	</form>
-	
+
 	<LoadingOverlay show={submitting} message={getMessage('ticket_create_submitting')} />
 </div>

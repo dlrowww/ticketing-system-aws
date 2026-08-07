@@ -11,6 +11,7 @@
 ## Quick Start
 
 ### Prerequisites
+
 - **Node.js** 20+ and **pnpm** 9+
 - Backend API running (default: http://localhost:5192)
 - PostgreSQL database with seeded data
@@ -73,9 +74,10 @@ frontend/
 ## Key Concepts
 
 ### 1. **Backend Enum Synchronization**
+
 Frontend enums are auto-generated from backend API to ensure type safety:
 
-```bashStatic Enums vs Dynamic Categories**
+````bashStatic Enums vs Dynamic Categories**
 Frontend uses **manual TypeScript enums** for static backend values:
 - **UserRole** (Employee, Support, TeamLeader, Admin)
 - **TicketStatus** (New, Open, InProgress, Resolved, etc.)
@@ -107,7 +109,7 @@ All API calls use relative paths `/api/*` (proxied by Vite in dev):
 ```typescript
 import { API_BASE } from '$lib/config';  // '/api'
 const response = await fetch(`${API_BASE}/tickets`, { credentials: 'include' });
-```
+````
 
 ---
 
@@ -178,17 +180,22 @@ node build  # Runs SvelteKit adapter-node output
 ```
 
 ---
+
 ### 1. **Enum Type Errors After Backend Changes**
+
 **Solution:** Re-run `pnpm run sync:lookups` to regenerate enums.
 
 ### 2. **API Proxy Not Working**
-**Cause:** Vite proxy only works in `pnpm run dev`, not `preview` mode.  
-**Solution:** Configure reverse proxy (nginx/Apache) for production.
-1. **API Proxy Not Working**
+
 **Cause:** Vite proxy only works in `pnpm run dev`, not `preview` mode.  
 **Solution:** Configure reverse proxy (nginx/Apache) for production.
 
+1. **API Proxy Not Working**
+   **Cause:** Vite proxy only works in `pnpm run dev`, not `preview` mode.
+   **Solution:** Configure reverse proxy (nginx/Apache) for production.
+
 ### 2
+
 ---
 
 ## Additional Documentation

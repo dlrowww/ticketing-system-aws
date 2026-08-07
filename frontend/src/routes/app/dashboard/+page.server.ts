@@ -3,7 +3,13 @@ import type { PageServerLoad } from './$types';
 import { redirect } from '@sveltejs/kit';
 
 import { UserRole } from '$lib/types/enums';
-import { fetchDashboardStats, fetchTicketTrend, fetchTicketsByCategory, fetchTicketsByStatus, fetchTicketsByPriority } from '$lib/services/Reports';
+import {
+	fetchDashboardStats,
+	fetchTicketTrend,
+	fetchTicketsByCategory,
+	fetchTicketsByStatus,
+	fetchTicketsByPriority
+} from '$lib/services/Reports';
 
 export const load: PageServerLoad = async ({ fetch, url, parent }) => {
 	const { user } = await parent();

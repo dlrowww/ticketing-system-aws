@@ -3,7 +3,7 @@ import { fetchLookups } from '$lib/services/Lookups';
 
 export const load: LayoutServerLoad = async ({ fetch, locals }) => {
 	let lookups = await fetchLookups(fetch);
-	
+
 	// Fetch categories server-side (SSR) and add to lookups
 	let categories = [];
 	try {
@@ -18,11 +18,11 @@ export const load: LayoutServerLoad = async ({ fetch, locals }) => {
 	} catch (error) {
 		console.error('Failed to load categories in +layout.server.ts:', error);
 	}
-	
+
 	return {
 		user: locals.user,
 		locale: locals.locale,
 		lookups,
 		categories // Pass categories to client (for categories store)
 	};
-}
+};

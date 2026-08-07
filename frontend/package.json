@@ -19,7 +19,7 @@
 		"test:components": "vitest run --project=components --reporter=verbose",
 		"test:coverage": "vitest run --coverage",
 		"test:ui": "vitest --ui",
-		"quality": "pnpm check && pnpm test:unit && pnpm build"
+		"quality": "pnpm lint && pnpm check && pnpm test:unit && pnpm build"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.2.5",

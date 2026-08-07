@@ -86,7 +86,7 @@ jobs:
     needs:
       - backend-ci
       - frontend-ci
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     environment: dev
     concurrency:

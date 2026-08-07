@@ -27,7 +27,11 @@
 
 {#if loading}
 	<div class="d-flex align-items-center gap-2 text-muted">
-		<div class="spinner-border spinner-border-sm" role="status" aria-label={getMessage('loading')}></div>
+		<div
+			class="spinner-border spinner-border-sm"
+			role="status"
+			aria-label={getMessage('loading')}
+		></div>
 		<span>{getMessage('loading')}</span>
 	</div>
 {:else if error}
@@ -49,7 +53,9 @@
 						<div class="fw-semibold d-flex align-items-center gap-2 flex-wrap">
 							<span>{formatAuthor(c)}</span>
 							{#if c.isInternal}
-								<span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle fw-normal">
+								<span
+									class="badge bg-secondary-subtle text-secondary border border-secondary-subtle fw-normal"
+								>
 									{getMessage('ticket_comment_internal_badge')}
 								</span>
 							{/if}

@@ -89,18 +89,14 @@
 					<i class="bi bi-chevron-down"></i>
 				</button>
 
-				<div
-					class="user-menu-dropdown"
-					class:open={showUserMenu}
-					aria-hidden={!showUserMenu}
-				>
+				<div class="user-menu-dropdown" class:open={showUserMenu} aria-hidden={!showUserMenu}>
 					<div class="user-menu-header">
 						<div class="user-info">
 							<div class="user-info-name">{user.name}</div>
 							<div class="user-info-email">{user.email}</div>
 						</div>
 						<Badge variant="secondary" size="sm">
-						{getMessage(UserRoleKey[userRole as UserRole])}
+							{getMessage(UserRoleKey[userRole as UserRole])}
 						</Badge>
 					</div>
 					<div class="dropdown-divider"></div>
@@ -170,7 +166,9 @@
 		background: transparent; /* var(--ironpack-red); */
 		color: var(--ironpack-font-black);
 		cursor: pointer;
-		transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+		transition:
+			background-color 0.15s ease-in-out,
+			border-color 0.15s ease-in-out;
 	}
 
 	.topbar-btn:hover {

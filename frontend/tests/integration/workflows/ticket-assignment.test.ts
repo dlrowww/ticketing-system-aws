@@ -340,9 +340,7 @@ describe('TicketDetailModal - Assignment Integration', () => {
 
 		// Should show error
 		await waitFor(() => {
-			const errorElement = screen.queryByText((content) => 
-				content.includes('Assignment failed')
-			);
+			const errorElement = screen.queryByText((content) => content.includes('Assignment failed'));
 			expect(errorElement).toBeInTheDocument();
 		});
 	});
@@ -366,8 +364,9 @@ describe('TicketDetailModal - Assignment Integration', () => {
 
 		// Wait for error to appear
 		await waitFor(() => {
-			const errorElement = screen.queryByText((content) => 
-				content.includes('Failed to load users') || content.includes('error_loading_users')
+			const errorElement = screen.queryByText(
+				(content) =>
+					content.includes('Failed to load users') || content.includes('error_loading_users')
 			);
 			expect(errorElement).toBeInTheDocument();
 		});

@@ -62,7 +62,7 @@
 	<Button variant="secondary" onclick={handleCancel} disabled={isProcessing}>
 		{resolvedCancelText}
 	</Button>
-	<Button variant={variant} onclick={handleConfirm} disabled={isProcessing}>
+	<Button {variant} onclick={handleConfirm} disabled={isProcessing}>
 		{#if isProcessing}
 			<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
 		{/if}

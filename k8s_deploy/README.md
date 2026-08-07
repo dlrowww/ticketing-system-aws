@@ -70,9 +70,17 @@ Namespace: ticketing-system
 推荐使用仓库脚本自动读取 Terraform outputs、初始化 Secret 值并渲染/应用清单：
 
 ```bash
-kubectl apply -f k8s_deploy/namespace.yaml
+# Infrastructure workflow 的 apply 已负责创建 Namespace。
 ./devops_scripts/bootstrap-secrets.sh
 ./devops_scripts/render-external-secrets.sh --apply
+```
+
+`Namespace` 是集群级资源。Application/Kubernetes GitHub Role 只管理
+`ticketing-system` Namespace 内部的资源，`deploy-k8s.sh` 不会创建或修改 Namespace。
+如果不使用 Infrastructure workflow，应由集群管理员预先执行：
+
+```bash
+kubectl apply -f k8s_deploy/namespace.yaml
 ```
 
 如果不用脚本，才需要手动替换 `external-secrets.yaml` 中的占位符。

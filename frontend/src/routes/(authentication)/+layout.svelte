@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { LayoutData } from './$types';
-	
+
 	import LanguageSwitcher from '$lib/components/LanguageSwitcher.svelte';
 	import ResourceProvider from '$lib/i18n';
 	import { DEFAULT_LOCALE } from '$lib/config';

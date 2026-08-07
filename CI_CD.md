@@ -4,9 +4,9 @@ The repository uses three path-scoped GitHub Actions workflows:
 
 | Changed path | Workflow | Responsibility |
 |---|---|---|
-| `aws/**` | `Infrastructure` | Terraform format/validate/plan and apply |
-| `backend/**`, `frontend/**` | `Application CI and CD` | Tests, immutable ECR images, migration and application rollout |
-| `k8s_deploy/**`, `devops_scripts/**` | `Kubernetes Deployment` | YAML/script validation and Kubernetes-only rollout |
+| `aws/**` | `Infrastructure` | Automatic Terraform format/validate; manual plan/apply |
+| `backend/**`, `frontend/**` | `Application CI and CD` | Automatic tests; manual immutable image build, migration and rollout |
+| `k8s_deploy/**`, `devops_scripts/**` | `Kubernetes Deployment` | Automatic validation; manual Kubernetes-only rollout |
 
 Both deployment workflows use `devops_scripts/deploy-k8s.sh`, so database
 migrations always finish before the API Deployment is updated. Application CD
@@ -40,6 +40,12 @@ Pull requests never receive AWS credentials: infrastructure PRs run local
 format/validate checks, while a real state-aware plan is an explicitly approved
 `workflow_dispatch` operation.
 
+All three jobs that change AWS or Kubernetes state currently run only through
+`workflow_dispatch`. A merge to `main` still runs the corresponding validation,
+but it cannot start Terraform apply or either deployment job. This prevents a
+first merge from racing infrastructure creation, image deployment and a
+Kubernetes-only rollout.
+
 ## AWS OIDC roles
 
 Use GitHub's OIDC provider (`token.actions.githubusercontent.com`) instead of
@@ -53,7 +59,9 @@ repo:dlrowww/ticketing-system-aws:environment:dev
 
 The infrastructure role needs access to the Terraform S3 state and to manage
 the AWS resources declared under `aws/`. Because Terraform also manages Helm
-releases, this role must have EKS cluster access.
+releases, this role must have EKS cluster access. It also applies
+`k8s_deploy/namespace.yaml` after Terraform succeeds, so it owns creation of the
+cluster-scoped `ticketing-system` Namespace.
 
 The application role needs:
 
@@ -65,7 +73,8 @@ The application role needs:
 
 The Kubernetes role needs read access to the Terraform state object,
 `eks:DescribeCluster`, and the same namespace deployment access. It does not
-need ECR push access.
+need ECR push access. Neither application role needs permission to create,
+patch or delete Namespace objects.
 
 For a first-time bootstrap, create the OIDC roles/EKS access entries using an
 administrator identity, then add their ARNs to the GitHub Environments. No AWS
@@ -73,7 +82,8 @@ access key is stored in GitHub.
 
 ## First deployment
 
-1. Run the Infrastructure workflow with `apply` (or merge an `aws/**` change).
+1. Manually run the Infrastructure workflow with `apply`. It creates the AWS
+   resources and then ensures the `ticketing-system` Namespace exists.
 2. Populate the JWT, SMTP and initial-admin Secrets Manager values locally with
    `devops_scripts/bootstrap-secrets.sh`. This interactive operation is never
    run by CI.
@@ -81,6 +91,11 @@ access key is stored in GitHub.
    Kubernetes Deployments.
 4. After that, `Kubernetes Deployment` can safely reuse the currently deployed
    image references for manifest-only changes.
+
+Keep deployments manual until this sequence has completed successfully. If
+automatic CD is enabled later, retain path filters and a shared deployment
+concurrency group, and do not make Terraform apply an unconditional `main`
+push action.
 
 If `route53_zone_id` and `application_domain_name` are configured, Terraform
 outputs the validated ACM certificate and domain. The deployment script renders

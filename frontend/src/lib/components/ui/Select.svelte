@@ -1,7 +1,7 @@
 <script lang="ts">
 	/**
 	 * Generic Select component - reusable form primitive
-	 * 
+	 *
 	 * @example
 	 * <Select bind:value={category} options={categoryOptions} placeholder="Select category" />
 	 * <Select bind:value={priority} options={priorityOptions} error="Priority is required" />
@@ -173,8 +173,10 @@
 		}
 	});
 
-	const selectClass = $derived(['form-select', error ? 'is-invalid' : '', className].filter(Boolean).join(' '));
-	
+	const selectClass = $derived(
+		['form-select', error ? 'is-invalid' : '', className].filter(Boolean).join(' ')
+	);
+
 	const showPlaceholder = $derived(
 		Boolean(placeholder && (value === '' || value === null || value === undefined))
 	);
@@ -239,9 +241,9 @@
 	<button
 		bind:this={buttonEl}
 		type="button"
-		id={id}
+		{id}
 		class={selectClass}
-		disabled={disabled}
+		{disabled}
 		aria-describedby={error && id ? `${id}-error` : undefined}
 		aria-haspopup="listbox"
 		aria-expanded={open}
@@ -255,19 +257,25 @@
 	</button>
 
 	<!-- Hidden measurement element used to compute min width based on the widest option. -->
-	<button bind:this={measureEl} type="button" class="form-select select-measure" tabindex="-1" aria-hidden="true"></button>
+	<button
+		bind:this={measureEl}
+		type="button"
+		class="form-select select-measure"
+		tabindex="-1"
+		aria-hidden="true"
+	></button>
 
 	{#if name}
-		<input type="hidden" name={name} value={value ?? ''} />
+		<input type="hidden" {name} value={value ?? ''} />
 	{/if}
 </div>
 
 <!-- Dropdown menu rendered with fixed positioning to appear over modals -->
 {#if open && menuPosition}
-	<div 
-		class="select-menu" 
-		class:open 
-		role="listbox" 
+	<div
+		class="select-menu"
+		class:open
+		role="listbox"
 		aria-hidden={!open}
 		style="top: {menuPosition.top}px; left: {menuPosition.left}px; width: {menuPosition.width}px;"
 	>

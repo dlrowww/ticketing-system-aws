@@ -2,11 +2,11 @@ import type { Cookies } from '@sveltejs/kit';
 
 const cookieName = 'locale';
 const cookieConfig = {
-  secret: 'keyboard cat secret',
-  path: '/',
-  httpOnly: true,
-  secure: process.env.NODE_ENV === 'production', // HTTPS-only in production
-  maxAge: 400 * 24 * 60 * 60 * 1000 //400 days in milliseconds - the max allowed by Chrome
+	secret: 'keyboard cat secret',
+	path: '/',
+	httpOnly: true,
+	secure: process.env.NODE_ENV === 'production', // HTTPS-only in production
+	maxAge: 400 * 24 * 60 * 60 * 1000 //400 days in milliseconds - the max allowed by Chrome
 };
 
 export function clearLocaleSession(cookies: Cookies, locals: App.Locals) {
@@ -21,7 +21,7 @@ export function getLocaleSessionFromCookie(cookies: Cookies) {
 }
 
 export function setLocaleSession(cookies: Cookies, locale: string) {
-	if(locale) {
+	if (locale) {
 		const value = btoa(JSON.stringify(locale));
 		cookies.set(cookieName, value, cookieConfig);
 	}

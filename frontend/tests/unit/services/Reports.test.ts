@@ -31,9 +31,9 @@ describe('Reports service', () => {
 	it('fetchTicketsByCategory throws on non-OK response', async () => {
 		const mockFetch = vi.fn().mockResolvedValue({ ok: false, status: 500, statusText: 'Error' });
 
-		await expect(fetchTicketsByCategory({ from: null, to: null }, mockFetch as any)).rejects.toThrow(
-			/Failed to load tickets by category/
-		);
+		await expect(
+			fetchTicketsByCategory({ from: null, to: null }, mockFetch as any)
+		).rejects.toThrow(/Failed to load tickets by category/);
 	});
 
 	it('fetchTicketsByStatus calls correct endpoint', async () => {

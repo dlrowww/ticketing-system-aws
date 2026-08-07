@@ -41,7 +41,10 @@
 
 		submitting = true;
 		try {
-			await addTicketComment(ticketId, { content: content.trim(), isInternal: canMarkInternal ? isInternal : false });
+			await addTicketComment(ticketId, {
+				content: content.trim(),
+				isInternal: canMarkInternal ? isInternal : false
+			});
 			content = '';
 			isInternal = false;
 			toastStore.success(getMessage('ticket_comment_added'));

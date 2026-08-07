@@ -29,7 +29,8 @@ vi.mock('$lib/lookups/Lookups', () => ({
 		ticketStatus: () => [],
 		userRole: () => []
 	},
-	toOptions: (items: Array<{ id: number; name: string }> = []) => items.map((i) => ({ value: i.id, labelKey: i.name, label: i.name }))
+	toOptions: (items: Array<{ id: number; name: string }> = []) =>
+		items.map((i) => ({ value: i.id, labelKey: i.name, label: i.name }))
 }));
 
 // Use a per-file mock so we can assert calls precisely.
@@ -92,7 +93,7 @@ describe('TicketFormModal', () => {
 
 		const titleInput = document.getElementById('ticket-title') as HTMLInputElement;
 		const descInput = document.getElementById('ticket-description') as HTMLTextAreaElement;
-		
+
 		await fireEvent.input(titleInput, { target: { value: 'Valid ticket title' } });
 		await fireEvent.input(descInput, {
 			target: { value: 'This is a sufficiently long description for a ticket (>= 20 chars).' }
@@ -117,7 +118,9 @@ describe('TicketFormModal', () => {
 
 		// Verify the app-level refresh event is dispatched.
 		expect(dispatchSpy).toHaveBeenCalled();
-		const refreshCall = dispatchSpy.mock.calls.find((c) => (c[0] as Event).type === 'tickets:refresh');
+		const refreshCall = dispatchSpy.mock.calls.find(
+			(c) => (c[0] as Event).type === 'tickets:refresh'
+		);
 		expect(refreshCall).toBeTruthy();
 	});
 
@@ -148,7 +151,7 @@ describe('TicketFormModal', () => {
 
 		const titleInput = document.getElementById('ticket-title') as HTMLInputElement;
 		const descInput = document.getElementById('ticket-description') as HTMLTextAreaElement;
-		
+
 		await fireEvent.input(titleInput, { target: { value: 'Valid ticket title' } });
 		await fireEvent.input(descInput, {
 			target: { value: 'This is a sufficiently long description for a ticket (>= 20 chars).' }

@@ -5,6 +5,7 @@
 ---
 
 ## Table of Contents
+
 1. [Test Structure](#test-structure)
 2. [Running Tests](#running-tests)
 3. [Writing Tests](#writing-tests)
@@ -43,7 +44,7 @@ frontend/
 ✅ **Clean Separation:** Tests are outside `src/`, making it easy to exclude from builds  
 ✅ **Consistent with Backend:** Matches `TicketingSystem.Api.Tests` and `TicketingSystem.Api.IntegrationTests` structure  
 ✅ **Scalable:** Clear organization as test suite grows  
-✅ **No Build Overhead:** Tests don't increase production bundle size  
+✅ **No Build Overhead:** Tests don't increase production bundle size
 
 ---
 
@@ -96,25 +97,27 @@ import { describe, it, expect } from 'vitest';
 import Button from '$lib/components/ui/Button.svelte';
 
 describe('Button', () => {
-  it('renders with text', () => {
-    const { getByText } = render(Button, { 
-      props: { children: 'Click Me' } 
-    });
-    expect(getByText('Click Me')).toBeInTheDocument();
-  });
+	it('renders with text', () => {
+		const { getByText } = render(Button, {
+			props: { children: 'Click Me' }
+		});
+		expect(getByText('Click Me')).toBeInTheDocument();
+	});
 
-  it('calls onclick handler when clicked', async () => {
-    let clicked = false;
-    const { getByRole } = render(Button, {
-      props: { 
-        onclick: () => { clicked = true; }
-      }
-    });
-    
-    const button = getByRole('button');
-    await fireEvent.click(button);
-    expect(clicked).toBe(true);
-  });
+	it('calls onclick handler when clicked', async () => {
+		let clicked = false;
+		const { getByRole } = render(Button, {
+			props: {
+				onclick: () => {
+					clicked = true;
+				}
+			}
+		});
+
+		const button = getByRole('button');
+		await fireEvent.click(button);
+		expect(clicked).toBe(true);
+	});
 });
 ```
 
@@ -126,21 +129,18 @@ import { describe, it, expect, vi } from 'vitest';
 import { fetchTickets } from '$lib/services/Tickets';
 
 describe('TicketService', () => {
-  it('fetches tickets with correct query params', async () => {
-    const mockFetch = vi.fn(() => 
-      Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve({ items: [], total: 0 })
-      })
-    );
+	it('fetches tickets with correct query params', async () => {
+		const mockFetch = vi.fn(() =>
+			Promise.resolve({
+				ok: true,
+				json: () => Promise.resolve({ items: [], total: 0 })
+			})
+		);
 
-    await fetchTickets({ page: 1, pageSize: 10 }, mockFetch as any);
+		await fetchTickets({ page: 1, pageSize: 10 }, mockFetch as any);
 
-    expect(mockFetch).toHaveBeenCalledWith(
-      expect.stringContaining('page=1'),
-      expect.any(Object)
-    );
-  });
+		expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('page=1'), expect.any(Object));
+	});
 });
 ```
 
@@ -157,22 +157,22 @@ import { render, fireEvent, waitFor } from '@testing-library/svelte';
 import TicketFormModal from '$lib/components/modals/TicketFormModal.svelte';
 
 describe('Ticket Creation Workflow', () => {
-  it('creates ticket and shows success message', async () => {
-    const { getByLabelText, getByText } = render(TicketFormModal);
+	it('creates ticket and shows success message', async () => {
+		const { getByLabelText, getByText } = render(TicketFormModal);
 
-    // Fill form
-    await fireEvent.input(getByLabelText('Title'), { 
-      target: { value: 'Test Ticket' } 
-    });
-    
-    // Submit
-    await fireEvent.click(getByText('Create'));
+		// Fill form
+		await fireEvent.input(getByLabelText('Title'), {
+			target: { value: 'Test Ticket' }
+		});
 
-    // Verify success
-    await waitFor(() => {
-      expect(getByText('Ticket created successfully')).toBeInTheDocument();
-    });
-  });
+		// Submit
+		await fireEvent.click(getByText('Create'));
+
+		// Verify success
+		await waitFor(() => {
+			expect(getByText('Ticket created successfully')).toBeInTheDocument();
+		});
+	});
 });
 ```
 
@@ -200,6 +200,7 @@ describe('Ticket Creation Workflow', () => {
 ### Naming Conventions
 
 **Test Files:**
+
 ```
 {ComponentName}.test.ts        ✅ Good
 {ComponentName}.spec.ts        ✅ Good (alternative)
@@ -207,12 +208,14 @@ test.{ComponentName}.ts        ❌ Bad
 ```
 
 **Test Suites:**
+
 ```typescript
 describe('ComponentName', () => { ... })          ✅ Good
 describe('ComponentName Component', () => { ... }) ❌ Redundant
 ```
 
 **Test Cases:**
+
 ```typescript
 it('renders with correct props', () => { ... })                    ✅ Good
 it('should render with correct props', () => { ... })              ⚠️ Acceptable
@@ -226,18 +229,21 @@ test('renders with correct props', () => { ... })                  ✅ Good (alt
 ### Available Mocks (from `vitest.setup.ts`)
 
 **SvelteKit Navigation:**
+
 ```typescript
 import { goto } from '$app/navigation'; // Mocked
 await goto('/tickets'); // No-op in tests
 ```
 
 **SvelteKit Stores:**
+
 ```typescript
 import { page } from '$app/stores'; // Mocked
 // Access via: $page.data.user
 ```
 
 **i18n:**
+
 ```typescript
 import { getMessage } from '$lib/i18n'; // Mocked
 getMessage('key'); // Returns 'key' by default
@@ -252,9 +258,9 @@ Create reusable test utilities in `tests/unit/helpers/` or `tests/integration/he
 import { render } from '@testing-library/svelte';
 
 export function renderWithUser(Component: any, user: any) {
-  return render(Component, {
-    context: new Map([['user', user]])
-  });
+	return render(Component, {
+		context: new Map([['user', user]])
+	});
 }
 ```
 
@@ -265,6 +271,7 @@ export function renderWithUser(Component: any, user: any) {
 ### vitest.config.ts
 
 Key settings:
+
 - **Environment:** `jsdom` (browser DOM simulation)
 - **Globals:** `true` (use `describe`, `it`, `expect` without imports)
 - **Setup:** `vitest.setup.ts` (runs before all tests)
@@ -273,6 +280,7 @@ Key settings:
 ### vitest.setup.ts
 
 Provides global mocks for:
+
 - `$app/navigation` (goto, invalidate, etc.)
 - `$app/stores` (page, navigating, updated)
 - `$app/state` (page data)
@@ -283,12 +291,12 @@ Provides global mocks for:
 
 ## Coverage Targets
 
-| Category | Target | Status |
-|----------|--------|--------|
+| Category   | Target | Status         |
+| ---------- | ------ | -------------- |
 | Components | 70-80% | 🟡 In Progress |
-| Services | 80-90% | 🟡 In Progress |
-| Utilities | 90%+ | ⏳ Pending |
-| Overall | 70%+ | ⏳ Pending |
+| Services   | 80-90% | 🟡 In Progress |
+| Utilities  | 90%+   | ⏳ Pending     |
+| Overall    | 70%+   | ⏳ Pending     |
 
 ### Viewing Coverage
 

@@ -1,7 +1,7 @@
 <script lang="ts">
 	/**
 	 * Loading Spinner component
-	 * 
+	 *
 	 * @example
 	 * <Spinner size="sm" />
 	 * <Spinner size="lg" variant="primary" />
@@ -26,7 +26,9 @@
 
 	const sizeClass = $derived(`spinner-${size}`);
 	const variantClass = $derived(`spinner-${variant}`);
-	const classes = $derived(['spinner', sizeClass, variantClass, className].filter(Boolean).join(' '));
+	const classes = $derived(
+		['spinner', sizeClass, variantClass, className].filter(Boolean).join(' ')
+	);
 </script>
 
 <div class={classes} role="status" aria-label={ariaLabel}>

@@ -58,17 +58,14 @@
 			return [];
 		}
 
-		const userOptions = users.map(user => ({
+		const userOptions = users.map((user) => ({
 			value: user.userId,
 			label: `${user.name}${user.roleName ? ` (${user.roleName})` : ''}`
 		}));
 
 		// Add "Unassigned" option if not required
 		if (!required) {
-			return [
-				{ value: '', label: `— ${getMessage('not_assigned')} —` },
-				...userOptions
-			];
+			return [{ value: '', label: `— ${getMessage('not_assigned')} —` }, ...userOptions];
 		}
 
 		return userOptions;
@@ -99,10 +96,10 @@
 
 <Select
 	bind:value={selectValue}
-	options={options}
-	excludeFromDropdown={excludeFromDropdown}
+	{options}
+	{excludeFromDropdown}
 	disabled={disabled || loading || users.length === 0}
 	placeholder={placeholderText}
-	id={id}
-	name={name}
+	{id}
+	{name}
 />

@@ -17,6 +17,7 @@ kube_context=""
 wait_timeout="120s"
 apply_manifest=false
 force_output=false
+skip_cluster_preflight=false
 temp_file=""
 
 usage() {
@@ -37,6 +38,8 @@ Options:
   --apply               Apply a temporary rendered manifest with kubectl
   --context NAME        kubectl context used with --apply
   --wait-timeout VALUE  ExternalSecret wait timeout (default: 120s)
+  --skip-cluster-preflight
+                        Do not read cluster-scoped Namespace/CRD resources
   -h, --help            Show this help
 
 Do not use --apply when the Helm release already owns the SecretStore and
@@ -101,6 +104,10 @@ while (($# > 0)); do
       (($# >= 2)) || die "--wait-timeout requires a value"
       wait_timeout="$2"
       shift 2
+      ;;
+    --skip-cluster-preflight)
+      skip_cluster_preflight=true
+      shift
       ;;
     -h | --help)
       usage
@@ -184,8 +191,10 @@ if [[ "$apply_manifest" == true ]]; then
     kubectl_args+=(--context "$kube_context")
   fi
 
-  kubectl "${kubectl_args[@]}" get namespace "$k8s_namespace" >/dev/null
-  kubectl "${kubectl_args[@]}" get crd externalsecrets.external-secrets.io >/dev/null
+  if [[ "$skip_cluster_preflight" != true ]]; then
+    kubectl "${kubectl_args[@]}" get namespace "$k8s_namespace" >/dev/null
+    kubectl "${kubectl_args[@]}" get crd externalsecrets.external-secrets.io >/dev/null
+  fi
 
   for resource in \
     secretstore/ticketing-system-aws-secrets-manager \

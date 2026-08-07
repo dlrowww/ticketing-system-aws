@@ -26,11 +26,7 @@ function createTicket(overrides: Partial<TicketDetail> = {}): TicketDetail {
 }
 
 // Helper to create minimal User
-function createUser(
-	userId: number,
-	role: UserRole,
-	categoryId: number | null = null
-): User {
+function createUser(userId: number, role: UserRole, categoryId: number | null = null): User {
 	return {
 		id: String(userId),
 		name: `User ${userId}`,

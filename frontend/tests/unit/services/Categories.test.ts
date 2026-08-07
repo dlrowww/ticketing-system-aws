@@ -7,7 +7,11 @@ import {
 	deleteCategory,
 	type FieldErrors
 } from '$lib/services/Categories';
-import type { CategoryDto, CreateCategoryRequest, UpdateCategoryRequest } from '$lib/types/categories';
+import type {
+	CategoryDto,
+	CreateCategoryRequest,
+	UpdateCategoryRequest
+} from '$lib/types/categories';
 
 describe('Categories Service', () => {
 	let mockFetch: ReturnType<typeof vi.fn> & typeof fetch;
@@ -19,8 +23,22 @@ describe('Categories Service', () => {
 	describe('fetchCategories', () => {
 		it('calls correct endpoint with default params', async () => {
 			const mockCategories: CategoryDto[] = [
-				{ categoryId: 1, namePl: 'IT', nameEn: 'IT', isActive: true, createdAt: new Date().toISOString(), updatedAt: null },
-				{ categoryId: 2, namePl: 'Logistyka', nameEn: 'Logistics', isActive: true, createdAt: new Date().toISOString(), updatedAt: null }
+				{
+					categoryId: 1,
+					namePl: 'IT',
+					nameEn: 'IT',
+					isActive: true,
+					createdAt: new Date().toISOString(),
+					updatedAt: null
+				},
+				{
+					categoryId: 2,
+					namePl: 'Logistyka',
+					nameEn: 'Logistics',
+					isActive: true,
+					createdAt: new Date().toISOString(),
+					updatedAt: null
+				}
 			];
 
 			mockFetch.mockResolvedValueOnce({
@@ -30,9 +48,12 @@ describe('Categories Service', () => {
 
 			const result = await fetchCategories(undefined, mockFetch);
 
-			expect(mockFetch).toHaveBeenCalledWith('/api/categories', expect.objectContaining({
-				credentials: 'include'
-			}));
+			expect(mockFetch).toHaveBeenCalledWith(
+				'/api/categories',
+				expect.objectContaining({
+					credentials: 'include'
+				})
+			);
 			expect(result).toEqual(mockCategories);
 		});
 
@@ -95,9 +116,12 @@ describe('Categories Service', () => {
 
 			const result = await getCategoryById(1, mockFetch);
 
-			expect(mockFetch).toHaveBeenCalledWith('/api/categories/1', expect.objectContaining({
-				credentials: 'include'
-			}));
+			expect(mockFetch).toHaveBeenCalledWith(
+				'/api/categories/1',
+				expect.objectContaining({
+					credentials: 'include'
+				})
+			);
 			expect(result).toEqual(mockCategory);
 		});
 

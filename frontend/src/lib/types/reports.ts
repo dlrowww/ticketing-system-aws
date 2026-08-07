@@ -9,7 +9,7 @@ export type DashboardStats = {
 };
 
 export type TicketCountByCategory = {
-	categoryId: number;  // Database FK to Categories table
+	categoryId: number; // Database FK to Categories table
 	count: number;
 };
 

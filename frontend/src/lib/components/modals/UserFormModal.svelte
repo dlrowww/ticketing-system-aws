@@ -6,7 +6,13 @@
 
 	import { getMessage } from '$lib/i18n';
 	import { toastStore } from '$lib/stores/toast';
-	import { createUser, deleteUser, getUserById, updateUser, type FieldErrors } from '$lib/services/Users';
+	import {
+		createUser,
+		deleteUser,
+		getUserById,
+		updateUser,
+		type FieldErrors
+	} from '$lib/services/Users';
 	import { lookups, toOptions } from '$lib/lookups/Lookups';
 	import { UserRole } from '$lib/types/enums';
 	import { getCategoryName, categoryMap } from '$lib/stores/categories';
@@ -60,10 +66,11 @@
 	// Form validation
 	const isFormValid = $derived(
 		name.trim().length >= 2 &&
-		email.trim().length >= 5 && email.includes('@') &&
-		(isEdit || password.length >= 8) && // Password required only in create mode
-		(role !== undefined) &&
-		(!shouldRequireCategory(role) || categoryId !== undefined) // Category required for Support/TeamLeader
+			email.trim().length >= 5 &&
+			email.includes('@') &&
+			(isEdit || password.length >= 8) && // Password required only in create mode
+			role !== undefined &&
+			(!shouldRequireCategory(role) || categoryId !== undefined) // Category required for Support/TeamLeader
 	);
 
 	function toErrorMessage(maybeCode: string): string {
@@ -84,7 +91,7 @@
 
 	const roleOptions = $derived(toOptions(lookups.userRole()));
 	const categoryOptions = $derived(
-		Array.from(get(categoryMap).values()).map(cat => ({
+		Array.from(get(categoryMap).values()).map((cat) => ({
 			value: cat.categoryId,
 			labelKey: getCategoryName(cat.categoryId)
 		}))
@@ -194,7 +201,9 @@
 				formError = allErrors.length > 0 ? allErrors.join(' ') : getMessage('validation_failed');
 			} else {
 				const code = err?.code as string | undefined;
-				const fallback = isEdit ? getMessage('user_update_failed') : getMessage('user_create_failed');
+				const fallback = isEdit
+					? getMessage('user_update_failed')
+					: getMessage('user_create_failed');
 				const msg = code ? getMessage(`error_code_${code}`) : (err?.message ?? fallback);
 				formError = msg;
 				toastStore.error(msg);
@@ -250,7 +259,11 @@
 
 	{#if isEdit && loadingDetails}
 		<div class="d-flex align-items-center gap-2 text-muted">
-			<div class="spinner-border spinner-border-sm" role="status" aria-label={getMessage('loading')}></div>
+			<div
+				class="spinner-border spinner-border-sm"
+				role="status"
+				aria-label={getMessage('loading')}
+			></div>
 			<span>{getMessage('loading')}</span>
 		</div>
 	{:else if isEdit && detailsError}
@@ -262,17 +275,23 @@
 		<form onsubmit={onSubmit} novalidate>
 			<div class="row g-3">
 				<div class="col-12 col-md-6">
-				<label class="form-label" for="user-name">
-					{getMessage('name')} <span class="text-danger">*</span>
-				</label>
+					<label class="form-label" for="user-name">
+						{getMessage('name')} <span class="text-danger">*</span>
+					</label>
 					<Input id="user-name" bind:value={name} error={fieldErrorMessages.Name} />
 				</div>
 
 				<div class="col-12 col-md-6">
-				<label class="form-label" for="user-email">
-					{getMessage('email')} <span class="text-danger">*</span>
-				</label>
-				<Input id="user-email" type="email" bind:value={email} error={fieldErrorMessages.Email} placeholder={getMessage('email_placeholder')} />
+					<label class="form-label" for="user-email">
+						{getMessage('email')} <span class="text-danger">*</span>
+					</label>
+					<Input
+						id="user-email"
+						type="email"
+						bind:value={email}
+						error={fieldErrorMessages.Email}
+						placeholder={getMessage('email_placeholder')}
+					/>
 				</div>
 
 				<div class="col-12 col-md-6">
@@ -280,12 +299,12 @@
 						{#if isEdit}
 							{getMessage('password_new_optional')}
 						{:else}
-						{getMessage('password')} <span class="text-danger">*</span>
+							{getMessage('password')} <span class="text-danger">*</span>
 						{/if}
 					</label>
-					<PasswordInput 
-						id="user-password" 
-						bind:value={password} 
+					<PasswordInput
+						id="user-password"
+						bind:value={password}
 						autocomplete="new-password"
 						error={fieldErrorMessages.Password}
 					/>
@@ -293,19 +312,24 @@
 				</div>
 
 				<div class="col-12 col-md-6">
-				<label class="form-label" for="user-role">
-					{getMessage('role')} <span class="text-danger">*</span>
-				</label>
-					<Select id="user-role" bind:value={role} options={roleOptions} error={fieldErrorMessages.Role} />
+					<label class="form-label" for="user-role">
+						{getMessage('role')} <span class="text-danger">*</span>
+					</label>
+					<Select
+						id="user-role"
+						bind:value={role}
+						options={roleOptions}
+						error={fieldErrorMessages.Role}
+					/>
 				</div>
 
 				<div class="col-12 col-md-6">
-				<label class="form-label" for="user-category">
-					{getMessage('category')}
-					{#if shouldRequireCategory(role)}
-						<span class="text-danger">*</span>
-					{/if}
-				</label>
+					<label class="form-label" for="user-category">
+						{getMessage('category')}
+						{#if shouldRequireCategory(role)}
+							<span class="text-danger">*</span>
+						{/if}
+					</label>
 					<Select
 						id="user-category"
 						bind:value={categoryId}
@@ -321,7 +345,12 @@
 				{#if isEdit}
 					<div class="col-12 col-md-6">
 						<div class="form-check mt-4">
-							<input id="user-active" class="form-check-input" type="checkbox" bind:checked={isActive} />
+							<input
+								id="user-active"
+								class="form-check-input"
+								type="checkbox"
+								bind:checked={isActive}
+							/>
 							<label class="form-check-label" for="user-active">{getMessage('user_active')}</label>
 						</div>
 					</div>
@@ -333,9 +362,14 @@
 					{getMessage('cancel')}
 				</Button>
 
-<Button type="submit" variant="primary" loading={submitting} disabled={submitting || !isFormValid}>
-				<i class="bi bi-check-circle me-1"></i>
-				{isEdit ? getMessage('save') : getMessage('create')}
+				<Button
+					type="submit"
+					variant="primary"
+					loading={submitting}
+					disabled={submitting || !isFormValid}
+				>
+					<i class="bi bi-check-circle me-1"></i>
+					{isEdit ? getMessage('save') : getMessage('create')}
 				</Button>
 
 				{#if isEdit}
@@ -347,6 +381,6 @@
 			</div>
 		</form>
 	{/if}
-	
+
 	<LoadingOverlay show={submitting} message={getMessage('saving')} />
 </div>

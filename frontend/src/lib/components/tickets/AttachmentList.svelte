@@ -91,11 +91,17 @@
 {#if files.length === 0}
 	<p class="text-muted mb-0">{getMessage('ticket_attachments_empty')}</p>
 {:else}
-	<DataTable config={attachmentsTableConfig} data={enrichedFiles} loading={loading || loadingUsers} {error} {onRowAction} />
+	<DataTable
+		config={attachmentsTableConfig}
+		data={enrichedFiles}
+		loading={loading || loadingUsers}
+		{error}
+		{onRowAction}
+	/>
 {/if}
 
 {#if showPreviewModal}
-	<FilePreviewModal 
+	<FilePreviewModal
 		fileUrl={previewFileUrl}
 		fileName={previewFileName}
 		mimeType={previewMimeType}

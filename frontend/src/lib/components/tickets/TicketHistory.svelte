@@ -47,7 +47,11 @@
 		return formatDateTimeForDetails(iso);
 	}
 
-	function formatHistoryValue(value: string | null, changeType: string, displayValue?: string | null): string {
+	function formatHistoryValue(
+		value: string | null,
+		changeType: string,
+		displayValue?: string | null
+	): string {
 		if (!value) return '';
 
 		// For ticket creation, return as-is (already formatted)
@@ -91,7 +95,11 @@
 
 {#if loading}
 	<div class="d-flex align-items-center gap-2 text-muted">
-		<div class="spinner-border spinner-border-sm" role="status" aria-label={getMessage('loading')}></div>
+		<div
+			class="spinner-border spinner-border-sm"
+			role="status"
+			aria-label={getMessage('loading')}
+		></div>
 		<span>{getMessage('loading')}</span>
 	</div>
 {:else if error}
@@ -110,7 +118,7 @@
 			<li class="list-group-item">
 				<div class="d-flex align-items-start justify-content-between gap-3">
 					<div class="d-flex gap-2">
-						<i class={"bi " + iconForChangeType(h.changeType) + " text-secondary"}></i>
+						<i class={'bi ' + iconForChangeType(h.changeType) + ' text-secondary'}></i>
 						<div>
 							<div class="fw-semibold">{labelForChangeType(h.changeType)}</div>
 							<div class="text-muted small">
@@ -120,14 +128,26 @@
 								<div class="mt-2 small">
 									{#if h.oldValue && h.newValue}
 										{console.log('History with both values: ', h)}
-										{#if h.changeType.toLowerCase().includes('change') && (h.oldValue === '0')}
-											<span>{getMessage('not_available')}<span class="mx-1">&rarr;</span> {formatHistoryValue(h.newValue, h.changeType, h.newValueDisplay)}</span>
+										{#if h.changeType.toLowerCase().includes('change') && h.oldValue === '0'}
+											<span
+												>{getMessage('not_available')}<span class="mx-1">&rarr;</span>
+												{formatHistoryValue(h.newValue, h.changeType, h.newValueDisplay)}</span
+											>
 										{:else}
-											<span>{formatHistoryValue(h.oldValue, h.changeType, h.oldValueDisplay)} <span class="mx-1">&rarr;</span> {formatHistoryValue(h.newValue, h.changeType, h.newValueDisplay)}</span>
+											<span
+												>{formatHistoryValue(h.oldValue, h.changeType, h.oldValueDisplay)}
+												<span class="mx-1">&rarr;</span>
+												{formatHistoryValue(h.newValue, h.changeType, h.newValueDisplay)}</span
+											>
 										{/if}
 									{:else if h.newValue}
-										{#if h.changeType.toLowerCase().includes('change') && (!h.oldValue || h.oldValue === '0')}
-											<span>{getMessage('not_available')}<span class="mx-1">&rarr;</span> {formatHistoryValue(h.newValue, h.changeType, h.newValueDisplay)}</span>
+										{#if h.changeType
+											.toLowerCase()
+											.includes('change') && (!h.oldValue || h.oldValue === '0')}
+											<span
+												>{getMessage('not_available')}<span class="mx-1">&rarr;</span>
+												{formatHistoryValue(h.newValue, h.changeType, h.newValueDisplay)}</span
+											>
 										{:else}
 											<span>{formatHistoryValue(h.newValue, h.changeType, h.newValueDisplay)}</span>
 										{/if}

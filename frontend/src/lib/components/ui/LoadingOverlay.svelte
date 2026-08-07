@@ -4,7 +4,7 @@
 
 	/**
 	 * Loading Overlay for blocking UI during async operations
-	 * 
+	 *
 	 * @example
 	 * <LoadingOverlay show={isLoading} message="Saving ticket..." />
 	 */
@@ -25,7 +25,9 @@
 
 	const defaultMessage = $derived(getMessage('loading'));
 	const displayMessage = $derived(message ?? defaultMessage);
-	const classes = $derived(['loading-overlay', fullscreen ? 'fullscreen' : '', className].filter(Boolean).join(' '));
+	const classes = $derived(
+		['loading-overlay', fullscreen ? 'fullscreen' : '', className].filter(Boolean).join(' ')
+	);
 </script>
 
 {#if show}

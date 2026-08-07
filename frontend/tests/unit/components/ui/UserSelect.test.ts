@@ -53,7 +53,9 @@ describe('UserSelect Component - Assignment Feature', () => {
 	}
 
 	function getMenuOptions(container: HTMLElement): HTMLButtonElement[] {
-		return Array.from(container.querySelectorAll('.select-menu .select-option')) as HTMLButtonElement[];
+		return Array.from(
+			container.querySelectorAll('.select-menu .select-option')
+		) as HTMLButtonElement[];
 	}
 
 	it('renders with users list', async () => {
@@ -116,7 +118,7 @@ describe('UserSelect Component - Assignment Feature', () => {
 
 	it('emits change event on selection and updates value', async () => {
 		let selectedValue: number | null = null;
-		
+
 		const { container } = render(UserSelect, {
 			props: {
 				ticketId: 1,
@@ -135,23 +137,23 @@ describe('UserSelect Component - Assignment Feature', () => {
 		const jan = options.find((o) => (o.textContent ?? '').includes('Jan Kowalski (Support)'));
 		expect(jan).not.toBeUndefined();
 		await fireEvent.click(jan!);
-		
+
 		expect(selectedValue).toBe(1);
-		
+
 		await openMenu(container);
 		options = getMenuOptions(container);
 		const anna = options.find((o) => (o.textContent ?? '').includes('Anna Nowak (TeamLeader)'));
 		expect(anna).not.toBeUndefined();
 		await fireEvent.click(anna!);
-		
+
 		expect(selectedValue).toBe(2);
-		
+
 		await openMenu(container);
 		options = getMenuOptions(container);
 		const unassign = options.find((o) => (o.textContent ?? '').includes('— not_assigned —'));
 		expect(unassign).not.toBeUndefined();
 		await fireEvent.click(unassign!);
-		
+
 		expect(selectedValue).toBeNull();
 	});
 
