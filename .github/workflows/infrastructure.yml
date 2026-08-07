@@ -1,0 +1,142 @@
+name: Infrastructure
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "aws/**"
+      - ".github/workflows/infrastructure.yml"
+  push:
+    branches: [main]
+    paths:
+      - "aws/**"
+      - ".github/workflows/infrastructure.yml"
+  workflow_dispatch:
+    inputs:
+      action:
+        description: Terraform operation
+        required: true
+        default: plan
+        type: choice
+        options:
+          - plan
+          - apply
+
+permissions:
+  contents: read
+
+env:
+  TF_IN_AUTOMATION: "true"
+  TF_INPUT: "false"
+  TF_VERSION: "1.15.8"
+
+jobs:
+  validate:
+    name: Terraform validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Check formatting
+        run: terraform -chdir=aws fmt -check -recursive
+
+      - name: Initialize without the remote backend
+        run: terraform -chdir=aws init -backend=false -input=false
+
+      - name: Validate configuration
+        run: terraform -chdir=aws validate
+
+  plan:
+    name: Terraform plan
+    needs: validate
+    if: github.event_name == 'workflow_dispatch' && inputs.action == 'plan'
+    runs-on: ubuntu-latest
+    environment: dev-infrastructure
+    env:
+      TF_VAR_aws_region: ${{ vars.AWS_REGION || 'us-east-1' }}
+      TF_VAR_environment: ${{ vars.DEPLOY_ENVIRONMENT || 'dev' }}
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Verify infrastructure role configuration
+        env:
+          ROLE_ARN: ${{ vars.AWS_INFRASTRUCTURE_ROLE_ARN }}
+        run: |
+          if [[ -z "$ROLE_ARN" ]]; then
+            echo "AWS_INFRASTRUCTURE_ROLE_ARN is not configured in the dev-infrastructure environment" >&2
+            exit 1
+          fi
+
+      - name: Configure AWS credentials through OIDC
+        uses: aws-actions/configure-aws-credentials@v6.1.2
+        with:
+          role-to-assume: ${{ vars.AWS_INFRASTRUCTURE_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION || 'us-east-1' }}
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Initialize Terraform
+        run: terraform -chdir=aws init -input=false
+
+      - name: Create plan
+        run: terraform -chdir=aws plan -input=false -lock-timeout=5m
+
+  apply:
+    name: Terraform apply
+    needs: validate
+    if: >-
+      github.event_name == 'push' ||
+      (github.event_name == 'workflow_dispatch' && inputs.action == 'apply')
+    runs-on: ubuntu-latest
+    environment: dev-infrastructure
+    env:
+      TF_VAR_aws_region: ${{ vars.AWS_REGION || 'us-east-1' }}
+      TF_VAR_environment: ${{ vars.DEPLOY_ENVIRONMENT || 'dev' }}
+    concurrency:
+      group: ticketing-system-dev-infrastructure
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Verify infrastructure role configuration
+        env:
+          ROLE_ARN: ${{ vars.AWS_INFRASTRUCTURE_ROLE_ARN }}
+        run: |
+          if [[ -z "$ROLE_ARN" ]]; then
+            echo "AWS_INFRASTRUCTURE_ROLE_ARN is not configured in the dev-infrastructure environment" >&2
+            exit 1
+          fi
+
+      - name: Configure AWS credentials through OIDC
+        uses: aws-actions/configure-aws-credentials@v6.1.2
+        with:
+          role-to-assume: ${{ vars.AWS_INFRASTRUCTURE_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION || 'us-east-1' }}
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Initialize Terraform
+        run: terraform -chdir=aws init -input=false
+
+      - name: Apply reviewed configuration
+        run: terraform -chdir=aws apply -auto-approve -input=false -lock-timeout=5m

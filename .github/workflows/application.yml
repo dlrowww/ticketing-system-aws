@@ -1,0 +1,213 @@
+name: Application CI and CD
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "backend/**"
+      - "frontend/**"
+      - ".dockerignore"
+      - ".github/workflows/application.yml"
+  push:
+    branches: [main]
+    paths:
+      - "backend/**"
+      - "frontend/**"
+      - ".dockerignore"
+      - ".github/workflows/application.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  TF_IN_AUTOMATION: "true"
+  TF_INPUT: "false"
+  TF_VERSION: "1.15.8"
+  DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+  DOTNET_NOLOGO: "true"
+
+jobs:
+  backend-ci:
+    name: Backend CI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore backend projects
+        run: |
+          dotnet restore backend/TicketingSystem.Api/TicketingSystem.Api.csproj
+          dotnet restore backend/TicketingSystem.Api.Tests/TicketingSystem.Api.Tests.csproj
+          dotnet restore backend/TicketingSystem.Api.IntegrationTests/TicketingSystem.Api.IntegrationTests.csproj
+
+      - name: Build backend
+        run: dotnet build backend/TicketingSystem.Api/TicketingSystem.Api.csproj --configuration Release --no-restore
+
+      - name: Run unit tests
+        run: dotnet test backend/TicketingSystem.Api.Tests/TicketingSystem.Api.Tests.csproj --configuration Release --no-restore --logger "console;verbosity=normal"
+
+      - name: Run integration tests
+        run: dotnet test backend/TicketingSystem.Api.IntegrationTests/TicketingSystem.Api.IntegrationTests.csproj --configuration Release --no-restore --logger "console;verbosity=normal"
+
+  frontend-ci:
+    name: Frontend CI
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+
+      - name: Enable the package.json pnpm version
+        run: |
+          corepack enable
+          corepack prepare pnpm@10.20.0 --activate
+
+      - name: Install locked dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run frontend quality gate
+        run: pnpm quality
+
+  deploy:
+    name: Build images and deploy application
+    needs:
+      - backend-ci
+      - frontend-ci
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    environment: dev
+    concurrency:
+      group: ticketing-system-dev-deployment
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Verify application role configuration
+        env:
+          ROLE_ARN: ${{ vars.AWS_APPLICATION_ROLE_ARN }}
+        run: |
+          if [[ -z "$ROLE_ARN" ]]; then
+            echo "AWS_APPLICATION_ROLE_ARN is not configured in the dev environment" >&2
+            exit 1
+          fi
+
+      - name: Configure AWS credentials through OIDC
+        uses: aws-actions/configure-aws-credentials@v6.1.2
+        with:
+          role-to-assume: ${{ vars.AWS_APPLICATION_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION || 'us-east-1' }}
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      - name: Read deployment targets from Terraform state
+        id: targets
+        run: |
+          terraform -chdir=aws init -input=false
+          repositories="$(terraform -chdir=aws output -json ecr_repository_urls)"
+          backend_repository="$(jq -er '."ticketing-backend"' <<<"$repositories")"
+          frontend_repository="$(jq -er '."ticketing-frontend"' <<<"$repositories")"
+          backend_repository_name="${backend_repository#*/}"
+          frontend_repository_name="${frontend_repository#*/}"
+          cluster_name="$(terraform -chdir=aws output -raw cluster_id)"
+          application_domain="$(terraform -chdir=aws output -raw application_domain_name 2>/dev/null || true)"
+          certificate_arn="$(terraform -chdir=aws output -raw acm_certificate_arn 2>/dev/null || true)"
+
+          [[ "$backend_repository" =~ ^[A-Za-z0-9._/-]+$ ]] || { echo "Unsafe backend repository output" >&2; exit 1; }
+          [[ "$frontend_repository" =~ ^[A-Za-z0-9._/-]+$ ]] || { echo "Unsafe frontend repository output" >&2; exit 1; }
+          [[ "$cluster_name" =~ ^[A-Za-z0-9_-]+$ ]] || { echo "Unsafe EKS cluster output" >&2; exit 1; }
+          [[ -z "$application_domain" || "$application_domain" =~ ^[A-Za-z0-9.-]+$ ]] || { echo "Unsafe domain output" >&2; exit 1; }
+          [[ -z "$certificate_arn" || "$certificate_arn" =~ ^arn:[a-z0-9-]+:acm:[a-z0-9-]+:[0-9]{12}:certificate/[A-Za-z0-9-]+$ ]] || { echo "Unsafe certificate output" >&2; exit 1; }
+
+          backend_exists=false
+          frontend_exists=false
+          if aws ecr describe-images --repository-name "$backend_repository_name" --image-ids "imageTag=${GITHUB_SHA}" >/dev/null 2>&1; then
+            backend_exists=true
+          fi
+          if aws ecr describe-images --repository-name "$frontend_repository_name" --image-ids "imageTag=${GITHUB_SHA}" >/dev/null 2>&1; then
+            frontend_exists=true
+          fi
+          {
+            echo "backend_image=${backend_repository}:${GITHUB_SHA}"
+            echo "frontend_image=${frontend_repository}:${GITHUB_SHA}"
+            echo "backend_exists=${backend_exists}"
+            echo "frontend_exists=${frontend_exists}"
+            echo "cluster_name=${cluster_name}"
+            echo "application_domain=${application_domain}"
+            echo "certificate_arn=${certificate_arn}"
+          } >>"$GITHUB_OUTPUT"
+
+      - name: Log in to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build and push backend image
+        if: steps.targets.outputs.backend_exists != 'true'
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: backend/TicketingSystem.Api/Dockerfile
+          push: true
+          tags: ${{ steps.targets.outputs.backend_image }}
+          cache-from: type=gha,scope=backend
+          cache-to: type=gha,mode=max,scope=backend
+
+      - name: Build and push frontend image
+        if: steps.targets.outputs.frontend_exists != 'true'
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: frontend/Dockerfile
+          push: true
+          tags: ${{ steps.targets.outputs.frontend_image }}
+          cache-from: type=gha,scope=frontend
+          cache-to: type=gha,mode=max,scope=frontend
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Configure the EKS kubeconfig
+        run: aws eks update-kubeconfig --name "${{ steps.targets.outputs.cluster_name }}" --region "${{ vars.AWS_REGION || 'us-east-1' }}"
+
+      - name: Install manifest rendering dependency
+        run: sudo apt-get update && sudo apt-get install --yes gettext-base
+
+      - name: Deploy immutable application images
+        env:
+          BACKEND_IMAGE: ${{ steps.targets.outputs.backend_image }}
+          FRONTEND_IMAGE: ${{ steps.targets.outputs.frontend_image }}
+          APPLICATION_DOMAIN: ${{ steps.targets.outputs.application_domain }}
+          CERTIFICATE_ARN: ${{ steps.targets.outputs.certificate_arn }}
+        run: |
+          args=(
+            --backend-image "$BACKEND_IMAGE"
+            --frontend-image "$FRONTEND_IMAGE"
+          )
+          if [[ -n "$APPLICATION_DOMAIN" && -n "$CERTIFICATE_ARN" ]]; then
+            args+=(--domain "$APPLICATION_DOMAIN" --certificate-arn "$CERTIFICATE_ARN")
+          elif [[ -n "$APPLICATION_DOMAIN" || -n "$CERTIFICATE_ARN" ]]; then
+            echo "Domain and certificate outputs are incomplete; skipping Ingress for this deployment" >&2
+          fi
+          ./devops_scripts/deploy-k8s.sh "${args[@]}"

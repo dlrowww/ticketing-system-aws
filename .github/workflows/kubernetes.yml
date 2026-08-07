@@ -1,0 +1,162 @@
+name: Kubernetes Deployment
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "k8s_deploy/**"
+      - "devops_scripts/**"
+      - ".github/workflows/kubernetes.yml"
+  push:
+    branches: [main]
+    paths:
+      - "k8s_deploy/**"
+      - "devops_scripts/**"
+      - ".github/workflows/kubernetes.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  TF_IN_AUTOMATION: "true"
+  TF_INPUT: "false"
+  TF_VERSION: "1.15.8"
+
+jobs:
+  validate:
+    name: Validate Kubernetes manifests and scripts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Parse Kubernetes YAML
+        run: |
+          ruby -rpsych -e '
+            files = Dir.glob("k8s_deploy/**/*.yaml").sort
+            abort("No Kubernetes YAML files found") if files.empty?
+            files.each do |file|
+              Psych.parse_stream(File.read(file), filename: file)
+              puts "valid YAML: #{file}"
+            end
+          '
+
+      - name: Check deployment script syntax
+        run: |
+          bash -n devops_scripts/deploy-k8s.sh
+          bash -n devops_scripts/render-external-secrets.sh
+          bash -n devops_scripts/bootstrap-secrets.sh
+
+  deploy:
+    name: Deploy Kubernetes configuration
+    needs: validate
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    environment: dev
+    concurrency:
+      group: ticketing-system-dev-deployment
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Verify Kubernetes role configuration
+        env:
+          ROLE_ARN: ${{ vars.AWS_KUBERNETES_ROLE_ARN }}
+        run: |
+          if [[ -z "$ROLE_ARN" ]]; then
+            echo "AWS_KUBERNETES_ROLE_ARN is not configured in the dev environment" >&2
+            exit 1
+          fi
+
+      - name: Configure AWS credentials through OIDC
+        uses: aws-actions/configure-aws-credentials@v6.1.2
+        with:
+          role-to-assume: ${{ vars.AWS_KUBERNETES_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION || 'us-east-1' }}
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      - name: Read cluster configuration from Terraform state
+        id: targets
+        run: |
+          terraform -chdir=aws init -input=false
+          cluster_name="$(terraform -chdir=aws output -raw cluster_id)"
+          repositories="$(terraform -chdir=aws output -json ecr_repository_urls)"
+          backend_repository="$(jq -er '."ticketing-backend"' <<<"$repositories")"
+          frontend_repository="$(jq -er '."ticketing-frontend"' <<<"$repositories")"
+          application_domain="$(terraform -chdir=aws output -raw application_domain_name 2>/dev/null || true)"
+          certificate_arn="$(terraform -chdir=aws output -raw acm_certificate_arn 2>/dev/null || true)"
+
+          [[ "$backend_repository" =~ ^[A-Za-z0-9._/-]+$ ]] || { echo "Unsafe backend repository output" >&2; exit 1; }
+          [[ "$frontend_repository" =~ ^[A-Za-z0-9._/-]+$ ]] || { echo "Unsafe frontend repository output" >&2; exit 1; }
+          [[ "$cluster_name" =~ ^[A-Za-z0-9_-]+$ ]] || { echo "Unsafe EKS cluster output" >&2; exit 1; }
+          [[ -z "$application_domain" || "$application_domain" =~ ^[A-Za-z0-9.-]+$ ]] || { echo "Unsafe domain output" >&2; exit 1; }
+          [[ -z "$certificate_arn" || "$certificate_arn" =~ ^arn:[a-z0-9-]+:acm:[a-z0-9-]+:[0-9]{12}:certificate/[A-Za-z0-9-]+$ ]] || { echo "Unsafe certificate output" >&2; exit 1; }
+          {
+            echo "cluster_name=${cluster_name}"
+            echo "backend_repository=${backend_repository}"
+            echo "frontend_repository=${frontend_repository}"
+            echo "application_domain=${application_domain}"
+            echo "certificate_arn=${certificate_arn}"
+          } >>"$GITHUB_OUTPUT"
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Configure the EKS kubeconfig
+        run: aws eks update-kubeconfig --name "${{ steps.targets.outputs.cluster_name }}" --region "${{ vars.AWS_REGION || 'us-east-1' }}"
+
+      - name: Reuse the currently deployed immutable images
+        id: images
+        env:
+          BACKEND_REPOSITORY: ${{ steps.targets.outputs.backend_repository }}
+          FRONTEND_REPOSITORY: ${{ steps.targets.outputs.frontend_repository }}
+        run: |
+          backend_image="$(kubectl get deployment ticketing-system-api --namespace ticketing-system --output jsonpath='{.spec.template.spec.containers[?(@.name=="api")].image}')"
+          frontend_image="$(kubectl get deployment ticketing-system-frontend --namespace ticketing-system --output jsonpath='{.spec.template.spec.containers[?(@.name=="frontend")].image}')"
+          if [[ -z "$backend_image" || -z "$frontend_image" ]]; then
+            echo "Existing application Deployments were not found; run Application CI and CD once before the Kubernetes-only pipeline" >&2
+            exit 1
+          fi
+          if [[ "$backend_image" != "${BACKEND_REPOSITORY}:"* && "$backend_image" != "${BACKEND_REPOSITORY}@sha256:"* ]]; then
+            echo "The running backend does not use the Terraform-managed ECR repository; run Application CI and CD first" >&2
+            exit 1
+          fi
+          if [[ "$frontend_image" != "${FRONTEND_REPOSITORY}:"* && "$frontend_image" != "${FRONTEND_REPOSITORY}@sha256:"* ]]; then
+            echo "The running frontend does not use the Terraform-managed ECR repository; run Application CI and CD first" >&2
+            exit 1
+          fi
+          {
+            echo "backend_image=${backend_image}"
+            echo "frontend_image=${frontend_image}"
+          } >>"$GITHUB_OUTPUT"
+
+      - name: Install manifest rendering dependency
+        run: sudo apt-get update && sudo apt-get install --yes gettext-base
+
+      - name: Deploy Kubernetes configuration
+        env:
+          BACKEND_IMAGE: ${{ steps.images.outputs.backend_image }}
+          FRONTEND_IMAGE: ${{ steps.images.outputs.frontend_image }}
+          APPLICATION_DOMAIN: ${{ steps.targets.outputs.application_domain }}
+          CERTIFICATE_ARN: ${{ steps.targets.outputs.certificate_arn }}
+        run: |
+          args=(
+            --backend-image "$BACKEND_IMAGE"
+            --frontend-image "$FRONTEND_IMAGE"
+          )
+          if [[ -n "$APPLICATION_DOMAIN" && -n "$CERTIFICATE_ARN" ]]; then
+            args+=(--domain "$APPLICATION_DOMAIN" --certificate-arn "$CERTIFICATE_ARN")
+          elif [[ -n "$APPLICATION_DOMAIN" || -n "$CERTIFICATE_ARN" ]]; then
+            echo "Domain and certificate outputs are incomplete; skipping Ingress for this deployment" >&2
+          fi
+          ./devops_scripts/deploy-k8s.sh "${args[@]}"
