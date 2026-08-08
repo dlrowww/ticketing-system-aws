@@ -51,6 +51,11 @@ resource "helm_release" "aws_load_balancer_controller" {
   # 最长等待时间，单位为秒
   timeout = 600
 
+  # Do not let dependent Kubernetes resources start until the controller and
+  # its admission webhook are ready.
+  wait          = true
+  wait_for_jobs = true
+
   values = [
     yamlencode({
       clusterName = aws_eks_cluster.eks_cluster.name

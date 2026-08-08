@@ -91,5 +91,6 @@ resource "aws_eks_addon" "cloudwatch_observability" {
     aws_iam_role_policy_attachment.cloudwatch_agent,
     aws_iam_role_policy_attachment.cloudwatch_xray,
     aws_cloudwatch_log_group.container_application,
+    helm_release.aws_load_balancer_controller,
   ]
 }
