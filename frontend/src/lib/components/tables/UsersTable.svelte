@@ -20,7 +20,10 @@
 	import UserFormModal from '$lib/components/modals/UserFormModal.svelte';
 	import { UserRole } from '$lib/types/enums';
 
-	let { initial, initialQuery }: { initial?: PagedResult<UserListItemDto>; initialQuery?: UserQuery } = $props();
+	let {
+		initial,
+		initialQuery
+	}: { initial?: PagedResult<UserListItemDto>; initialQuery?: UserQuery } = $props();
 
 	let loading = $state(false);
 	let errorMsg = $state<string | null>(null);
@@ -56,7 +59,7 @@
 
 	const categoryOptions = $derived([
 		{ value: 'All' as const, labelKey: 'all' },
-		...Array.from(get(categoryMap).values()).map(cat => ({
+		...Array.from(get(categoryMap).values()).map((cat) => ({
 			value: cat.categoryId as number | 'All',
 			labelKey: getCategoryName(cat.categoryId)
 		}))
@@ -161,7 +164,9 @@
 				await load();
 			} catch (e: any) {
 				const code = (e as any)?.code as string | undefined;
-				toastStore.error(code ? getMessage(`error_code_${code}`) : getMessage('user_update_failed'));
+				toastStore.error(
+					code ? getMessage(`error_code_${code}`) : getMessage('user_update_failed')
+				);
 			}
 		}
 	}
@@ -181,17 +186,32 @@
 
 	<div class="me-2">
 		<label for="users-role" class="form-label mb-1">{getMessage('role')}</label>
-		<Select id="users-role" bind:value={query.role} options={roleOptions} widthGroup="user-filters" />
+		<Select
+			id="users-role"
+			bind:value={query.role}
+			options={roleOptions}
+			widthGroup="user-filters"
+		/>
 	</div>
 
 	<div class="me-2">
 		<label for="users-category" class="form-label mb-1">{getMessage('category')}</label>
-		<Select id="users-category" bind:value={query.category} options={categoryOptions} widthGroup="user-filters" />
+		<Select
+			id="users-category"
+			bind:value={query.category}
+			options={categoryOptions}
+			widthGroup="user-filters"
+		/>
 	</div>
 
 	<div class="me-2">
 		<label for="users-status" class="form-label mb-1">{getMessage('status')}</label>
-		<Select id="users-status" bind:value={query.isActive} options={statusOptions} widthGroup="user-filters" />
+		<Select
+			id="users-status"
+			bind:value={query.isActive}
+			options={statusOptions}
+			widthGroup="user-filters"
+		/>
 	</div>
 
 	<div class="ms-auto d-flex gap-2">

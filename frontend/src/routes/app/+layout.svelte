@@ -7,15 +7,15 @@
 
 <div class="app-container">
 	<TopBar user={data.user} />
-	
+
 	<div class="app-body">
 		<NavRail user={data.user} />
-		
+
 		<main class="app-content">
 			{@render children()}
 		</main>
 	</div>
-	
+
 	<Footer />
 	<FloatingActionButton />
 </div>

@@ -12,10 +12,8 @@ describe('Tickets Service - File Upload', () => {
 	it('should upload files successfully and return file metadata', async () => {
 		// Arrange
 		const ticketId = 1;
-		const mockFiles = [
-			new File(['test content'], 'test.txt', { type: 'text/plain' })
-		];
-		
+		const mockFiles = [new File(['test content'], 'test.txt', { type: 'text/plain' })];
+
 		const mockResponse = [
 			{
 				fileId: 1,
@@ -39,12 +37,12 @@ describe('Tickets Service - File Upload', () => {
 		// Assert
 		expect(result).toEqual(mockResponse);
 		expect(global.fetch).toHaveBeenCalledTimes(1);
-		
+
 		const callArgs = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0];
 		expect(callArgs[0]).toBe('/api/tickets/1/files');
 		expect(callArgs[1].method).toBe('POST');
 		expect(callArgs[1].credentials).toBe('include');
-		
+
 		// Verify FormData was created with correct files
 		const formData = callArgs[1].body as FormData;
 		expect(formData).toBeInstanceOf(FormData);
@@ -61,9 +59,30 @@ describe('Tickets Service - File Upload', () => {
 		];
 
 		const mockResponse = [
-			{ fileId: 1, ticketId: 1, fileName: 'file1.txt', contentType: 'text/plain', sizeBytes: 512, uploadedAt: '2026-01-06T22:00:00Z' },
-			{ fileId: 2, ticketId: 1, fileName: 'file2.pdf', contentType: 'application/pdf', sizeBytes: 1024, uploadedAt: '2026-01-06T22:00:01Z' },
-			{ fileId: 3, ticketId: 1, fileName: 'file3.jpg', contentType: 'image/jpeg', sizeBytes: 2048, uploadedAt: '2026-01-06T22:00:02Z' }
+			{
+				fileId: 1,
+				ticketId: 1,
+				fileName: 'file1.txt',
+				contentType: 'text/plain',
+				sizeBytes: 512,
+				uploadedAt: '2026-01-06T22:00:00Z'
+			},
+			{
+				fileId: 2,
+				ticketId: 1,
+				fileName: 'file2.pdf',
+				contentType: 'application/pdf',
+				sizeBytes: 1024,
+				uploadedAt: '2026-01-06T22:00:01Z'
+			},
+			{
+				fileId: 3,
+				ticketId: 1,
+				fileName: 'file3.jpg',
+				contentType: 'image/jpeg',
+				sizeBytes: 2048,
+				uploadedAt: '2026-01-06T22:00:02Z'
+			}
 		];
 
 		(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
@@ -77,7 +96,7 @@ describe('Tickets Service - File Upload', () => {
 
 		// Assert
 		expect(result).toEqual(mockResponse);
-		
+
 		const formData = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0][1].body as FormData;
 		expect(formData.getAll('files')).toHaveLength(3);
 	});
@@ -125,9 +144,7 @@ describe('Tickets Service - File Upload', () => {
 		});
 
 		// Act & Assert
-		await expect(addTicketAttachments(ticketId, mockFiles)).rejects.toThrow(
-			'Ticket not found'
-		);
+		await expect(addTicketAttachments(ticketId, mockFiles)).rejects.toThrow('Ticket not found');
 	});
 
 	it('should throw error with user-friendly message on 413 Payload Too Large', async () => {
@@ -155,7 +172,9 @@ describe('Tickets Service - File Upload', () => {
 			ok: false,
 			status: 500,
 			statusText: 'Internal Server Error',
-			json: async () => { throw new Error('Not JSON'); }
+			json: async () => {
+				throw new Error('Not JSON');
+			}
 		});
 
 		// Act & Assert
@@ -169,9 +188,7 @@ describe('Tickets Service - File Upload', () => {
 		const ticketId = 1;
 		const mockFiles = [new File(['test'], 'test.txt', { type: 'text/plain' })];
 
-		(global.fetch as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
-			new Error('Network error')
-		);
+		(global.fetch as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error('Network error'));
 
 		// Act & Assert
 		await expect(addTicketAttachments(ticketId, mockFiles)).rejects.toThrow('Network error');

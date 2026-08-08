@@ -1,16 +1,16 @@
 <script>
-// @ts-nocheck
+	// @ts-nocheck
 
 	let { options = [], value = '', onchange } = $props();
 
 	let open = $state(false);
 	let selected = $state(value || (options.length > 0 ? options[0].id : ''));
-	let selectedValue = $state((options.find(item => item.id === selected) || {}).name || '');
+	let selectedValue = $state((options.find((item) => item.id === selected) || {}).name || '');
 
 	$effect(() => {
 		// Only update selected if prop 'value' changes (ignore if set by user)
 		if (value !== selected) {
-			selected  = value;
+			selected = value;
 		}
 	});
 
@@ -57,8 +57,8 @@
 			<li>
 				<button
 					type="button"
-				class="select-option {option.id === selected ? 'selected' : ''}"
-				onclick={() => handleSelect(option.id)}
+					class="select-option {option.id === selected ? 'selected' : ''}"
+					onclick={() => handleSelect(option.id)}
 					role="option"
 					aria-selected={option.id === selected}
 				>

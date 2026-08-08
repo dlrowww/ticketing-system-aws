@@ -84,10 +84,10 @@
 		</div>
 
 		<div class="d-flex justify-content-end">
-			<Button 
-				type="submit" 
-				variant="primary" 
-				size="sm" 
+			<Button
+				type="submit"
+				variant="primary"
+				size="sm"
 				disabled={submitting || selectedFiles.length === 0}
 				loading={submitting}
 			>

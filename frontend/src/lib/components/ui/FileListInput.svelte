@@ -57,12 +57,12 @@
 
 	function removeFile(index: number) {
 		value = value.filter((_, i) => i !== index);
-		
+
 		// Reset file input to sync with state
 		if (fileInput) {
 			fileInput.value = '';
 		}
-		
+
 		onChange?.(value);
 	}
 
@@ -78,12 +78,12 @@
 			<strong>{getMessage('attachment_selected_files')} ({value.length}):</strong>
 		{/if}
 	</div> -->
-	
+
 	<div class="row g-3">
 		<div class="col-12 {value.length > 0 ? 'col-md-6' : ''}">
-            {#if label}
-                <label for={id} class="form-label">{label}</label>
-            {/if}
+			{#if label}
+				<label for={id} class="form-label">{label}</label>
+			{/if}
 			<input
 				bind:this={fileInput}
 				{id}
@@ -111,7 +111,7 @@
 
 		{#if value.length > 0}
 			<div class="col-12 col-md-6">
-                <strong>{getMessage('attachment_selected_files')} ({value.length}):</strong>
+				<strong>{getMessage('attachment_selected_files')} ({value.length}):</strong>
 				<div class="selected-files-container">
 					<ul class="list-group list-group-flush">
 						{#each value as file, index}
@@ -140,47 +140,47 @@
 </div>
 
 <style lang="scss">
-    .selected-files-container {
-        max-height: 8em; // ~3 items height
-        overflow-y: auto;
-        border: 1px solid var(--bs-border-color);
-        border-radius: 0.375rem;
-        padding: 0 0.25rem;
-        background-color: var(--bs-body-bg);
-        margin-top: 0.3rem;
-    }
+	.selected-files-container {
+		max-height: 8em; // ~3 items height
+		overflow-y: auto;
+		border: 1px solid var(--bs-border-color);
+		border-radius: 0.375rem;
+		padding: 0 0.25rem;
+		background-color: var(--bs-body-bg);
+		margin-top: 0.3rem;
+	}
 
-    .list-group-item {
-        padding: 0.375rem 0.5rem;
-        border: none;
-        border-bottom: 1px solid var(--bs-border-color-translucent);
-        background-color: transparent;
+	.list-group-item {
+		padding: 0.375rem 0.5rem;
+		border: none;
+		border-bottom: 1px solid var(--bs-border-color-translucent);
+		background-color: transparent;
 
-        &:last-child {
-            border-bottom: none;
-        }
+		&:last-child {
+			border-bottom: none;
+		}
 
-        .file-info {
-            display: flex;
-            align-items: center;
-            min-width: 0;
-            flex: 1;
-        }
+		.file-info {
+			display: flex;
+			align-items: center;
+			min-width: 0;
+			flex: 1;
+		}
 
-        .file-name {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-    }
+		.file-name {
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+	}
 
-    .btn-link.text-danger {
-        transition: all 0.15s ease-in-out;
-        
-        &:hover:not(:disabled) {
-            color: var(--ironpack-red);
-            transform: scale(1.15);
-            text-decoration: none;
-        }
-    }
+	.btn-link.text-danger {
+		transition: all 0.15s ease-in-out;
+
+		&:hover:not(:disabled) {
+			color: var(--ironpack-red);
+			transform: scale(1.15);
+			text-decoration: none;
+		}
+	}
 </style>

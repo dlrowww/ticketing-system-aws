@@ -15,7 +15,9 @@ describe('Root redirects', () => {
 	it('redirects Admin users from / to /app/dashboard', async () => {
 		const { load } = await import('../../../src/routes/+page.server');
 
-		await expect(load({ locals: { user: { roleId: String(UserRole.Admin) } } } as any)).rejects.toMatchObject({
+		await expect(
+			load({ locals: { user: { roleId: String(UserRole.Admin) } } } as any)
+		).rejects.toMatchObject({
 			status: 303,
 			location: '/app/dashboard'
 		});
@@ -24,7 +26,9 @@ describe('Root redirects', () => {
 	it('redirects TeamLeader users from / to /app/dashboard', async () => {
 		const { load } = await import('../../../src/routes/+page.server');
 
-		await expect(load({ locals: { user: { roleId: String(UserRole.TeamLeader) } } } as any)).rejects.toMatchObject({
+		await expect(
+			load({ locals: { user: { roleId: String(UserRole.TeamLeader) } } } as any)
+		).rejects.toMatchObject({
 			status: 303,
 			location: '/app/dashboard'
 		});
@@ -33,7 +37,9 @@ describe('Root redirects', () => {
 	it('redirects non-Admin/TeamLeader users from / to /app/my-tickets', async () => {
 		const { load } = await import('../../../src/routes/+page.server');
 
-		await expect(load({ locals: { user: { roleId: String(UserRole.Employee) } } } as any)).rejects.toMatchObject({
+		await expect(
+			load({ locals: { user: { roleId: String(UserRole.Employee) } } } as any)
+		).rejects.toMatchObject({
 			status: 303,
 			location: '/app/my-tickets'
 		});
@@ -53,7 +59,9 @@ describe('/app redirects', () => {
 	it('redirects Admin users from /app to /app/dashboard', async () => {
 		const { load } = await import('../../../src/routes/app/+page.server');
 
-		await expect(load({ locals: { user: { roleId: String(UserRole.Admin) } } } as any)).rejects.toMatchObject({
+		await expect(
+			load({ locals: { user: { roleId: String(UserRole.Admin) } } } as any)
+		).rejects.toMatchObject({
 			status: 303,
 			location: '/app/dashboard'
 		});
@@ -62,7 +70,9 @@ describe('/app redirects', () => {
 	it('redirects non-Admin/TeamLeader users from /app to /app/my-tickets', async () => {
 		const { load } = await import('../../../src/routes/app/+page.server');
 
-		await expect(load({ locals: { user: { roleId: String(UserRole.Support) } } } as any)).rejects.toMatchObject({
+		await expect(
+			load({ locals: { user: { roleId: String(UserRole.Support) } } } as any)
+		).rejects.toMatchObject({
 			status: 303,
 			location: '/app/my-tickets'
 		});
@@ -79,7 +89,9 @@ describe('/login redirects', () => {
 	it('redirects Admin users to /app/dashboard', async () => {
 		const { load } = await import('../../../src/routes/(authentication)/login/+page.server');
 
-		await expect(load({ locals: { user: { roleId: String(UserRole.Admin) } } } as any)).rejects.toMatchObject({
+		await expect(
+			load({ locals: { user: { roleId: String(UserRole.Admin) } } } as any)
+		).rejects.toMatchObject({
 			status: 303,
 			location: '/app/dashboard'
 		});
@@ -88,7 +100,9 @@ describe('/login redirects', () => {
 	it('redirects non-Admin/TeamLeader users to /app/my-tickets', async () => {
 		const { load } = await import('../../../src/routes/(authentication)/login/+page.server');
 
-		await expect(load({ locals: { user: { roleId: String(UserRole.Employee) } } } as any)).rejects.toMatchObject({
+		await expect(
+			load({ locals: { user: { roleId: String(UserRole.Employee) } } } as any)
+		).rejects.toMatchObject({
 			status: 303,
 			location: '/app/my-tickets'
 		});

@@ -1,14 +1,23 @@
 <script lang="ts">
 	/**
 	 * Generic Badge component - reusable UI primitive
-	 * 
+	 *
 	 * @example
 	 * <Badge variant="primary">New</Badge>
 	 * <Badge variant="success" size="sm" label="Resolved" />
 	 * <Badge variant="custom" class="bg-status-open">Open</Badge>
 	 */
 
-	type Variant = 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark' | 'custom';
+	type Variant =
+		| 'primary'
+		| 'secondary'
+		| 'success'
+		| 'danger'
+		| 'warning'
+		| 'info'
+		| 'light'
+		| 'dark'
+		| 'custom';
 	type Size = 'sm' | 'md' | 'lg';
 
 	interface BadgeProps {
@@ -30,11 +39,13 @@
 	}: BadgeProps = $props();
 
 	const variantClass = $derived(variant === 'custom' ? '' : `bg-${variant}`);
-	const sizeClass = $derived({
-		sm: 'badge-sm',
-		md: 'badge-md',
-		lg: 'badge-lg'
-	}[size]);
+	const sizeClass = $derived(
+		{
+			sm: 'badge-sm',
+			md: 'badge-md',
+			lg: 'badge-lg'
+		}[size]
+	);
 
 	const classes = $derived(['badge', variantClass, sizeClass, className].filter(Boolean).join(' '));
 </script>

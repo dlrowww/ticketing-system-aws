@@ -42,7 +42,7 @@ export function getChartPalette() {
 		'#f1f3f5', // Light gray
 		'#dee2e6', // Cool gray
 		'#ced4da', // Steel gray
-		'#e5dbff'  // Light lavender
+		'#e5dbff' // Light lavender
 	];
 
 	return {

@@ -18,7 +18,7 @@ export interface TicketEditCapabilities {
 /**
  * Client-side fallback to compute edit capabilities when backend doesn't provide them.
  * Should mirror backend TicketEditPolicy logic.
- * 
+ *
  * @param ticket - The ticket to check permissions for
  * @param user - The current authenticated user
  * @returns Edit capabilities object
@@ -94,7 +94,8 @@ export function computeEditCapabilities(
 
 	// Field-level permissions
 	const canEditTitleDesc = canEdit; // All roles if they have base permission
-	const canEditRestricted = canEdit && [UserRole.Admin, UserRole.TeamLeader, UserRole.Support].includes(role);
+	const canEditRestricted =
+		canEdit && [UserRole.Admin, UserRole.TeamLeader, UserRole.Support].includes(role);
 
 	return {
 		canEditTitle: canEditTitleDesc,
@@ -111,8 +112,14 @@ export function computeEditCapabilities(
  */
 export function canEditTicket(ticket: TicketDetail, user: User | null | undefined): boolean {
 	const caps = computeEditCapabilities(ticket, user);
-	return caps.canEditTitle || caps.canEditDescription || caps.canEditCategory ||
-		caps.canEditPriority || caps.canEditStatus || caps.canEditAssignment;
+	return (
+		caps.canEditTitle ||
+		caps.canEditDescription ||
+		caps.canEditCategory ||
+		caps.canEditPriority ||
+		caps.canEditStatus ||
+		caps.canEditAssignment
+	);
 }
 
 /**

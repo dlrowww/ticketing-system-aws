@@ -4,7 +4,11 @@ import { UserRole } from '$lib/types/enums';
 
 import { redirect } from '@sveltejs/kit';
 
-import { buildTicketsSearchParams, emptyTicketsPage, loadTicketsListPage } from '$lib/server/ticketsListPage';
+import {
+	buildTicketsSearchParams,
+	emptyTicketsPage,
+	loadTicketsListPage
+} from '$lib/server/ticketsListPage';
 
 export const load: PageServerLoad = async ({ fetch, url, parent }) => {
 	const { user } = await parent();

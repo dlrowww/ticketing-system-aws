@@ -31,7 +31,14 @@ describe('Users service', () => {
 		});
 
 		await fetchUsers(
-			{ page: 2, pageSize: 25, role: 'All' as any, search: 'john', sortBy: 'email' as any, sortDir: 'desc' },
+			{
+				page: 2,
+				pageSize: 25,
+				role: 'All' as any,
+				search: 'john',
+				sortBy: 'email' as any,
+				sortDir: 'desc'
+			},
 			fetchSpy as any
 		);
 

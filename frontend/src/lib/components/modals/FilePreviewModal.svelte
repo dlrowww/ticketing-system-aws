@@ -58,10 +58,10 @@
 	}
 </script>
 
-<div 
-	class="modal fade show d-block" 
-	tabindex="-1" 
-	role="dialog" 
+<div
+	class="modal fade show d-block"
+	tabindex="-1"
+	role="dialog"
 	aria-modal="true"
 	onclick={handleBackdropClick}
 	onkeydown={handleDialogKeydown}
@@ -74,11 +74,7 @@
 					<i class="bi bi-eye me-2"></i>
 					{getMessage('file_preview_title')}
 				</h5>
-				<button
-					type="button"
-					class="btn-close"
-					aria-label={getMessage('close')}
-					onclick={close}
+				<button type="button" class="btn-close" aria-label={getMessage('close')} onclick={close}
 				></button>
 			</div>
 
@@ -106,7 +102,7 @@
 									onclick={zoomOut}
 									disabled={zoomLevel <= 0.5}
 									aria-label={getMessage('zoom_out')}
-                                    title={getMessage('zoom_out')}
+									title={getMessage('zoom_out')}
 								>
 									<i class="bi bi-zoom-out"></i>
 								</button>
@@ -115,7 +111,7 @@
 									class="btn btn-outline-secondary"
 									onclick={resetZoom}
 									aria-label={getMessage('zoom_reset')}
-                                    title={getMessage('zoom_reset')}
+									title={getMessage('zoom_reset')}
 								>
 									<i class="bi bi-aspect-ratio"></i>
 								</button>
@@ -125,7 +121,7 @@
 									onclick={zoomIn}
 									disabled={zoomLevel >= 3}
 									aria-label={getMessage('zoom_in')}
-                                    title={getMessage('zoom_in')}
+									title={getMessage('zoom_in')}
 								>
 									<i class="bi bi-zoom-in"></i>
 								</button>
@@ -150,11 +146,7 @@
 								{getMessage('open_in_new_tab')}
 							</Button>
 						</div>
-						<iframe
-							src={fileUrl}
-							title={fileName}
-							class="pdf-preview"
-						></iframe>
+						<iframe src={fileUrl} title={fileName} class="pdf-preview"></iframe>
 					</div>
 				{/if}
 			</div>

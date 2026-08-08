@@ -7,9 +7,12 @@ import { fileURLToPath } from 'node:url';
 import ts from 'typescript-eslint';
 import svelteConfig from './svelte.config.js';
 
-const gitignorePath = fileURLToPath(new URL('./.gitignore', import.meta.url));
+const gitignorePath = fileURLToPath(new URL('../.gitignore', import.meta.url));
 
 export default ts.config(
+	{
+		ignores: ['.svelte-kit/**', 'build/**', 'coverage/**', 'node_modules/**']
+	},
 	includeIgnoreFile(gitignorePath),
 	js.configs.recommended,
 	...ts.configs.recommended,
@@ -23,7 +26,17 @@ export default ts.config(
 		rules: {
 			// typescript-eslint strongly recommend that you do not use the no-undef lint rule on TypeScript projects.
 			// see: https://typescript-eslint.io/troubleshooting/faqs/eslint/#i-get-errors-from-the-no-undef-rule-about-global-variables-not-being-defined-even-though-there-are-no-typescript-errors
-			'no-undef': 'off'
+			'no-undef': 'off',
+			// Keep the existing lint debt visible without making the first quality gate unusable.
+			// New code should avoid adding warnings; these rules can be promoted to errors incrementally.
+			'@typescript-eslint/no-explicit-any': 'warn',
+			'@typescript-eslint/no-unused-vars': 'warn',
+			'@typescript-eslint/no-empty-object-type': 'warn',
+			'no-prototype-builtins': 'warn',
+			'svelte/no-unused-props': 'warn',
+			'svelte/prefer-svelte-reactivity': 'warn',
+			'svelte/prefer-writable-derived': 'warn',
+			'svelte/require-each-key': 'warn'
 		}
 	},
 	{

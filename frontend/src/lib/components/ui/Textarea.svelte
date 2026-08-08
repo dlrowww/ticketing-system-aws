@@ -1,7 +1,7 @@
 <script lang="ts">
 	/**
 	 * Generic Textarea component - reusable form primitive
-	 * 
+	 *
 	 * @example
 	 * <Textarea bind:value={description} placeholder="Enter description" rows={5} />
 	 * <Textarea bind:value={comment} error="Comment is required" />
@@ -35,7 +35,9 @@
 		maxlength
 	}: TextareaProps = $props();
 
-	const textareaClass = $derived(['form-control', error ? 'is-invalid' : '', className].filter(Boolean).join(' '));
+	const textareaClass = $derived(
+		['form-control', error ? 'is-invalid' : '', className].filter(Boolean).join(' ')
+	);
 </script>
 
 <textarea
@@ -78,7 +80,9 @@
 		background-clip: padding-box;
 		border: 1px solid #ced4da;
 		border-radius: 0.25rem;
-		transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+		transition:
+			border-color 0.15s ease-in-out,
+			box-shadow 0.15s ease-in-out;
 		resize: vertical;
 	}
 
@@ -87,7 +91,7 @@
 		background-color: #fff;
 		border-color: var(--ironpack-border);
 		outline: 0;
-		box-shadow: 0 0 0 0.25rem 	rgba(var(--ironpack-border-rgb), 0.2);
+		box-shadow: 0 0 0 0.25rem rgba(var(--ironpack-border-rgb), 0.2);
 	}
 
 	.form-control:disabled,

@@ -26,7 +26,7 @@ function createFetchSpy() {
 			ok: true,
 			status: 200,
 			statusText: 'OK',
-			json: async () => ([])
+			json: async () => []
 		} as any;
 	});
 }

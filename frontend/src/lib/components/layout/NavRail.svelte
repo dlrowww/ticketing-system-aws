@@ -211,7 +211,9 @@
 		background: var(--bs-gray-100);
 		display: flex;
 		flex-direction: column;
-		transition: width 0.3s ease, left 0.3s ease;
+		transition:
+			width 0.3s ease,
+			left 0.3s ease;
 		z-index: 1020;
 		overflow-y: auto;
 		flex-shrink: 0; /* Prevent flex shrinking */
@@ -287,7 +289,7 @@
 	}
 
 	.nav-link.active {
-		background: rgba(var(--ironpack-red-rgb), 0.10);
+		background: rgba(var(--ironpack-red-rgb), 0.1);
 		color: var(--ironpack-red);
 		font-weight: 600;
 		border-right: 3px solid var(--ironpack-red);

@@ -7,7 +7,7 @@
 
 	/**
 	 * Priority Badge with IronPack colors and icons
-	 * 
+	 *
 	 * @example
 	 * <PriorityBadge priority={Priority.PriorityHigh} />
 	 */
@@ -18,21 +18,31 @@
 	// Map priority to custom CSS class and icon
 	function priorityClass(p: Priority) {
 		switch (p) {
-			case TP.Low:      return 'bg-priority-low';
-			case TP.Medium:   return 'bg-priority-medium';
-			case TP.High:     return 'bg-priority-high';
-			case TP.Critical: return 'bg-priority-critical';
-			default:          return 'bg-priority-unknown';
+			case TP.Low:
+				return 'bg-priority-low';
+			case TP.Medium:
+				return 'bg-priority-medium';
+			case TP.High:
+				return 'bg-priority-high';
+			case TP.Critical:
+				return 'bg-priority-critical';
+			default:
+				return 'bg-priority-unknown';
 		}
 	}
 
 	function priorityIcon(p: Priority): string {
 		switch (p) {
-			case TP.Low:      return 'bi-arrow-down';
-			case TP.Medium:   return 'bi-dash';
-			case TP.High:     return 'bi-arrow-up';
-			case TP.Critical: return 'bi-exclamation-triangle-fill';
-			default:          return 'bi-question-circle';
+			case TP.Low:
+				return 'bi-arrow-down';
+			case TP.Medium:
+				return 'bi-dash';
+			case TP.High:
+				return 'bi-arrow-up';
+			case TP.Critical:
+				return 'bi-exclamation-triangle-fill';
+			default:
+				return 'bi-question-circle';
 		}
 	}
 

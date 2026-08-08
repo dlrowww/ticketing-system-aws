@@ -1,13 +1,25 @@
 <script lang="ts">
 	/**
 	 * Generic Input component - reusable form primitive
-	 * 
+	 *
 	 * @example
 	 * <Input type="text" bind:value={name} placeholder="Enter name" />
 	 * <Input type="email" bind:value={email} error="Invalid email" />
 	 */
 
-	type InputType = 'text' | 'email' | 'password' | 'number' | 'tel' | 'url' | 'search' | 'date' | 'time' | 'datetime-local' | 'month' | 'week';
+	type InputType =
+		| 'text'
+		| 'email'
+		| 'password'
+		| 'number'
+		| 'tel'
+		| 'url'
+		| 'search'
+		| 'date'
+		| 'time'
+		| 'datetime-local'
+		| 'month'
+		| 'week';
 
 	interface InputProps {
 		type?: InputType;
@@ -115,13 +127,15 @@
 		background-clip: padding-box;
 		border: 1px solid var(--bs-border-color);
 		border-radius: 0.25rem;
-		transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+		transition:
+			border-color 0.15s ease-in-out,
+			box-shadow 0.15s ease-in-out;
 	}
 
 	.form-control:focus {
 		border-color: var(--ironpack-border);
 		outline: 0;
-		box-shadow: 0 0 0 0.25rem 	rgba(var(--ironpack-border-rgb), 0.2);
+		box-shadow: 0 0 0 0.25rem rgba(var(--ironpack-border-rgb), 0.2);
 	}
 
 	.form-control.input-ellipsis {
@@ -134,7 +148,7 @@
 	}
 
 	/* Style the search clear button (x) to be black like Select's chevron */
-	.form-control[type="search"]::-webkit-search-cancel-button {
+	.form-control[type='search']::-webkit-search-cancel-button {
 		-webkit-appearance: none;
 		appearance: none;
 		height: 0.8em;

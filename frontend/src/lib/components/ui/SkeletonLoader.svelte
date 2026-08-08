@@ -1,7 +1,7 @@
 <script lang="ts">
 	/**
 	 * Skeleton Loader for content placeholders
-	 * 
+	 *
 	 * @example
 	 * <SkeletonLoader type="text" />
 	 * <SkeletonLoader type="circle" size="lg" />
@@ -43,12 +43,7 @@
 
 <style>
 	.skeleton {
-		background: linear-gradient(
-			90deg,
-			#f0f0f0 25%,
-			#e0e0e0 50%,
-			#f0f0f0 75%
-		);
+		background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
 		background-size: 200% 100%;
 		animation: shimmer 1.5s ease-in-out infinite;
 		border-radius: 4px;

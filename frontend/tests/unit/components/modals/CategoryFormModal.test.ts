@@ -47,9 +47,9 @@ describe('CategoryFormModal', () => {
 		it('renders create form with empty fields', async () => {
 			render(CategoryFormModal as any, { props: {} });
 
-				expect(screen.getByLabelText(/category_name_pl/)).toBeTruthy();
-				expect(screen.getByLabelText(/category_name_en/)).toBeTruthy();
-				expect(screen.getByText('create')).toBeTruthy();
+			expect(screen.getByLabelText(/category_name_pl/)).toBeTruthy();
+			expect(screen.getByLabelText(/category_name_en/)).toBeTruthy();
+			expect(screen.getByText('create')).toBeTruthy();
 		});
 
 		it('submits create request with valid data and shows success toast', async () => {
@@ -68,10 +68,10 @@ describe('CategoryFormModal', () => {
 
 			render(CategoryFormModal as any, { props: { onClose } });
 
-				await fireEvent.input(screen.getByLabelText(/category_name_pl/), {
+			await fireEvent.input(screen.getByLabelText(/category_name_pl/), {
 				target: { value: 'Finanse' }
 			});
-				await fireEvent.input(screen.getByLabelText(/category_name_en/), {
+			await fireEvent.input(screen.getByLabelText(/category_name_en/), {
 				target: { value: 'Finance' }
 			});
 
@@ -87,20 +87,20 @@ describe('CategoryFormModal', () => {
 				expect(toastStore.success).toHaveBeenCalledWith('category_create_success');
 			});
 
-				await waitFor(() => {
-					const refreshCall = dispatchSpy.mock.calls.find(
-						(c) => (c[0] as Event).type === 'categories:refresh'
-					);
-					expect(refreshCall).toBeTruthy();
-				});
+			await waitFor(() => {
+				const refreshCall = dispatchSpy.mock.calls.find(
+					(c) => (c[0] as Event).type === 'categories:refresh'
+				);
+				expect(refreshCall).toBeTruthy();
+			});
 		});
 
 		it('displays field errors from backend validation failure', async () => {
 			createCategoryMock.mockRejectedValue({
 				message: 'Validation failed',
 				fieldErrors: {
-						NamePl: ['CATEGORY_NAME_TOO_SHORT'],
-						NameEn: ['CATEGORY_NAME_REQUIRED']
+					NamePl: ['CATEGORY_NAME_TOO_SHORT'],
+					NameEn: ['CATEGORY_NAME_REQUIRED']
 				}
 			});
 

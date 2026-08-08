@@ -39,7 +39,11 @@ function createApiError(message: string, extras?: Record<string, unknown>) {
 	return err;
 }
 
-export async function fetchUsers(query: UserQuery, fetchFn: typeof fetch = fetch, signal?: AbortSignal): Promise<PagedResult<UserListItemDto>> {
+export async function fetchUsers(
+	query: UserQuery,
+	fetchFn: typeof fetch = fetch,
+	signal?: AbortSignal
+): Promise<PagedResult<UserListItemDto>> {
 	const params = new URLSearchParams();
 
 	if (query.page) params.set('page', String(query.page));
@@ -61,13 +65,21 @@ export async function fetchUsers(query: UserQuery, fetchFn: typeof fetch = fetch
 	return (await res.json()) as PagedResult<UserListItemDto>;
 }
 
-export async function getUserById(id: number, fetchFn: typeof fetch = fetch, signal?: AbortSignal): Promise<UserDetailsDto> {
+export async function getUserById(
+	id: number,
+	fetchFn: typeof fetch = fetch,
+	signal?: AbortSignal
+): Promise<UserDetailsDto> {
 	const res = await fetchFn(`${API}/${id}`, { credentials: 'include', signal });
 	if (!res.ok) throw new Error(`Failed to load user #${id}: ${res.status} ${res.statusText}`);
 	return (await res.json()) as UserDetailsDto;
 }
 
-export async function createUser(request: CreateUserRequest, fetchFn: typeof fetch = fetch, signal?: AbortSignal): Promise<UserDetailsDto> {
+export async function createUser(
+	request: CreateUserRequest,
+	fetchFn: typeof fetch = fetch,
+	signal?: AbortSignal
+): Promise<UserDetailsDto> {
 	const res = await fetchFn(API, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
@@ -99,13 +111,22 @@ export async function createUser(request: CreateUserRequest, fetchFn: typeof fet
 		const code = payload?.code;
 		const traceId = payload?.traceId;
 		const text = payload?.detail ?? (await res.text().catch(() => ''));
-		throw createApiError(`Create user failed: ${res.status} ${res.statusText}`, { code, traceId, detail: text });
+		throw createApiError(`Create user failed: ${res.status} ${res.statusText}`, {
+			code,
+			traceId,
+			detail: text
+		});
 	}
 
 	return (await res.json()) as UserDetailsDto;
 }
 
-export async function updateUser(id: number, request: UpdateUserRequest, fetchFn: typeof fetch = fetch, signal?: AbortSignal): Promise<UserDetailsDto> {
+export async function updateUser(
+	id: number,
+	request: UpdateUserRequest,
+	fetchFn: typeof fetch = fetch,
+	signal?: AbortSignal
+): Promise<UserDetailsDto> {
 	const res = await fetchFn(`${API}/${id}`, {
 		method: 'PATCH',
 		headers: { 'Content-Type': 'application/json' },
@@ -137,13 +158,21 @@ export async function updateUser(id: number, request: UpdateUserRequest, fetchFn
 		const code = payload?.code;
 		const traceId = payload?.traceId;
 		const text = payload?.detail ?? (await res.text().catch(() => ''));
-		throw createApiError(`Update user failed: ${res.status} ${res.statusText}`, { code, traceId, detail: text });
+		throw createApiError(`Update user failed: ${res.status} ${res.statusText}`, {
+			code,
+			traceId,
+			detail: text
+		});
 	}
 
 	return (await res.json()) as UserDetailsDto;
 }
 
-export async function deleteUser(id: number, fetchFn: typeof fetch = fetch, signal?: AbortSignal): Promise<void> {
+export async function deleteUser(
+	id: number,
+	fetchFn: typeof fetch = fetch,
+	signal?: AbortSignal
+): Promise<void> {
 	const res = await fetchFn(`${API}/${id}`, {
 		method: 'DELETE',
 		credentials: 'include',
@@ -155,7 +184,11 @@ export async function deleteUser(id: number, fetchFn: typeof fetch = fetch, sign
 		const code = payload?.code;
 		const traceId = payload?.traceId;
 		const text = payload?.detail ?? (await res.text().catch(() => ''));
-		throw createApiError(`Delete user failed: ${res.status} ${res.statusText}`, { code, traceId, detail: text });
+		throw createApiError(`Delete user failed: ${res.status} ${res.statusText}`, {
+			code,
+			traceId,
+			detail: text
+		});
 	}
 }
 
@@ -171,7 +204,9 @@ export async function fetchAssignableUsers(
 
 	if (!res.ok) {
 		const text = await res.text().catch(() => '');
-		throw createApiError(`Failed to load assignable users: ${res.status} ${res.statusText}`, { detail: text });
+		throw createApiError(`Failed to load assignable users: ${res.status} ${res.statusText}`, {
+			detail: text
+		});
 	}
 
 	return (await res.json()) as AssignableUserDto[];
@@ -180,7 +215,10 @@ export async function fetchAssignableUsers(
 /**
  * Fetch all users (no pagination) - useful for lookups/mapping
  */
-export async function fetchAllUsers(fetchFn: typeof fetch = fetch, signal?: AbortSignal): Promise<UserListItemDto[]> {
+export async function fetchAllUsers(
+	fetchFn: typeof fetch = fetch,
+	signal?: AbortSignal
+): Promise<UserListItemDto[]> {
 	const res = await fetchFn(`${API}?pageSize=1000`, {
 		credentials: 'include',
 		signal
@@ -188,7 +226,9 @@ export async function fetchAllUsers(fetchFn: typeof fetch = fetch, signal?: Abor
 
 	if (!res.ok) {
 		const text = await res.text().catch(() => '');
-		throw createApiError(`Failed to load all users: ${res.status} ${res.statusText}`, { detail: text });
+		throw createApiError(`Failed to load all users: ${res.status} ${res.statusText}`, {
+			detail: text
+		});
 	}
 
 	const paged = (await res.json()) as PagedResult<UserListItemDto>;

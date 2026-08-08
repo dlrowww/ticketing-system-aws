@@ -1,6 +1,6 @@
 /**
  * UI Primitives - Reusable components
- * 
+ *
  * Centralized exports for all UI primitive components.
  * Use: import { Badge, Button, Input } from '$lib/components/ui';
  */

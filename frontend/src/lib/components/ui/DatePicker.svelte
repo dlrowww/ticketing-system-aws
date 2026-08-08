@@ -1,10 +1,10 @@
 <script lang="ts">
 	/**
 	 * Custom DatePicker component with IronPack styling
-	 * 
+	 *
 	 * Fully custom calendar dropdown styled to match Select.svelte with IronPack red colors,
 	 * NavRail hover/focus/selected states, and a calendar icon.
-	 * 
+	 *
 	 * @example
 	 * <DatePicker bind:value={dateFrom} placeholder="Select date" />
 	 * <DatePicker bind:value={dateTo} error="Date is required" min="2025-01-01" />
@@ -45,7 +45,7 @@
 
 	let open = $state(false);
 	let currentMonth = $state(new Date());
-	
+
 	// Parse value to Date or use today
 	const selectedDate = $derived.by(() => {
 		if (!value) return null;
@@ -83,11 +83,11 @@
 
 	function selectDate(date: Date) {
 		const formatted = formatDate(date);
-		
+
 		// Check min/max constraints
 		if (min && formatted < min) return;
 		if (max && formatted > max) return;
-		
+
 		value = formatted;
 		close();
 	}
@@ -141,23 +141,23 @@
 	const calendarDays = $derived.by(() => {
 		const year = currentMonth.getFullYear();
 		const month = currentMonth.getMonth();
-		
+
 		const firstDay = new Date(year, month, 1);
 		const lastDay = new Date(year, month + 1, 0);
-		
+
 		const startPadding = firstDay.getDay(); // 0 = Sunday
 		const days: (Date | null)[] = [];
-		
+
 		// Add padding for days before month starts
 		for (let i = 0; i < startPadding; i++) {
 			days.push(null);
 		}
-		
+
 		// Add all days of the month
 		for (let day = 1; day <= lastDay.getDate(); day++) {
 			days.push(new Date(year, month, day));
 		}
-		
+
 		return days;
 	});
 
@@ -198,7 +198,7 @@
 		type="button"
 		{id}
 		class={inputClass}
-		disabled={disabled}
+		{disabled}
 		aria-describedby={error && id ? `${id}-error` : undefined}
 		aria-haspopup="dialog"
 		aria-expanded={open}
@@ -212,12 +212,17 @@
 	</button>
 
 	{#if name}
-		<input type="hidden" name={name} value={value ?? ''} />
+		<input type="hidden" {name} value={value ?? ''} />
 	{/if}
 
 	<div class="calendar-dropdown" class:open role="dialog" aria-hidden={!open}>
 		<div class="calendar-header">
-			<button type="button" class="calendar-nav" onclick={previousMonth} aria-label="Previous month">
+			<button
+				type="button"
+				class="calendar-nav"
+				onclick={previousMonth}
+				aria-label="Previous month"
+			>
 				<i class="bi bi-chevron-left"></i>
 			</button>
 			<div class="calendar-month-year">{monthYearDisplay}</div>
@@ -311,7 +316,7 @@
 	}
 
 	.date-picker-text.placeholder {
-        background-color: transparent;
+		background-color: transparent;
 	}
 
 	.calendar-icon {
@@ -355,7 +360,7 @@
 		background: var(--ironpack-white);
 		border: 1px solid var(--bs-secondary);
 		border-radius: 0.25rem;
-		box-shadow: 0 4px 12px rgba(var(--bs-secondary-rgb), 0.20);
+		box-shadow: 0 4px 12px rgba(var(--bs-secondary-rgb), 0.2);
 		z-index: 1050;
 		padding: 0.75rem;
 		opacity: 0;
@@ -372,7 +377,6 @@
 		visibility: visible;
 		pointer-events: auto;
 	}
-
 
 	/* Calendar Header */
 	.calendar-header {
@@ -401,7 +405,7 @@
 	}
 
 	.calendar-nav:hover {
-		background: rgba(var(--bs-secondary-rgb), 0.10);
+		background: rgba(var(--bs-secondary-rgb), 0.1);
 		color: var(--ironpack-font-black);
 	}
 
@@ -498,7 +502,7 @@
 
 	.calendar-link:hover {
 		color: var(--ironpack-font-black);
-		background: rgba(var(--bs-secondary-rgb), 0.10);
+		background: rgba(var(--bs-secondary-rgb), 0.1);
 	}
 
 	/* Invalid feedback */

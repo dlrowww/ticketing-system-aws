@@ -4,8 +4,21 @@
 
 	import { getMessage } from '$lib/i18n';
 	import { toastStore } from '$lib/stores/toast';
-	import { getTicketById, listTicketFiles, listTicketHistory, listTicketComments, updateTicket, getAllowedStatuses, type UpdateTicketRequest } from '$lib/services/Tickets';
-	import type { TicketDetail, TicketFileDto, TicketHistoryDto, TicketCommentDto } from '$lib/types/tickets';
+	import {
+		getTicketById,
+		listTicketFiles,
+		listTicketHistory,
+		listTicketComments,
+		updateTicket,
+		getAllowedStatuses,
+		type UpdateTicketRequest
+	} from '$lib/services/Tickets';
+	import type {
+		TicketDetail,
+		TicketFileDto,
+		TicketHistoryDto,
+		TicketCommentDto
+	} from '$lib/types/tickets';
 	import type { User } from '$lib/types/user';
 	import { fetchAssignableUsers } from '$lib/services/Users';
 	import type { AssignableUserDto } from '$lib/types/users';
@@ -187,9 +200,9 @@
 	// Form validation for edit mode
 	const isEditFormValid = $derived(
 		editTitle.trim().length >= 6 &&
-		editDescription.trim().length >= 20 &&
-		editCategory !== undefined &&
-		editPriority !== undefined
+			editDescription.trim().length >= 20 &&
+			editCategory !== undefined &&
+			editPriority !== undefined
 	);
 
 	// Helper to get category name by ID
@@ -203,19 +216,19 @@
 	// IMPORTANT: Use editAssignedToId (current form value), not ticket.assignedToId (original data)
 	const assignableUsersWithCurrent = $derived.by(() => {
 		if (!assignableUsers || !ticket) return assignableUsers ?? [];
-		
+
 		// Get the currently selected assignee from the form data
 		const currentAssigneeId = editAssignedToId;
-		
+
 		// If no one is assigned, return a new array (ensure reactivity)
 		if (!currentAssigneeId) return [...assignableUsers];
-		
+
 		// Check if current assignee is already in the list
-		const currentAssigneeInList = assignableUsers.some(u => u.userId === currentAssigneeId);
-		
+		const currentAssigneeInList = assignableUsers.some((u) => u.userId === currentAssigneeId);
+
 		// If already included, return a new array (ensure reactivity)
 		if (currentAssigneeInList) return [...assignableUsers];
-		
+
 		// Otherwise, add current assignee to the list so Select can display them
 		// This only happens for the ORIGINAL assignee if backend doesn't include them
 		if (currentAssigneeId === ticket.assignedToId && ticket.assignedToName) {
@@ -231,7 +244,7 @@
 			};
 			return [currentAssignee, ...assignableUsers];
 		}
-		
+
 		// Shouldn't happen: user selected someone not in list and not original assignee
 		// Just return assignable users as new array
 		return [...assignableUsers];
@@ -260,7 +273,7 @@
 		} catch (e) {
 			// Graceful fallback: If API fails, show all statuses (existing behavior)
 			console.warn('Failed to load allowed statuses, showing all statuses:', e);
-			allowedStatuses = lookups.ticketStatus().map(s => s.id);
+			allowedStatuses = lookups.ticketStatus().map((s) => s.id);
 		} finally {
 			loadingAllowedStatuses = false;
 		}
@@ -277,12 +290,12 @@
 		editPriority = ticket.priority;
 		editStatus = ticket.status;
 		editAssignedToId = ticket.assignedToId;
-		
+
 		// Load assignable users if user can edit assignment
 		if (capabilities?.canEditAssignment) {
 			loadAssignableUsers();
 		}
-		
+
 		// Load allowed statuses if user can edit status
 		if (capabilities?.canEditStatus) {
 			loadAllowedStatuses();
@@ -330,12 +343,12 @@
 				if (editAssignedToId === null) {
 					request.clearAssignment = true;
 				} else if (editAssignedToId !== undefined) {
-				request.assignedToUserId = editAssignedToId;
+					request.assignedToUserId = editAssignedToId;
+				}
 			}
-		}
 
-		const updated = await updateTicket(ticketId, request, fetch, abort.signal);
-		
+			const updated = await updateTicket(ticketId, request, fetch, abort.signal);
+
 			ticket = updated;
 			isEditMode = false;
 			toastStore.success(getMessage('ticket_edit_success'));
@@ -364,7 +377,10 @@
 			} else if (errorCode) {
 				const i18nKey = `error_code_${errorCode}`;
 				const translatedMsg = getMessage(i18nKey);
-				saveError = translatedMsg !== i18nKey ? translatedMsg : (e?.message ?? getMessage('ticket_edit_failed'));
+				saveError =
+					translatedMsg !== i18nKey
+						? translatedMsg
+						: (e?.message ?? getMessage('ticket_edit_failed'));
 			} else {
 				saveError = e?.message ?? getMessage('ticket_edit_failed');
 			}
@@ -401,7 +417,9 @@
 
 	const canSeeInternalComments = $derived.by(() => {
 		const roleId = Number(user?.roleId);
-		return roleId === UserRole.Admin || roleId === UserRole.TeamLeader || roleId === UserRole.Support;
+		return (
+			roleId === UserRole.Admin || roleId === UserRole.TeamLeader || roleId === UserRole.Support
+		);
 	});
 
 	const commentFilterOptions = [
@@ -435,13 +453,7 @@
 			{/if}
 		</div>
 
-		<Button
-			type="button"
-			variant="outline-secondary"
-			size="sm"
-			onclick={close}
-			class="px-2"
-		>
+		<Button type="button" variant="outline-secondary" size="sm" onclick={close} class="px-2">
 			<i class="bi bi-x-lg"></i>
 			<span class="visually-hidden">{getMessage('close')}</span>
 		</Button>
@@ -522,7 +534,11 @@
 		{#if activeTab === 'details'}
 			{#if loadingTicket}
 				<div class="d-flex align-items-center gap-2 text-muted">
-					<div class="spinner-border spinner-border-sm" role="status" aria-label={getMessage('loading')}></div>
+					<div
+						class="spinner-border spinner-border-sm"
+						role="status"
+						aria-label={getMessage('loading')}
+					></div>
 					<span>{getMessage('loading')}</span>
 				</div>
 			{:else if ticketError}
@@ -534,7 +550,7 @@
 				{#if isSaving}
 					<LoadingOverlay message={getMessage('saving')} />
 				{/if}
-				
+
 				<div class="row g-3">
 					<div class="col-12">
 						<div class="card details-upper-part">
@@ -545,7 +561,10 @@
 										<label for="edit-title" class="form-label text-muted small">
 											{getMessage('title')}
 											{#if !capabilities.canEditTitle}
-												<i class="bi bi-lock-fill ms-1" title={getMessage('ticket_edit_field_disabled')}></i>
+												<i
+													class="bi bi-lock-fill ms-1"
+													title={getMessage('ticket_edit_field_disabled')}
+												></i>
 											{/if}
 										</label>
 										<Input
@@ -562,7 +581,10 @@
 										<label for="edit-description" class="form-label text-muted small">
 											{getMessage('description')}
 											{#if !capabilities.canEditDescription}
-												<i class="bi bi-lock-fill ms-1" title={getMessage('ticket_edit_field_disabled')}></i>
+												<i
+													class="bi bi-lock-fill ms-1"
+													title={getMessage('ticket_edit_field_disabled')}
+												></i>
 											{/if}
 										</label>
 										<Textarea
@@ -601,14 +623,17 @@
 											<label for="edit-category" class="form-label text-muted small">
 												{getMessage('category')}
 												{#if !capabilities.canEditCategory}
-													<i class="bi bi-lock-fill ms-1" title={getMessage('ticket_edit_field_disabled')}></i>
+													<i
+														class="bi bi-lock-fill ms-1"
+														title={getMessage('ticket_edit_field_disabled')}
+													></i>
 												{/if}
 											</label>
 											<Select
 												id="edit-category"
 												bind:value={editCategory}
 												disabled={!capabilities.canEditCategory}
-												options={Array.from(get(categoryMap).values()).map(c => ({
+												options={Array.from(get(categoryMap).values()).map((c) => ({
 													value: c.categoryId,
 													labelKey: getCategoryName(c.categoryId)
 												}))}
@@ -625,14 +650,19 @@
 											<label for="edit-priority" class="form-label text-muted small">
 												{getMessage('priority')}
 												{#if !capabilities.canEditPriority}
-													<i class="bi bi-lock-fill ms-1" title={getMessage('ticket_edit_field_disabled')}></i>
+													<i
+														class="bi bi-lock-fill ms-1"
+														title={getMessage('ticket_edit_field_disabled')}
+													></i>
 												{/if}
 											</label>
 											<Select
 												id="edit-priority"
 												bind:value={editPriority}
 												disabled={!capabilities.canEditPriority}
-												options={lookups.priority().map(p => ({ value: p.id, label: getMessage(p.name) }))}
+												options={lookups
+													.priority()
+													.map((p) => ({ value: p.id, label: getMessage(p.name) }))}
 											/>
 										{:else}
 											<div class="text-muted small mb-1">{getMessage('priority')}</div>
@@ -646,16 +676,20 @@
 											<label for="edit-status" class="form-label text-muted small">
 												{getMessage('status')}
 												{#if !capabilities.canEditStatus}
-													<i class="bi bi-lock-fill ms-1" title={getMessage('ticket_edit_field_disabled')}></i>
+													<i
+														class="bi bi-lock-fill ms-1"
+														title={getMessage('ticket_edit_field_disabled')}
+													></i>
 												{/if}
 											</label>
 											<Select
 												id="edit-status"
 												bind:value={editStatus}
 												disabled={!capabilities.canEditStatus}
-												options={lookups.ticketStatus()
-													.filter(s => allowedStatuses?.includes(s.id) ?? true)
-													.map(s => ({ value: s.id, label: getMessage(s.name) }))}
+												options={lookups
+													.ticketStatus()
+													.filter((s) => allowedStatuses?.includes(s.id) ?? true)
+													.map((s) => ({ value: s.id, label: getMessage(s.name) }))}
 											/>
 										{:else}
 											<div class="text-muted small mb-1">{getMessage('status')}</div>
@@ -676,23 +710,26 @@
 											<label for="edit-assignee" class="form-label text-muted small">
 												{getMessage('assigned_to')}
 											</label>
-										{#if assignableUsersError}
-											<FormError message={assignableUsersError} />
-										{:else}
-											<UserSelect
-												ticketId={ticketId}
-												excludeUserIds={ticket?.assignedToId ? [ticket.assignedToId] : []}
-												id="edit-assignee"
-												bind:value={editAssignedToId}
-												users={assignableUsersWithCurrent}
-												loading={loadingAssignableUsers}
-												disabled={isSaving}
-											/>
-										{/if}
+											{#if assignableUsersError}
+												<FormError message={assignableUsersError} />
+											{:else}
+												<UserSelect
+													{ticketId}
+													excludeUserIds={ticket?.assignedToId ? [ticket.assignedToId] : []}
+													id="edit-assignee"
+													bind:value={editAssignedToId}
+													users={assignableUsersWithCurrent}
+													loading={loadingAssignableUsers}
+													disabled={isSaving}
+												/>
+											{/if}
 										{:else}
 											<div class="text-muted small mb-1">{getMessage('assigned_to')}</div>
 											<div>
-												{ticket.assignedToName ?? (ticket.assignedToId ? `#${ticket.assignedToId}` : getMessage('not_assigned'))}
+												{ticket.assignedToName ??
+													(ticket.assignedToId
+														? `#${ticket.assignedToId}`
+														: getMessage('not_assigned'))}
 											</div>
 										{/if}
 									</div>
@@ -750,12 +787,7 @@
 												{getMessage('ticket_edit')}
 											</Button>
 										{:else}
-											<Button
-												type="button"
-												variant="outline-secondary"
-												size="sm"
-												disabled
-											>
+											<Button type="button" variant="outline-secondary" size="sm" disabled>
 												<i class="bi bi-lock-fill me-1"></i>
 												{getMessage('ticket_edit_no_permission')}
 											</Button>
@@ -768,23 +800,31 @@
 				</div>
 			{/if}
 		{:else if activeTab === 'history'}
-		<div class="card">
-			<div class="card-body">
-			<div class="history-scrollable">
-				<TicketHistory entries={history ?? []} loading={loadingHistory} error={historyError} />
+			<div class="card">
+				<div class="card-body">
+					<div class="history-scrollable">
+						<TicketHistory entries={history ?? []} loading={loadingHistory} error={historyError} />
+					</div>
+				</div>
 			</div>
-			</div>
-		</div>
 		{:else if activeTab === 'comments'}
 			<div class="d-flex flex-column">
 				<!-- Comment form stays at top (fixed height) -->
 				<div class="comments-top-section">
-					<AddCommentForm ticketId={ticketId} onAdded={onCommentAdded} canMarkInternal={canSeeInternalComments} />
+					<AddCommentForm
+						{ticketId}
+						onAdded={onCommentAdded}
+						canMarkInternal={canSeeInternalComments}
+					/>
 					{#if canSeeInternalComments}
 						<div class="d-flex align-items-center mt-3">
 							<div class="d-flex align-items-center gap-2">
 								<span class="text-muted small">{getMessage('ticket_comment_filter_label')}</span>
-								<Select bind:value={commentFilter} options={commentFilterOptions} class="form-select-sm" />
+								<Select
+									bind:value={commentFilter}
+									options={commentFilterOptions}
+									class="form-select-sm"
+								/>
 							</div>
 						</div>
 					{/if}
@@ -793,7 +833,11 @@
 				<div class="card mt-3">
 					<div class="card-body">
 						<div class="comments-scrollable">
-							<CommentList comments={filteredComments} loading={loadingComments} error={commentsError} />
+							<CommentList
+								comments={filteredComments}
+								loading={loadingComments}
+								error={commentsError}
+							/>
 						</div>
 					</div>
 				</div>
@@ -802,13 +846,18 @@
 			<div class="d-flex flex-column">
 				<!-- Attachment form stays at top (fixed height with micro-scroll for file list) -->
 				<div class="attachments-top-section">
-					<AddAttachmentForm ticketId={ticketId} onAdded={onFileAdded} />
+					<AddAttachmentForm {ticketId} onAdded={onFileAdded} />
 				</div>
 				<!-- Attachments list is scrollable (wrapped in card) -->
 				<div class="attachments-scrollable mt-3">
 					<div class="card">
 						<div class="card-body">
-							<AttachmentList ticketId={ticketId} files={files ?? []} loading={loadingFiles} error={filesError} />
+							<AttachmentList
+								{ticketId}
+								files={files ?? []}
+								loading={loadingFiles}
+								error={filesError}
+							/>
 						</div>
 					</div>
 				</div>
@@ -873,13 +922,13 @@
 		overflow-y: auto;
 		overflow-x: hidden;
 		padding-right: 0.5rem;
-		
+
 		/* Card container provides borders during scroll */
 		:global(.card) {
 			height: 100%;
 			overflow: hidden;
 		}
-		
+
 		:global(.card-body) {
 			height: 100%;
 			overflow-y: auto;
@@ -900,13 +949,13 @@
 		height: calc(90vh - 26em); /* 90vh - (10em header + 18em form max + 3em spacing) */
 		//overflow-y: auto;
 		overflow-x: hidden;
-		
+
 		/* Card container provides borders during scroll */
 		.card {
 			height: 100%;
 			overflow: hidden;
 		}
-		
+
 		.card-body {
 			height: 100%;
 			overflow-y: auto;

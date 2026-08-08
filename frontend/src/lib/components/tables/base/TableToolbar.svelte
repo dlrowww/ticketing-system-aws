@@ -8,7 +8,14 @@
 
 	type QuickRange = 'Custom' | 'Today' | 'Yesterday' | 'Last7' | 'Last30' | 'Last90';
 
-	const QUICK_RANGE_ORDER: QuickRange[] = ['Custom', 'Today', 'Yesterday', 'Last7', 'Last30', 'Last90'];
+	const QUICK_RANGE_ORDER: QuickRange[] = [
+		'Custom',
+		'Today',
+		'Yesterday',
+		'Last7',
+		'Last30',
+		'Last90'
+	];
 	const QUICK_RANGE_LABEL_KEYS: Record<QuickRange, string> = {
 		Custom: 'quick_range_custom',
 		Today: 'quick_range_today',
@@ -194,17 +201,32 @@
 	{#if enableFilters}
 		<div class="me-2">
 			<label for="search-status" class="form-label mb-1">{getMessage('status')}</label>
-			<Select bind:value={status} options={statusOptions} id="search-status" widthGroup="ticket-filters" />
+			<Select
+				bind:value={status}
+				options={statusOptions}
+				id="search-status"
+				widthGroup="ticket-filters"
+			/>
 		</div>
 
 		<div class="me-2">
 			<label for="search-category" class="form-label mb-1">{getMessage('category')}</label>
-			<Select bind:value={category} options={categoryOptions} id="search-category" widthGroup="ticket-filters" />
+			<Select
+				bind:value={category}
+				options={categoryOptions}
+				id="search-category"
+				widthGroup="ticket-filters"
+			/>
 		</div>
 
 		<div class="me-2">
 			<label for="search-priority" class="form-label mb-1">{getMessage('priority')}</label>
-			<Select bind:value={priority} options={priorityOptions} id="search-priority" widthGroup="ticket-filters" />
+			<Select
+				bind:value={priority}
+				options={priorityOptions}
+				id="search-priority"
+				widthGroup="ticket-filters"
+			/>
 		</div>
 
 		<div class="me-2">

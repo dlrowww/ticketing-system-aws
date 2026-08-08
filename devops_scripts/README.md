@@ -4,9 +4,32 @@ These scripts bootstrap the AWS Secrets Manager values and generate the raw
 Kubernetes `SecretStore`/`ExternalSecret` manifest without manually copying
 Terraform outputs.
 
+## CI/CD Kubernetes deployment
+
+`deploy-k8s.sh` is the shared deployment entry point used by both application
+CD and Kubernetes-only CD. It renders temporary immutable image references,
+synchronizes External Secrets, runs the database migration Job, and only then
+rolls out the API and frontend Deployments.
+
+```bash
+terraform -chdir=aws init
+./devops_scripts/deploy-k8s.sh \
+  --backend-image ACCOUNT.dkr.ecr.us-east-1.amazonaws.com/ticketing-system-dev/ticketing-backend:GIT_SHA \
+  --frontend-image ACCOUNT.dkr.ecr.us-east-1.amazonaws.com/ticketing-system-dev/ticketing-frontend:GIT_SHA \
+  --domain tickets.example.com \
+  --certificate-arn arn:aws:acm:us-east-1:ACCOUNT:certificate/ID
+```
+
+The domain and certificate options are optional as a pair. If omitted, Ingress
+is not applied. The script does not initialize secret values and never invokes
+the interactive `bootstrap-secrets.sh`. It also does not create or modify the
+cluster-scoped Namespace; the Infrastructure workflow owns that step.
+
 ## Prerequisites
 
 - Terraform has already been initialized and applied in `aws/`.
+- The `ticketing-system` Namespace has already been created by Infrastructure
+  apply (or manually by a cluster administrator).
 - The caller can read Terraform state and update the three application Secrets.
 - `terraform`, `aws`, `jq`, `openssl`, `envsubst` and optionally `kubectl` are
   installed.
@@ -62,7 +85,10 @@ temporary file:
 ```
 
 Use `--context` when the current kubectl context is not the intended cluster.
-The script checks the Namespace and ESO CRD before applying anything.
+By default the script checks the Namespace and ESO CRD before applying
+anything. `deploy-k8s.sh` uses `--skip-cluster-preflight` because the application
+roles are intentionally limited to namespaced resources; the Infrastructure
+workflow is responsible for those cluster-scoped prerequisites.
 
 Do not use `--apply` if the application Helm release already owns these two
 resources. The script checks the existing `app.kubernetes.io/managed-by` label
@@ -71,12 +97,11 @@ equivalent `externalSecrets` values.
 
 ## Current architecture boundary
 
-These scripts automate the current project design; they do not solve two
-follow-up architecture changes:
+These scripts automate the current project design; they do not solve this
+follow-up architecture change:
 
 - the API connection string is still built from the RDS master credential;
-- initial-admin credentials are still exposed to the long-running API Pod.
 
-For production, introduce a lower-privilege application database role and move
-database migration/admin bootstrap into one-shot Jobs. After that, remove the
-RDS master and initial-admin values from the API runtime Secret.
+For production, introduce a lower-privilege application database role. Database
+migration and initial-admin bootstrap already run in the one-shot migration Job;
+the long-running API Deployment does not import the initial-admin values.

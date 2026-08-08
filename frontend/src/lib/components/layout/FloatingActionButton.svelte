@@ -29,7 +29,11 @@
 		height: 56px;
 		border: none;
 		border-radius: 50%;
-		background: linear-gradient(135deg, var(--ironpack-gradient-from) 0%, var(--ironpack-gradient-to) 100%);
+		background: linear-gradient(
+			135deg,
+			var(--ironpack-gradient-from) 0%,
+			var(--ironpack-gradient-to) 100%
+		);
 		color: var(--ironpack-white);
 		font-size: 1.5rem;
 		box-shadow: 0 4px 12px rgba(var(--ironpack-red-rgb), 0.35);

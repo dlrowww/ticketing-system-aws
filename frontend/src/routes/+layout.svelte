@@ -2,7 +2,7 @@
 	import type { LayoutData } from './$types';
 	import { setLookups, getLookups } from '$lib/lookups/Lookups';
 	import { categories } from '$lib/stores/categories';
- 	// export let data: { lookups: import('$lib/lookups/Lookups').LookupsPayload };
+	// export let data: { lookups: import('$lib/lookups/Lookups').LookupsPayload };
 	import '../styles/main.scss';
 	import 'bootstrap-icons/font/bootstrap-icons.css';
 	import { browser } from '$app/environment';
@@ -17,7 +17,10 @@
 	let localeKey = $state(0);
 
 	// Initialize i18n using the SSR cookie-driven locale
-	ResourceProvider.init({ initialLocale: data?.locale ?? DEFAULT_LOCALE, fallbackLocale: DEFAULT_LOCALE });
+	ResourceProvider.init({
+		initialLocale: data?.locale ?? DEFAULT_LOCALE,
+		fallbackLocale: DEFAULT_LOCALE
+	});
 
 	// Wait until dictionaries for that locale are loaded
 	let loading = $state(ResourceProvider.waitLocale());
@@ -37,7 +40,7 @@
 	// Hydrate the store once the root layout is created on the client.
 	// If the server already gave us the same version, we skip.
 	const current = getLookups();
-	
+
 	onMount(() => {
 		if (!current || current.version !== data.lookups.version) {
 			setLookups(data.lookups);

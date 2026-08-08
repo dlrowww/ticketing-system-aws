@@ -6,30 +6,30 @@ describe('LoadingOverlay Component', () => {
 	it('should not render when show is false', () => {
 		const { container } = render(LoadingOverlay, { props: { show: false } });
 		const overlay = container.querySelector('.loading-overlay');
-		
+
 		expect(overlay).toBeNull();
 	});
 
 	it('should render when show is true', () => {
 		const { container } = render(LoadingOverlay, { props: { show: true } });
 		const overlay = container.querySelector('.loading-overlay');
-		
+
 		expect(overlay).toBeTruthy();
 	});
 
 	it('should display spinner when visible', () => {
 		const { container } = render(LoadingOverlay, { props: { show: true } });
 		const spinner = container.querySelector('.spinner');
-		
+
 		expect(spinner).toBeTruthy();
 	});
 
 	it('should display message if provided', () => {
-		const { container } = render(LoadingOverlay, { 
-			props: { show: true, message: 'Saving changes...' } 
+		const { container } = render(LoadingOverlay, {
+			props: { show: true, message: 'Saving changes...' }
 		});
 		const content = container.querySelector('.loading-overlay');
-		
+
 		expect(content?.textContent).toContain('Saving changes...');
 	});
 
@@ -43,7 +43,7 @@ describe('LoadingOverlay Component', () => {
 		const { container } = render(LoadingOverlay, { props: { show: true } });
 		const overlay = container.querySelector('.loading-overlay');
 		const style = window.getComputedStyle(overlay as Element);
-		
+
 		// Overlay should have high z-index
 		expect(overlay?.classList.contains('loading-overlay')).toBe(true);
 	});
