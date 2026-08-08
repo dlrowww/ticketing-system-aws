@@ -27,6 +27,7 @@ The defaults are sized for a development environment:
 - RDS is Single-AZ.
 - RDS deletion protection is disabled.
 - Final snapshot is skipped.
+- RDS automated backups are disabled.
 - EKS application container logs are retained for 30 days.
 
 Production should normally override at least:

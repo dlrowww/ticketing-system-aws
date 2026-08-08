@@ -53,6 +53,10 @@ locals {
     var.application_secrets_recovery_window_in_days,
     var.environment == "dev" ? 0 : 7
   )
+  effective_db_backup_retention_days = coalesce(
+    var.db_backup_retention_days,
+    var.environment == "dev" ? 0 : 7
+  )
 }
 
 variable "db_name" {
@@ -98,9 +102,18 @@ variable "db_multi_az" {
 }
 
 variable "db_backup_retention_days" {
-  description = "Number of days that automated RDS backups are retained."
+  description = "Number of days that automated RDS backups are retained. Null selects 0 days for dev and 7 days for other environments."
   type        = number
-  default     = 7
+  default     = null
+  nullable    = true
+
+  validation {
+    condition = var.db_backup_retention_days == null ? true : (
+      var.db_backup_retention_days >= 0 &&
+      var.db_backup_retention_days <= 35
+    )
+    error_message = "db_backup_retention_days must be between 0 and 35."
+  }
 }
 
 variable "db_deletion_protection" {

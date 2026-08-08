@@ -12,12 +12,12 @@ db_instance_class        = "db.t4g.micro"
 db_multi_az              = false
 db_deletion_protection   = false
 db_skip_final_snapshot   = true
-db_backup_retention_days = 7
 
-# With these values left unset, environment = "dev" automatically uses true
-# for ECR force deletion and 0 days for the application Secret recovery window.
-# Staging/production automatically use false and 7 days respectively. Override
-# them only when the environment has a deliberate retention policy.
+# With these values left unset, environment = "dev" automatically disables RDS
+# automated backups, enables ECR force deletion, and uses a 0-day application
+# Secret recovery window. Staging/production default to 7 backup/recovery days
+# and disabled ECR force deletion. Override only for a deliberate policy.
+# db_backup_retention_days                  = 0
 # ecr_force_delete                           = true
 # application_secrets_recovery_window_in_days = 0
 

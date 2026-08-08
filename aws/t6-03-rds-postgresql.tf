@@ -63,7 +63,7 @@ resource "aws_db_instance" "ticketing" {
   publicly_accessible    = false
   multi_az               = var.db_multi_az
 
-  backup_retention_period = var.db_backup_retention_days
+  backup_retention_period = local.effective_db_backup_retention_days
   backup_window           = "02:00-03:00"
   maintenance_window      = "sun:03:30-sun:04:30"
   copy_tags_to_snapshot   = true
@@ -83,4 +83,3 @@ resource "aws_db_instance" "ticketing" {
     }
   )
 }
-
