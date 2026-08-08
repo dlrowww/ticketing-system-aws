@@ -110,20 +110,19 @@ namespace TicketingSystem.Api.Services
 
                 await tx.CommitAsync(ct);
 
-                // Send email notification if ticket was auto-assigned (fire-and-forget)
+                // EmailService is scoped and shares this request's DbContext. Await the
+                // notification so it cannot query that context concurrently or outlive
+                // the request scope.
                 if (assignedTo.HasValue)
                 {
-                    _ = Task.Run(async () =>
+                    try
                     {
-                        try
-                        {
-                            await _email.SendTicketAssignedAsync(ticket.TicketId, assignedTo.Value, CancellationToken.None);
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogError(ex, "Failed to send TicketAssigned email for ticket {TicketId}", ticket.TicketId);
-                        }
-                    });
+                        await _email.SendTicketAssignedAsync(ticket.TicketId, assignedTo.Value, ct);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Failed to send TicketAssigned email for ticket {TicketId}", ticket.TicketId);
+                    }
                 }
 
                 var createdAtUtc = ticket.CreatedAt.Kind == DateTimeKind.Utc
@@ -325,67 +324,60 @@ namespace TicketingSystem.Api.Services
                 );
             }
 
-            // Send email notifications (fire-and-forget)
+            // EmailService is scoped and shares this request's DbContext. These calls
+            // must be awaited; Task.Run would use the same context concurrently with
+            // the response queries below and could continue after scope disposal.
             // 1. Reassignment notification
             if ((req.AssignedToUserId.HasValue || req.ClearAssignment == true) && oldAssignedToId != ticket.AssignedToId)
             {
                 if (ticket.AssignedToId.HasValue)
                 {
-                    _ = Task.Run(async () =>
+                    try
                     {
-                        try
-                        {
-                            await _email.SendTicketReassignedAsync(
-                                ticket.TicketId, 
-                                oldAssignedToId, 
-                                ticket.AssignedToId.Value, 
-                                userId, 
-                                CancellationToken.None
-                            );
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogError(ex, "Failed to send TicketReassigned email for ticket {TicketId}", ticket.TicketId);
-                        }
-                    });
+                        await _email.SendTicketReassignedAsync(
+                            ticket.TicketId,
+                            oldAssignedToId,
+                            ticket.AssignedToId.Value,
+                            userId,
+                            ct
+                        );
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Failed to send TicketReassigned email for ticket {TicketId}", ticket.TicketId);
+                    }
                 }
             }
 
             // 2. Ticket resolved notification
             if (req.Status.HasValue && ticket.Status == TicketStatus.Resolved && oldStatus != TicketStatus.Resolved)
             {
-                _ = Task.Run(async () =>
+                try
                 {
-                    try
-                    {
-                        await _email.SendTicketResolvedAsync(ticket.TicketId, userId, CancellationToken.None);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Failed to send TicketResolved email for ticket {TicketId}", ticket.TicketId);
-                    }
-                });
+                    await _email.SendTicketResolvedAsync(ticket.TicketId, userId, ct);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to send TicketResolved email for ticket {TicketId}", ticket.TicketId);
+                }
             }
             // 3. Status changed notification (non-resolution)
             else if (req.Status.HasValue && oldStatus != ticket.Status)
             {
-                _ = Task.Run(async () =>
+                try
                 {
-                    try
-                    {
-                        await _email.SendTicketStatusChangedAsync(
-                            ticket.TicketId, 
-                            (byte)oldStatus, 
-                            (byte)ticket.Status, 
-                            userId, 
-                            CancellationToken.None
-                        );
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Failed to send TicketStatusChanged email for ticket {TicketId}", ticket.TicketId);
-                    }
-                });
+                    await _email.SendTicketStatusChangedAsync(
+                        ticket.TicketId,
+                        (byte)oldStatus,
+                        (byte)ticket.Status,
+                        userId,
+                        ct
+                    );
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to send TicketStatusChanged email for ticket {TicketId}", ticket.TicketId);
+                }
             }
 
             // 4. Priority escalation notification (only if escalating to High or Critical)
@@ -393,23 +385,20 @@ namespace TicketingSystem.Api.Services
                 ticket.Priority >= TicketPriority.High && 
                 oldPriority < TicketPriority.High)
             {
-                _ = Task.Run(async () =>
+                try
                 {
-                    try
-                    {
-                        await _email.SendPriorityEscalatedAsync(
-                            ticket.TicketId, 
-                            (byte)oldPriority, 
-                            (byte)ticket.Priority, 
-                            userId, 
-                            CancellationToken.None
-                        );
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Failed to send PriorityEscalated email for ticket {TicketId}", ticket.TicketId);
-                    }
-                });
+                    await _email.SendPriorityEscalatedAsync(
+                        ticket.TicketId,
+                        (byte)oldPriority,
+                        (byte)ticket.Priority,
+                        userId,
+                        ct
+                    );
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to send PriorityEscalated email for ticket {TicketId}", ticket.TicketId);
+                }
             }
 
             // return full details with capabilities (re-fetch ticket to get updated state)

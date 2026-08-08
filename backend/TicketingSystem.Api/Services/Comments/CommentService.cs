@@ -83,20 +83,19 @@ namespace TicketingSystem.Api.Services
                 userId,
                 ct);
 
-            // Send email notification ONLY for public comments (fire-and-forget)
+            // EmailService is scoped and shares this request's DbContext. Await the
+            // notification so it cannot race with the author query below or outlive
+            // the request scope.
             if (!entity.IsInternal)
             {
-                _ = Task.Run(async () =>
+                try
                 {
-                    try
-                    {
-                        await _email.SendCommentAddedAsync(ticketId, entity.CommentId, userId, CancellationToken.None);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Failed to send CommentAdded email for ticket {TicketId}", ticketId);
-                    }
-                });
+                    await _email.SendCommentAddedAsync(ticketId, entity.CommentId, userId, ct);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to send CommentAdded email for ticket {TicketId}", ticketId);
+                }
             }
 
             var author = await _db.Users
