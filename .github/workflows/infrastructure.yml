@@ -6,11 +6,13 @@ on:
     paths:
       - "aws/**"
       - ".github/workflows/infrastructure.yml"
+      - ".github/workflows/teardown.yml"
   push:
     branches: [main]
     paths:
       - "aws/**"
       - ".github/workflows/infrastructure.yml"
+      - ".github/workflows/teardown.yml"
   workflow_dispatch:
     inputs:
       action:
