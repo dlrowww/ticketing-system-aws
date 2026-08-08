@@ -19,7 +19,7 @@ resource "aws_secretsmanager_secret" "application" {
 
   name                    = "${local.name}/${each.value}"
   description             = "Runtime ${each.value} configuration for ${local.name}; value is populated outside Terraform"
-  recovery_window_in_days = 7
+  recovery_window_in_days = local.effective_application_secrets_recovery_window_in_days
 
   tags = merge(
     local.common_tags,

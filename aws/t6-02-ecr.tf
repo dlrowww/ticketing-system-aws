@@ -14,6 +14,7 @@ resource "aws_ecr_repository" "application" {
 
   name                 = "${local.name}/${each.value}"
   image_tag_mutability = var.ecr_image_tag_mutability
+  force_delete         = local.effective_ecr_force_delete
 
   encryption_configuration {
     encryption_type = "AES256"
@@ -54,4 +55,3 @@ resource "aws_ecr_lifecycle_policy" "application" {
     ]
   })
 }
-

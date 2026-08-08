@@ -19,6 +19,42 @@ variable "ecr_untagged_image_retention_days" {
   default     = 14
 }
 
+variable "ecr_force_delete" {
+  description = "Whether Terraform may delete non-empty ECR repositories. Null enables this automatically only for dev."
+  type        = bool
+  default     = null
+  nullable    = true
+}
+
+variable "application_secrets_recovery_window_in_days" {
+  description = "Secrets Manager deletion recovery window. Null selects 0 days for dev and 7 days for other environments."
+  type        = number
+  default     = null
+  nullable    = true
+
+  validation {
+    condition = var.application_secrets_recovery_window_in_days == null ? true : (
+      var.application_secrets_recovery_window_in_days == 0 ||
+      (
+        var.application_secrets_recovery_window_in_days >= 7 &&
+        var.application_secrets_recovery_window_in_days <= 30
+      )
+    )
+    error_message = "application_secrets_recovery_window_in_days must be 0 or between 7 and 30."
+  }
+}
+
+locals {
+  effective_ecr_force_delete = coalesce(
+    var.ecr_force_delete,
+    var.environment == "dev"
+  )
+  effective_application_secrets_recovery_window_in_days = coalesce(
+    var.application_secrets_recovery_window_in_days,
+    var.environment == "dev" ? 0 : 7
+  )
+}
+
 variable "db_name" {
   description = "Initial PostgreSQL database name."
   type        = string
