@@ -55,7 +55,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: dev
     concurrency:
-      group: ticketing-system-dev-deployment
+      group: ticketing-system-dev-infrastructure
       cancel-in-progress: false
     permissions:
       contents: read
