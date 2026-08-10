@@ -35,5 +35,9 @@ resource "helm_release" "external_secrets" {
   depends_on = [
     aws_eks_node_group.eks_ng_private,
     aws_iam_role_policy_attachment.external_secrets_read,
+    # The AWS Load Balancer Controller registers an admission webhook for
+    # Services. Wait for that webhook to be ready before this chart creates
+    # the External Secrets controller and webhook Services.
+    helm_release.aws_load_balancer_controller,
   ]
 }
