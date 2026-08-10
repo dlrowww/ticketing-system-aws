@@ -140,6 +140,9 @@ fi
 info "Reading ExternalSecret references from Terraform outputs" >&2
 application_secret_names_json="$(terraform_output_json "$terraform_dir" application_secret_names)"
 RDS_MASTER_SECRET_ARN="$(terraform_output_raw "$terraform_dir" rds_master_user_secret_arn)"
+RDS_ADDRESS="$(terraform_output_raw "$terraform_dir" rds_address)"
+RDS_ENDPOINT="$(terraform_output_raw "$terraform_dir" rds_endpoint)"
+RDS_PORT="${RDS_ENDPOINT##*:}"
 DATABASE_NAME="$(terraform_output_raw "$terraform_dir" rds_database_name)"
 JWT_SECRET_NAME="$(jq -er '.jwt' <<<"$application_secret_names_json")" ||
   die "Terraform output application_secret_names does not contain 'jwt'"
@@ -159,22 +162,28 @@ K8S_NAMESPACE="$k8s_namespace"
   die "Invalid Kubernetes namespace: $K8S_NAMESPACE"
 [[ "$AWS_REGION" =~ ^[a-z]{2}(-[a-z0-9]+)+-[0-9]+$ ]] ||
   die "Invalid AWS region: $AWS_REGION"
+[[ ${#RDS_ADDRESS} -le 253 && "$RDS_ADDRESS" =~ ^[A-Za-z0-9]([A-Za-z0-9.-]*[A-Za-z0-9])?$ ]] ||
+  die "RDS address is unsafe for direct template substitution: $RDS_ADDRESS"
+[[ "$RDS_PORT" =~ ^[0-9]{1,5}$ ]] && ((10#$RDS_PORT >= 1 && 10#$RDS_PORT <= 65535)) ||
+  die "Invalid RDS port: $RDS_PORT"
+[[ "$RDS_ENDPOINT" == "$RDS_ADDRESS:$RDS_PORT" ]] ||
+  die "Terraform RDS endpoint does not match its address and port outputs: $RDS_ENDPOINT"
 [[ "$DATABASE_NAME" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]] ||
   die "Database name is unsafe for direct template substitution: $DATABASE_NAME"
 
-export AWS_REGION K8S_NAMESPACE RDS_MASTER_SECRET_ARN DATABASE_NAME
+export AWS_REGION K8S_NAMESPACE RDS_MASTER_SECRET_ARN RDS_ADDRESS RDS_PORT DATABASE_NAME
 export JWT_SECRET_NAME SMTP_SECRET_NAME INITIAL_ADMIN_SECRET_NAME
 
 render_manifest() {
   envsubst \
-    '${AWS_REGION} ${K8S_NAMESPACE} ${RDS_MASTER_SECRET_ARN} ${DATABASE_NAME} ${JWT_SECRET_NAME} ${SMTP_SECRET_NAME} ${INITIAL_ADMIN_SECRET_NAME}' \
+    '${AWS_REGION} ${K8S_NAMESPACE} ${RDS_MASTER_SECRET_ARN} ${RDS_ADDRESS} ${RDS_PORT} ${DATABASE_NAME} ${JWT_SECRET_NAME} ${SMTP_SECRET_NAME} ${INITIAL_ADMIN_SECRET_NAME}' \
     <"$template_file"
 }
 
 validate_rendered_manifest() {
   local manifest_file="$1"
 
-  if grep -Eq '\$\{(AWS_REGION|K8S_NAMESPACE|RDS_MASTER_SECRET_ARN|DATABASE_NAME|JWT_SECRET_NAME|SMTP_SECRET_NAME|INITIAL_ADMIN_SECRET_NAME)\}' "$manifest_file"; then
+  if grep -Eq '\$\{(AWS_REGION|K8S_NAMESPACE|RDS_MASTER_SECRET_ARN|RDS_ADDRESS|RDS_PORT|DATABASE_NAME|JWT_SECRET_NAME|SMTP_SECRET_NAME|INITIAL_ADMIN_SECRET_NAME)\}' "$manifest_file"; then
     die "Rendered manifest still contains unresolved template variables"
   fi
 }
