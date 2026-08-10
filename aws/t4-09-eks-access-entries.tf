@@ -37,8 +37,9 @@ resource "aws_eks_access_policy_association" "github_deployment" {
   }
 }
 
-# Allow the local AWS CLI operator to inspect workloads without granting
-# write access or permissions outside the application namespace.
+# Allow the local AWS CLI operator to troubleshoot workloads, including using
+# kubectl port-forward, without granting permissions outside the application
+# namespace.
 data "aws_iam_user" "local_operator" {
   user_name = "Simon"
 }
@@ -52,7 +53,7 @@ resource "aws_eks_access_entry" "local_operator" {
 resource "aws_eks_access_policy_association" "local_operator" {
   cluster_name  = aws_eks_cluster.eks_cluster.name
   principal_arn = aws_eks_access_entry.local_operator.principal_arn
-  policy_arn    = "arn:${data.aws_partition.current.partition}:eks::aws:cluster-access-policy/AmazonEKSAdminViewPolicy"
+  policy_arn    = "arn:${data.aws_partition.current.partition}:eks::aws:cluster-access-policy/AmazonEKSEditPolicy"
 
   access_scope {
     type       = "namespace"
