@@ -5,6 +5,14 @@ resource "aws_eks_cluster" "eks_cluster" {
   #EKS 控制平面用什么 AWS 身份
   version = var.cluster_version
 
+  # Keep legacy aws-auth compatibility while enabling EKS Access Entries.
+  # The infrastructure role creates the cluster and needs administrator access
+  # during the same apply to install controllers and cluster-scoped resources.
+  access_config {
+    authentication_mode                         = "API_AND_CONFIG_MAP"
+    bootstrap_cluster_creator_admin_permissions = true
+  }
+
   vpc_config {
     subnet_ids = module.vpc.public_subnets
     #表示 EKS 在这些 Subnet 中创建网络接口，用来让 AWS 管理的 Control Plane 与你的 Worker Nodes 通信。
