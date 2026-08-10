@@ -83,6 +83,20 @@ resource "aws_eks_addon" "cloudwatch_observability" {
   addon_name               = "amazon-cloudwatch-observability"
   service_account_role_arn = aws_iam_role.cloudwatch_observability[0].arn
 
+  # Keep Container Insights and container log collection enabled, but do not
+  # auto-instrument every Service-backed workload with Application Signals.
+  # The default injects all supported language runtimes into each workload,
+  # which can prevent instrumented processes from reaching their entry point.
+  configuration_values = jsonencode({
+    manager = {
+      applicationSignals = {
+        autoMonitor = {
+          monitorAllServices = false
+        }
+      }
+    }
+  })
+
   resolve_conflicts_on_create = "OVERWRITE"
   resolve_conflicts_on_update = "PRESERVE"
 
