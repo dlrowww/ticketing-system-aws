@@ -218,11 +218,34 @@ if [[ "$apply_manifest" == true ]]; then
     --for=condition=Ready \
     secretstore/ticketing-system-aws-secrets-manager \
     --timeout="$wait_timeout"
-  kubectl "${kubectl_args[@]}" wait \
+  if ! kubectl "${kubectl_args[@]}" wait \
     --namespace "$k8s_namespace" \
     --for=condition=Ready \
     externalsecret/ticketing-system-runtime \
-    --timeout="$wait_timeout"
+    --timeout="$wait_timeout"; then
+    printf '::error::ExternalSecret ticketing-system-runtime failed to become Ready\n' >&2
+    printf '::group::ExternalSecret status\n'
+    kubectl "${kubectl_args[@]}" get \
+      --namespace "$k8s_namespace" \
+      externalsecret/ticketing-system-runtime \
+      --output yaml || true
+    printf '::endgroup::\n'
+
+    printf '::group::ExternalSecret description\n'
+    kubectl "${kubectl_args[@]}" describe \
+      --namespace "$k8s_namespace" \
+      externalsecret/ticketing-system-runtime || true
+    printf '::endgroup::\n'
+
+    printf '::group::ExternalSecret events\n'
+    kubectl "${kubectl_args[@]}" get events \
+      --namespace "$k8s_namespace" \
+      --field-selector involvedObject.name=ticketing-system-runtime \
+      --sort-by=.lastTimestamp || true
+    printf '::endgroup::\n'
+
+    die "ExternalSecret ticketing-system-runtime synchronization failed"
+  fi
   info "ticketing-system-runtime is synchronized"
 elif [[ -n "$output_file" ]]; then
   output_parent="$(dirname -- "$output_file")"
