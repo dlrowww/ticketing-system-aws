@@ -31,21 +31,13 @@ spec:
       engineVersion: v2
       type: Opaque
       data:
-        connection-string: 'Host={{ .dbHost }};Port={{ .dbPort }};Database=${DATABASE_NAME};Username={{ .dbUsername }};Password="{{ .dbPassword }}";SSL Mode=Require'
+        connection-string: 'Host=${RDS_ADDRESS};Port=${RDS_PORT};Database=${DATABASE_NAME};Username={{ .dbUsername }};Password="{{ .dbPassword }}";SSL Mode=Require'
         jwt-key: '{{ .jwtKey }}'
         smtp-username: '{{ .smtpUsername }}'
         smtp-password: '{{ .smtpPassword }}'
         admin-email: '{{ .adminEmail }}'
         admin-password: '{{ .adminPassword }}'
   data:
-    - secretKey: dbHost
-      remoteRef:
-        key: "${RDS_MASTER_SECRET_ARN}"
-        property: host
-    - secretKey: dbPort
-      remoteRef:
-        key: "${RDS_MASTER_SECRET_ARN}"
-        property: port
     - secretKey: dbUsername
       remoteRef:
         key: "${RDS_MASTER_SECRET_ARN}"
