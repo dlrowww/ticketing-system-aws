@@ -26,12 +26,11 @@ cloudwatch_log_retention_days   = 30
 
 # Pin the operator chart deliberately; review its release notes before upgrades.
 external_secrets_chart_version = "2.7.0"
+external_dns_chart_version     = "1.21.1"
 
 # Enable these two lines only after a real public Route 53 hosted zone exists.
 # route53_zone_id        = "Z0123456789EXAMPLE"
 # application_domain_name = "tickets.example.com"
 
-# Enable this second step only after Kubernetes Ingress creates the ALB.
-# create_route53_alb_record = true
-# alb_dns_name             = "k8s-example-123456.us-east-1.elb.amazonaws.com"
-# alb_zone_id              = "Z35SXDOTRQ7X7K"
+# When both DNS values are set, ExternalDNS automatically observes the Ingress
+# and maintains its Route 53 Alias after the ALB is created.

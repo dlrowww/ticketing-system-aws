@@ -16,22 +16,20 @@ variable "application_domain_name" {
   nullable    = true
 }
 
-variable "create_route53_alb_record" {
-  description = "Create the application Route 53 alias after the Kubernetes Ingress has created its ALB."
-  type        = bool
-  default     = false
+variable "external_dns_namespace" {
+  description = "Kubernetes namespace in which ExternalDNS is installed."
+  type        = string
+  default     = "external-dns"
 }
 
-variable "alb_dns_name" {
-  description = "DNS name of the ALB created by AWS Load Balancer Controller. Required when create_route53_alb_record is true."
+variable "external_dns_service_account_name" {
+  description = "Kubernetes ServiceAccount used by ExternalDNS through IRSA."
   type        = string
-  default     = null
-  nullable    = true
+  default     = "external-dns"
 }
 
-variable "alb_zone_id" {
-  description = "Canonical hosted zone ID of the ALB. Required when create_route53_alb_record is true."
+variable "external_dns_chart_version" {
+  description = "Pinned ExternalDNS Helm chart version."
   type        = string
-  default     = null
-  nullable    = true
+  default     = "1.21.1"
 }

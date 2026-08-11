@@ -1,22 +1,15 @@
 # ============================================================
-# Optional ACM certificate and Route 53 records
+# Optional ACM certificate and Route 53 validation record
 #
 # ACM is created once route53_zone_id and application_domain_name are set.
-# The ALB alias is a second step because the ALB is created later by the
-# Kubernetes AWS Load Balancer Controller.
+# ExternalDNS creates and reconciles the application Alias after Kubernetes
+# AWS Load Balancer Controller publishes the ALB address on the Ingress.
 # ============================================================
 
 locals {
   enable_application_dns = (
     var.route53_zone_id != null &&
     var.application_domain_name != null
-  )
-
-  enable_route53_alb_alias = (
-    local.enable_application_dns &&
-    var.create_route53_alb_record &&
-    var.alb_dns_name != null &&
-    var.alb_zone_id != null
   )
 }
 
@@ -27,20 +20,6 @@ check "application_dns_inputs" {
       (var.route53_zone_id != null && var.application_domain_name != null)
     )
     error_message = "Set route53_zone_id and application_domain_name together, or leave both null."
-  }
-}
-
-check "route53_alb_alias_inputs" {
-  assert {
-    condition = (
-      !var.create_route53_alb_record ||
-      (
-        local.enable_application_dns &&
-        var.alb_dns_name != null &&
-        var.alb_zone_id != null
-      )
-    )
-    error_message = "When create_route53_alb_record is true, application DNS, alb_dns_name, and alb_zone_id must all be set."
   }
 }
 
@@ -79,16 +58,14 @@ resource "aws_acm_certificate_validation" "application" {
   validation_record_fqdns = [aws_route53_record.certificate_validation[0].fqdn]
 }
 
-resource "aws_route53_record" "application" {
-  count = local.enable_route53_alb_alias ? 1 : 0
+# Preserve the existing application Alias while transferring ownership from
+# Terraform to ExternalDNS. After the first apply, Terraform forgets the old
+# resource without deleting the live DNS record; ExternalDNS then reconciles
+# the same endpoint and adds its TXT ownership record.
+removed {
+  from = aws_route53_record.application
 
-  zone_id = var.route53_zone_id
-  name    = var.application_domain_name
-  type    = "A"
-
-  alias {
-    name                   = var.alb_dns_name
-    zone_id                = var.alb_zone_id
-    evaluate_target_health = true
+  lifecycle {
+    destroy = false
   }
 }

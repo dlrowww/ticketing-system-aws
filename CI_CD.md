@@ -99,5 +99,6 @@ push action.
 
 If `route53_zone_id` and `application_domain_name` are configured, Terraform
 outputs the validated ACM certificate and domain. The deployment script renders
-and applies the Ingress automatically. Without both values, it intentionally
-skips Ingress.
+and applies the Ingress automatically. ExternalDNS then creates and maintains
+the Route 53 Alias from the ALB address published on that Ingress. Without both
+values, Terraform skips ACM, ExternalDNS, and the Ingress intentionally.
