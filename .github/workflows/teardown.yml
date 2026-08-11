@@ -143,21 +143,63 @@ jobs:
       - name: Delete Kubernetes application and wait for ALB cleanup
         if: inputs.action == 'destroy' && steps.cluster.outputs.exists == 'true'
         run: |
-          if ! kubectl get namespace ticketing-system >/dev/null 2>&1; then
-            echo "ticketing-system namespace does not exist; continuing with Terraform destroy"
-            exit 0
+          application_domain="$(terraform -chdir=aws output -raw application_domain_name 2>/dev/null || true)"
+          route53_zone_id="$(terraform -chdir=aws output -raw application_route53_zone_id 2>/dev/null || true)"
+
+          if [[ -n "$application_domain" ]] &&
+             ! [[ "$application_domain" =~ ^[A-Za-z0-9.-]+$ ]]; then
+            echo "Unsafe application_domain_name Terraform output" >&2
+            exit 1
           fi
 
-          kubectl delete ingress \
-            --all \
-            --namespace ticketing-system \
-            --ignore-not-found \
-            --wait=true \
-            --timeout=10m
+          if [[ -n "$route53_zone_id" ]] &&
+             ! [[ "$route53_zone_id" =~ ^Z[A-Z0-9]+$ ]]; then
+            echo "Unsafe application_route53_zone_id Terraform output" >&2
+            exit 1
+          fi
 
-          kubectl delete namespace ticketing-system \
-            --wait=true \
-            --timeout=10m
+          if ! kubectl get namespace ticketing-system >/dev/null 2>&1; then
+            echo "ticketing-system namespace does not exist; skipping application resource deletion"
+          else
+            kubectl delete ingress \
+              --all \
+              --namespace ticketing-system \
+              --ignore-not-found \
+              --wait=true \
+              --timeout=10m
+          fi
+
+          if [[ -n "$application_domain" && -n "$route53_zone_id" ]]; then
+            echo "Waiting for ExternalDNS to remove $application_domain records"
+            dns_removed=false
+
+            for attempt in {1..72}; do
+              record_types="$(aws route53 list-resource-record-sets \
+                --hosted-zone-id "$route53_zone_id" \
+                --query "ResourceRecordSets[?Name == '${application_domain}.' && (Type == 'A' || Type == 'AAAA' || Type == 'TXT')].Type" \
+                --output text)"
+
+              if [[ -z "$record_types" || "$record_types" == "None" ]]; then
+                echo "ExternalDNS records have been removed"
+                dns_removed=true
+                break
+              fi
+
+              echo "Attempt $attempt/72: records still present: $record_types"
+              sleep 5
+            done
+
+            if [[ "$dns_removed" != "true" ]]; then
+              echo "ExternalDNS did not remove the application DNS records within 6 minutes; refusing to destroy the controller and cluster" >&2
+              exit 1
+            fi
+          fi
+
+          if kubectl get namespace ticketing-system >/dev/null 2>&1; then
+            kubectl delete namespace ticketing-system \
+              --wait=true \
+              --timeout=10m
+          fi
 
       - name: Apply destroy plan
         if: inputs.action == 'destroy'

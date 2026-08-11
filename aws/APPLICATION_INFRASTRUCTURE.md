@@ -104,8 +104,10 @@ t7  External Secrets Operator
 
 t8  DNS and TLS
     t8-01  variables
-    t8-02  ACM and Route 53
+    t8-02  ACM and Route 53 validation
     t8-03  outputs
+    t8-04  ExternalDNS IAM / IRSA
+    t8-05  ExternalDNS Helm release
 
 t9  Observability
     t9-01  variables
@@ -116,19 +118,18 @@ t9  Observability
 Terraform still loads every `.tf` file as one configuration. These stage names
 document responsibility and dependency flow; they do not control apply order.
 
-## DNS deployment is intentionally two-phase
+## DNS deployment is automatic after the Ingress exists
 
-The AWS Load Balancer Controller creates the ALB only after the application
-Ingress exists, so Terraform cannot know the ALB address during the first
-infrastructure apply.
+Set `route53_zone_id` and `application_domain_name`, then apply Terraform. This
+creates and validates the ACM certificate and installs ExternalDNS with an IRSA
+role restricted to that Route 53 hosted zone. The Application workflow renders
+the certificate and hostname into the Ingress. AWS Load Balancer Controller
+then creates the ALB, and ExternalDNS automatically reconciles the Ingress host
+to a Route 53 Alias plus its ownership TXT record.
 
-1. Set `route53_zone_id` and `application_domain_name`, then apply Terraform.
-   Use the `acm_certificate_arn` output in the Kubernetes ALB Ingress.
-2. Deploy the Ingress and wait for the controller to create the ALB.
-3. Read the ALB DNS name and canonical hosted zone ID.
-4. Set `create_route53_alb_record`, `alb_dns_name`, and `alb_zone_id`, then
-   apply Terraform again.
-
+No ALB DNS name or canonical hosted zone ID needs to be copied into Terraform.
+The existing Terraform-managed Alias is preserved during the first migration
+apply and then reconciled by ExternalDNS, avoiding a DNS deletion window.
 See `terraform.tfvars.example` for the expected variables.
 
 ## Before applying
