@@ -29,7 +29,6 @@ resource "helm_release" "external_dns" {
       }
 
       sources            = ["ingress"]
-      #domainFilters      = [var.application_domain_name]
       policy             = "sync"
       registry           = "txt"
       txtOwnerId         = "${local.name}-external-dns"
